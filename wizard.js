@@ -71,7 +71,7 @@ window.esailsWizard = (function () {
     },
 
     vensterfolie: { id: "ID_VENSTERFOLIE", naam: "Premium Vensterfolie 0.5mm (120cm breed)", prijs: 14.95, unit: "meter" },
-    trekband:     { id: "ID_TREKBAND_SET", naam: "Trekbandset: 1m Polyester 1366 band (25mm) + RVS klemgesp", prijs: 9.95, unit: "set" },
+    trekband:     { id: "ID_TREKBAND_SET", naam: "Trekbandset: 1m Polyester 1366 band (25mm) + klemgesp", prijs: 9.95, unit: "set" },
     bandbeugel: {
       kunststof_zwart: { id: "ID_BEUGEL_KS_ZWART", naam: "Bandbeugel kunststof - Zwart", prijs: 1.95 },
       kunststof_wit:   { id: "ID_BEUGEL_KS_WIT",   naam: "Bandbeugel kunststof - Wit", prijs: 1.95 },
