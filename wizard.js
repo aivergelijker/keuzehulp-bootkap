@@ -225,8 +225,8 @@ window.esailsWizard = (function () {
       '<h3>Kies de prestatieklasse van het doek</h3>' +
       '<div class="esails-card-grid">' +
         cardBadge('doek_type','premium_acryl','Meest gekozen','Premium Maritiem Acryl','Luxe geweven look, ademend (voorkomt schimmel), extreme UV-stabiliteit en kleurvastheid.') +
-        cardSimpleDesc('doek_type','heavy_pvc','Heavy-Duty PVC','100% waterdicht vrachtwagenzeil-kwaliteit. Oersterk, vlekbestendig en eenvoudig afneembaar.') +
-        cardBadge('doek_type','polyester_comfort','Budget','Lichtgewicht Polyester','Soepel, compact op te vouwen en zeer hanteerbaar. Iets minder hoogwaardig, ideaal voor lichtere zomerafdekking.') +
+        cardBadgePlaceholder('doek_type','heavy_pvc','Heavy-Duty PVC','100% waterdicht vrachtwagenzeil-kwaliteit. Oersterk, vlekbestendig en eenvoudig afneembaar.') +
+        cardBadge('doek_type','polyester_comfort','Budget','Lichtgewicht Polyester','Soepel, compact op te vouwen en zeer hanteerbaar. Iets minder hoogwaardig, ideaal voor lichtere zomerafdekking.','esails-badge-budget') +
       '</div>' +
     '</div>' +
 
@@ -314,7 +314,7 @@ window.esailsWizard = (function () {
         pill('trekband_beugel','kunststof_zwart','Kunststof zwart') +
         pill('trekband_beugel','kunststof_wit','Kunststof wit') +
         pill('trekband_beugel','rvs','RVS (luxe)') + '</div>' +
-      '<p class="esails-sub-note">1 set = 1 meter band + 1 RVS klemgesp.</p>' +
+      '<p class="esails-sub-note">1 set = 1 meter band + 1 klemgesp.</p>' +
     '</div>';
   }
   function loxxSubHTML() {
@@ -348,8 +348,7 @@ window.esailsWizard = (function () {
       '<div class="esails-sub-row"><span class="esails-sub-label">Gereedschap:</span>' +
         toggle('zeil_holpijp','Holpijp') + toggle('zeil_stansblok','Stansblok') + '</div>' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Carmo zeilkous kleur:</span>' +
-        pill('carmo_kleur','wit','Wit') + '</div>' +
-      '<p class="esails-sub-note">Carmo kunststof zeilkousen worden in het doek geplaatst — kies een kleur zodat duidelijk is dat je kousen bestelt (en gereedschap nodig hebt).</p></div>';
+        pill('carmo_kleur','wit','Wit') + '</div></div>';
   }
 
   /* ---------- bouwstenen ---------- */
@@ -363,9 +362,14 @@ window.esailsWizard = (function () {
   function cardSimpleDesc(key, val, titel, tekst) {
     return '<div class="esails-selection-card" data-key="' + key + '" data-value="' + val + '"><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
   }
-  function cardBadge(key, val, badge, titel, tekst) {
+  function cardBadge(key, val, badge, titel, tekst, extraClass) {
+    var cls = 'esails-badge' + (extraClass ? ' ' + extraClass : '');
     return '<div class="esails-selection-card" data-key="' + key + '" data-value="' + val + '">' +
-      '<span class="esails-badge">' + badge + '</span><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
+      '<span class="' + cls + '">' + badge + '</span><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
+  }
+  function cardBadgePlaceholder(key, val, titel, tekst) {
+    return '<div class="esails-selection-card" data-key="' + key + '" data-value="' + val + '">' +
+      '<span class="esails-badge esails-badge-placeholder">&nbsp;</span><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
   }
   function colorCard(val, hex, titel, extraStyle) {
     return '<div class="esails-color-card" data-key="kleur" data-value="' + val + '">' +
@@ -662,7 +666,7 @@ window.esailsWizard = (function () {
         state.rits_aantal, 'Deelbare rits voor achterdeur of oprolbaar deel.');
     }
     if (state.extra_trekbandjes) {
-      addLine('trekband', CONFIG.trekband, state.trekband_sets, '1 set = 1 meter band + 1 RVS klemgesp.');
+      addLine('trekband', CONFIG.trekband, state.trekband_sets, '1 set = 1 meter band + 1 klemgesp.');
       if (state.trekband_beugel) {
         var beugelObj = CONFIG.bandbeugel[state.trekband_beugel];
         addLine('bandbeugel', { id: beugelObj.id, naam: beugelObj.naam, prijs: beugelObj.prijs, unit: 'stuks' },
