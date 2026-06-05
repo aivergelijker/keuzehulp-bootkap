@@ -103,8 +103,8 @@ window.esailsWizard = (function () {
     drukknoop: {
       ykk:    { id: "ID_DRUK_YKK",    naam: "Drukknoop RVS - YKK", prijs: 1.20 },
       dot:    { id: "ID_DRUK_DOT",    naam: "Drukknoop RVS - DOT", prijs: 1.25 },
-      fasnap: { id: "ID_DRUK_FASNAP", naam: "Drukknoop Fasnap", prijs: 1.40 },
-      prym:   { id: "ID_DRUK_PRYM",   naam: "Drukknoop Prym", prijs: 1.35 }
+      fasnap: { id: "ID_DRUK_FASNAP", naam: "Drukknoop Fasnap (koper/vernikkeld)", prijs: 1.40 },
+      prym:   { id: "ID_DRUK_PRYM",   naam: "Drukknoop Prym (antraciet)", prijs: 1.35 }
     },
 
     zeilkous_carmo: {
