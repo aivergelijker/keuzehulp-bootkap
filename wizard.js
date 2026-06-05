@@ -72,15 +72,30 @@ window.esailsWizard = (function () {
 
     vensterfolie: { id: "ID_VENSTERFOLIE", naam: "Premium Vensterfolie 0.5mm (120cm breed)", prijs: 14.95, unit: "meter" },
     trekband:     { id: "ID_TREKBAND_SET", naam: "Trekbandset: 1m Polyester 1366 band (25mm) + RVS klemgesp", prijs: 9.95, unit: "set" },
+    bandbeugel: {
+      kunststof_zwart: { id: "ID_BEUGEL_KS_ZWART", naam: "Bandbeugel kunststof - Zwart", prijs: 1.95 },
+      kunststof_wit:   { id: "ID_BEUGEL_KS_WIT",   naam: "Bandbeugel kunststof - Wit", prijs: 1.95 },
+      rvs:             { id: "ID_BEUGEL_RVS",       naam: "Bandbeugel RVS (luxe)", prijs: 4.95 }
+    },
 
     loxx: {
       rvs:   { id: "ID_LOXX_RVS",   naam: "Loxx drukknoop RVS", prijs: 3.95 },
       koper: { id: "ID_LOXX_KOPER", naam: "Loxx drukknoop Koper/Vernikkeld", prijs: 4.50 }
     },
+    loxx_schroef: {
+      zelftapper: { id: "ID_LOXX_ZELFTAPPER", naam: "Loxx bevestiging - Zelftapper (schroef)", prijs: 0.65 },
+      bout_moer:  { id: "ID_LOXX_BOUTMOER",   naam: "Loxx bevestiging - Bout en moer", prijs: 0.95 }
+    },
 
     draaisluiting: {
-      prym: { id: "ID_DRAAI_PRYM", naam: "Draaisluiting Prym Koper-vernikkeld (zilverkleurig)", prijs: 2.25 },
-      mh:   { id: "ID_DRAAI_MH",   naam: "Draaisluiting MH Messing (goudkleurig)", prijs: 2.50 }
+      prym: {
+        koper:   { id: "ID_DRAAI_PRYM_KOPER",   naam: "Draaisluiting Prym - Koper-Vernikkeld (zilver)", prijs: 2.25 },
+        messing: { id: "ID_DRAAI_PRYM_MESSING", naam: "Draaisluiting Prym - Messing (goud)", prijs: 2.40 }
+      },
+      mh: {
+        koper:   { id: "ID_DRAAI_MH_KOPER",   naam: "Draaisluiting MH - Koper-Vernikkeld (zilver)", prijs: 2.50 },
+        messing: { id: "ID_DRAAI_MH_MESSING", naam: "Draaisluiting MH - Messing (goud)", prijs: 2.65 }
+      }
     },
     draai_kous: { id: "ID_DRAAI_KOUS", naam: "Zeilkous voor draaisluiting", prijs: 0.65 },
     draai_ring: { id: "ID_DRAAI_RING", naam: "Tegenring voor draaisluiting", prijs: 0.45 },
@@ -92,7 +107,9 @@ window.esailsWizard = (function () {
       prym:   { id: "ID_DRUK_PRYM",   naam: "Drukknoop Prym (antraciet)", prijs: 1.35 }
     },
 
-    zeilkous_carmo: { id: "ID_CARMO_KOUS", naam: "Carmo kunststof zeilkous", prijs: 0.55 },
+    zeilkous_carmo: {
+      wit: { id: "ID_CARMO_WIT", naam: "Carmo kunststof zeilkous - Wit", prijs: 0.55 }
+    },
     holpijp:        { id: "ID_HOLPIJP",    naam: "Holpijp (om gaten te slaan)", prijs: 12.95 },
     stansblok:      { id: "ID_STANSBLOK",  naam: "Stansblok (slagonderlegger)", prijs: 9.95 },
     koord: {
@@ -111,6 +128,12 @@ window.esailsWizard = (function () {
     rvs:   [{ key: "ykk", label: "YKK" }, { key: "dot", label: "DOT" }],
     koper: [{ key: "fasnap", label: "Fasnap (koper/vernikkeld)" }, { key: "prym", label: "Prym (antraciet)" }]
   };
+
+  /* Draaisluiting: uitvoering is voor beide merken gelijk */
+  var DRAAI_UITVOERINGEN = [
+    { key: "koper", label: "Koper-Vernikkeld (zilver)" },
+    { key: "messing", label: "Messing (goud)" }
+  ];
 
   var RITS_LENGTES = ["1.5", "2", "2.5", "3", "3.5", "4", "6"];
 
@@ -137,15 +160,19 @@ window.esailsWizard = (function () {
       rits_aantal: 1,
       extra_trekbandjes: false,
       trekband_sets: 1,
+      trekband_beugel: null,   // 'kunststof_zwart' | 'kunststof_wit' | 'rvs'
 
       bevestiging: null,
       loxx_materiaal: null,
-      draai_merk: null,
+      loxx_schroef: null,      // 'zelftapper' | 'bout_moer'
+      draai_merk: null,        // 'prym' | 'mh'
+      draai_uitvoering: null,  // 'koper' | 'messing'
       druk_materiaal: null,
       druk_merk: null,
       koord_kleur: null,
       koord_dikte: null,
       rijgknop_type: null,
+      carmo_kleur: null,       // 'wit'
       zeil_holpijp: false,
       zeil_stansblok: false,
 
@@ -217,7 +244,7 @@ window.esailsWizard = (function () {
           '<strong>Bijpassend garen bestellen?</strong>' +
           '<span>Professioneel UV-bestendig zeilmakersgaren in de kleur van je doek. Aanbevolen.</span>' +
         '</div>' +
-        '<button type="button" class="esails-pill esails-toggle active" data-toggle="wil_garen">Garen toevoegen</button>' +
+        '<button type="button" class="esails-pill esails-toggle active" data-toggle="wil_garen"><span class="esails-check">✓</span> Garen toevoegen</button>' +
       '</div>' +
     '</div>' +
 
@@ -227,7 +254,7 @@ window.esailsWizard = (function () {
       '<div class="esails-card-grid">' +
         multiCard('extra_ramen','🪟','Premium Raamfolie','Voeg hoogwaardige, UV-gestabiliseerde vensterfolie toe voor optimaal zicht.') +
         multiCardSub('extra_ritsen','🤐','Ritsen','Deelbare ritsen voor een achterdeur of oprolbare delen.', ritsenSubHTML()) +
-        multiCardSub('extra_trekbandjes','🎗️','Trekbandjes met Gespen','Polyester 1366 band (25mm) + RVS klemgesp. 1 set = 1 meter band + 1 gesp.', trekbandSubHTML()) +
+        multiCardSub('extra_trekbandjes','🎗️','Trekbandjes met Gespen','Polyester 1366 band (25mm) met RVS klemgesp om de kap strak te fixeren.', trekbandSubHTML()) +
       '</div>' +
     '</div>' +
 
@@ -283,17 +310,25 @@ window.esailsWizard = (function () {
   function trekbandSubHTML() {
     return '<div class="esails-sub">' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Aantal sets:</span>' + stepper('trekband_sets', 1) + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Bandbeugel (op boot/dek):</span>' +
+        pill('trekband_beugel','kunststof_zwart','Kunststof zwart') +
+        pill('trekband_beugel','kunststof_wit','Kunststof wit') +
+        pill('trekband_beugel','rvs','RVS (luxe)') + '</div>' +
+      '<p class="esails-sub-note">1 set = 1 meter band + 1 RVS klemgesp.</p>' +
     '</div>';
   }
   function loxxSubHTML() {
     return '<div class="esails-sub">' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Materiaal:</span>' +
-        pill('loxx_materiaal','rvs','RVS') + pill('loxx_materiaal','koper','Koper/Vernikkeld') + '</div></div>';
+        pill('loxx_materiaal','rvs','RVS') + pill('loxx_materiaal','koper','Koper/Vernikkeld') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Bevestiging:</span>' +
+        pill('loxx_schroef','zelftapper','Zelftapper (schroef)') + pill('loxx_schroef','bout_moer','Bout en moer') + '</div></div>';
   }
   function draaiSubHTML() {
     return '<div class="esails-sub">' +
-      '<div class="esails-sub-row"><span class="esails-sub-label">Type:</span>' +
-        pill('draai_merk','prym','Prym (zilverkleurig)') + pill('draai_merk','mh','MH Messing (goudkleurig)') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Merk:</span>' +
+        pill('draai_merk','prym','Prym') + pill('draai_merk','mh','MH') + '</div>' +
+      '<div class="esails-sub-row" id="esailsDraaiUitvRow" style="display:none;"><span class="esails-sub-label">Uitvoering:</span><span id="esailsDraaiUitvOpts"></span></div>' +
       '<p class="esails-sub-note">Kousen en tegenringen worden automatisch meegeleverd.</p></div>';
   }
   function drukSubHTML() {
@@ -312,7 +347,9 @@ window.esailsWizard = (function () {
         pill('rijgknop_type','rondknop','Rondknop (kunststof)') + pill('rijgknop_type','noorse','Noorse knop (RVS)') + '</div>' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Gereedschap:</span>' +
         toggle('zeil_holpijp','Holpijp') + toggle('zeil_stansblok','Stansblok') + '</div>' +
-      '<p class="esails-sub-note">Carmo kunststof zeilkousen worden automatisch meegeleverd.</p></div>';
+      '<div class="esails-sub-row"><span class="esails-sub-label">Carmo zeilkous kleur:</span>' +
+        pill('carmo_kleur','wit','Wit') + '</div>' +
+      '<p class="esails-sub-note">Carmo kunststof zeilkousen worden in het doek geplaatst — kies een kleur zodat duidelijk is dat je kousen bestelt (en gereedschap nodig hebt).</p></div>';
   }
 
   /* ---------- bouwstenen ---------- */
@@ -440,6 +477,7 @@ window.esailsWizard = (function () {
     for (var i = 0; i < siblings.length; i++) siblings[i].classList.remove('active');
     btn.classList.add('active');
     if (subKey === 'druk_materiaal') { state.druk_merk = null; renderDrukMerken(subVal); }
+    if (subKey === 'draai_merk') { state.draai_uitvoering = null; renderDraaiUitvoeringen(); }
     evaluateNavButtons();
   }
 
@@ -447,7 +485,22 @@ window.esailsWizard = (function () {
     var key = btn.getAttribute('data-toggle');
     state[key] = !state[key];
     btn.classList.toggle('active', state[key]);
+    if (key === 'wil_garen') updateGarenButton(btn);
     evaluateNavButtons();
+  }
+
+  function updateGarenButton(btn) {
+    if (!btn) btn = root.querySelector('[data-toggle="wil_garen"]');
+    if (!btn) return;
+    if (state.wil_garen) {
+      btn.classList.add('active');
+      btn.classList.remove('esails-toggle-off');
+      btn.innerHTML = '<span class="esails-check">✓</span> Garen toevoegen';
+    } else {
+      btn.classList.remove('active');
+      btn.classList.add('esails-toggle-off');
+      btn.innerHTML = '<span class="esails-cross">✕</span> Geen garen';
+    }
   }
 
   function onStepper(key, delta) {
@@ -468,6 +521,18 @@ window.esailsWizard = (function () {
     for (var i = 0; i < merken.length; i++) h += pill('druk_merk', merken[i].key, merken[i].label);
     opts.innerHTML = h;
     row.style.display = merken.length ? 'flex' : 'none';
+  }
+
+  function renderDraaiUitvoeringen() {
+    var row = $('esailsDraaiUitvRow');
+    var opts = $('esailsDraaiUitvOpts');
+    if (!row || !opts) return;
+    var h = '';
+    for (var i = 0; i < DRAAI_UITVOERINGEN.length; i++) {
+      h += pill('draai_uitvoering', DRAAI_UITVOERINGEN[i].key, DRAAI_UITVOERINGEN[i].label);
+    }
+    opts.innerHTML = h;
+    row.style.display = 'flex';
   }
 
   function updateSliderLabel(which, val) {
@@ -501,10 +566,10 @@ window.esailsWizard = (function () {
   }
   function step6Valid() {
     if (!state.bevestiging) return false;
-    if (state.bevestiging === 'loxx') return !!state.loxx_materiaal;
-    if (state.bevestiging === 'draaisluiting') return !!state.draai_merk;
+    if (state.bevestiging === 'loxx') return !!state.loxx_materiaal && !!state.loxx_schroef;
+    if (state.bevestiging === 'draaisluiting') return !!state.draai_merk && !!state.draai_uitvoering;
     if (state.bevestiging === 'drukknoop') return !!state.druk_materiaal && !!state.druk_merk;
-    if (state.bevestiging === 'zeiloog_koord') return !!state.koord_kleur && !!state.koord_dikte && !!state.rijgknop_type;
+    if (state.bevestiging === 'zeiloog_koord') return !!state.koord_kleur && !!state.koord_dikte && !!state.rijgknop_type && !!state.carmo_kleur;
     return false;
   }
 
@@ -598,6 +663,11 @@ window.esailsWizard = (function () {
     }
     if (state.extra_trekbandjes) {
       addLine('trekband', CONFIG.trekband, state.trekband_sets, '1 set = 1 meter band + 1 RVS klemgesp.');
+      if (state.trekband_beugel) {
+        var beugelObj = CONFIG.bandbeugel[state.trekband_beugel];
+        addLine('bandbeugel', { id: beugelObj.id, naam: beugelObj.naam, prijs: beugelObj.prijs, unit: 'stuks' },
+          state.trekband_sets, 'Bandbeugel om op de boot/dek te bevestigen.');
+      }
     }
 
     var basis = Math.ceil((state.boot_lengte + state.boot_breedte) * 2);
@@ -606,8 +676,10 @@ window.esailsWizard = (function () {
     if (state.bevestiging === 'loxx') {
       var loxxObj = CONFIG.loxx[state.loxx_materiaal];
       addLine('loxx', { id: loxxObj.id, naam: loxxObj.naam, prijs: loxxObj.prijs, unit: 'stuks' }, basis, 'Zelfborgende Loxx drukknopen.');
+      var schroefObj = CONFIG.loxx_schroef[state.loxx_schroef];
+      addLine('loxx_schroef', { id: schroefObj.id, naam: schroefObj.naam, prijs: schroefObj.prijs, unit: 'stuks' }, basis, 'Bevestigingsmateriaal voor de Loxx-onderdelen.');
     } else if (state.bevestiging === 'draaisluiting') {
-      var draaiObj = CONFIG.draaisluiting[state.draai_merk];
+      var draaiObj = CONFIG.draaisluiting[state.draai_merk][state.draai_uitvoering];
       var draaiAantal = Math.ceil(basis * 0.8);
       addLine('draaisluiting', { id: draaiObj.id, naam: draaiObj.naam, prijs: draaiObj.prijs, unit: 'stuks' }, draaiAantal, 'Traditionele draaier.');
       addLine('draai_kous', CONFIG.draai_kous, draaiAantal, 'Bijbehorende kous in het doek.');
@@ -619,7 +691,7 @@ window.esailsWizard = (function () {
       var koordObj = CONFIG.koord[state.koord_kleur + '_' + state.koord_dikte];
       var koordMeters = Math.ceil((state.boot_lengte + state.boot_breedte) * 2.5);
       addLine('koord', { id: koordObj.id, naam: koordObj.naam, prijs: koordObj.prijs, unit: 'meter' }, koordMeters, 'Elastisch schokkoord langs de rand.');
-      addLine('carmo_kous', CONFIG.zeilkous_carmo, basis, 'Carmo kunststof zeilkousen in het doek.');
+      addLine('carmo_kous', CONFIG.zeilkous_carmo[state.carmo_kleur], basis, 'Carmo kunststof zeilkousen in het doek.');
       var knopObj = CONFIG.rijgknop[state.rijgknop_type];
       addLine('rijgknop', { id: knopObj.id, naam: knopObj.naam, prijs: knopObj.prijs, unit: 'stuks' }, basis, 'Knoppen op de boot om het koord omheen te rijgen.');
       if (state.zeil_holpijp) addLine('holpijp', CONFIG.holpijp, 1, 'Voor het slaan van de gaten.');
