@@ -1,16 +1,22 @@
 /* =====================================================================
-   eSails Bootkap Keuzehulp  -  Custom JavaScript
+   eSails Bootkap Keuzehulp  -  wizard.js  (v2)
    ---------------------------------------------------------------------
-   Deze code bouwt de VOLLEDIGE wizard zelf op binnen #esails-wizard-mount.
-   Daardoor maakt het niet meer uit of de CMS-editor lange HTML afkapt:
-   in de CMS-pagina staat alleen een kort, onafkapbaar <div>.
+   Wijzigingen t.o.v. v1:
+   - Geen auto-scroll meer bij stapwissel (pagina blijft rustig staan).
+   - Stap 2: breedte toegevoegd; doekberekening o.b.v. doekbreedte 152cm.
+   - Microvezel-doekenset NIET meer automatisch toegevoegd.
+   - Stap 5 ritsen: keuze bloktand/spiraal + lengte + aantal (uitklappend).
+   - Stap 5 trekbandjes: aantal sets (1 set = 1m band + 1 RVS klemgesp).
+   - Stap 6 bevestiging: sub-opties klappen uit onder de gekozen kaart.
+   - "Lichtgewicht Polyester" krijgt een budget-label.
 
-   TE DOEN: vervang in CONFIG hieronder elke "id" met een echt
-   Lightspeed product-ID (een getal, te vinden in de product-URL in je
-   back office). Placeholders beginnen met "ID_".
+   TE DOEN: vervang elke "id" (ID_...) en placeholder-prijs door de echte
+   Lightspeed product-ID's en prijzen in CONFIG hieronder.
    ===================================================================== */
 window.esailsWizard = (function () {
   "use strict";
+
+  var DOEK_BREEDTE_CM = 152; // standaard doekbreedte voor meterberekening
 
   /* -------------------- CONFIGURATIE -------------------- */
   var CONFIG = {
@@ -34,21 +40,73 @@ window.esailsWizard = (function () {
         ecru:      { id: "ID_POLY_ECRU",  naam: "eSails Comfort Polyester - Ecru", prijs: 24.95, unit: "meter" }
       }
     },
-    fournituren: {
-      tenax_knop:      { id: "ID_TENAX_KNOP", naam: "Tenax Knop Bovendeel (RVS)", prijs: 2.50, unit: "stuks" },
-      tenax_schroef:   { id: "ID_TENAX_SCHROEF", naam: "Tenax Zelftappende Schroef 16mm", prijs: 1.50, unit: "stuks" },
-      tenax_sleutel:   { id: "ID_TENAX_SLEUTEL", naam: "Tenax Montagesleutel (Onmisbaar)", prijs: 4.95, unit: "stuks" },
-      draaisluiting:   { id: "ID_DRAAI_SLUITING", naam: "Traditionele Draaisluiting Messing", prijs: 1.95, unit: "stuks" },
-      dot_drukknoop:   { id: "ID_DOT_DRUKKNOOP", naam: "DOT Drukknoop Set RVS", prijs: 1.20, unit: "stuks" },
-      zeiloog_set:     { id: "ID_ZEILOOG_SET", naam: "Messing Zeilringen + Stempelset", prijs: 14.95, unit: "stuks" },
-      elastisch_koord: { id: "ID_ELASTISCH_KOORD", naam: "Elastisch Schokkoord 6mm", prijs: 2.25, unit: "meter" },
-      garen:           { id: "ID_GAREN_MATCH", naam: "Zeilmakersgaren UV-bestendig", prijs: 18.50, unit: "klos" },
-      vensterfolie:    { id: "ID_VENSTERFOLIE", naam: "Premium Vensterfolie 0.5mm (120cm breed)", prijs: 14.95, unit: "meter" },
-      ykk_rits:        { id: "ID_YKK_RITS", naam: "YKK Heavy-Duty Deelbare Rits 200cm", prijs: 14.95, unit: "stuks" },
-      trekbandjes:     { id: "ID_TREKBANDJES", naam: "Trekbandjes met RVS gespen set", prijs: 9.95, unit: "set" },
-      microvezel:      { id: "ID_MICROVEZEL", naam: "eSails Premium Microvezel Doekenset", prijs: 12.95, unit: "set" }
+
+    garen: { id: "ID_GAREN_MATCH", naam: "Zeilmakersgaren UV-bestendig", prijs: 18.50, unit: "klos" },
+
+    ritsen: {
+      bloktand: {
+        "1.5": { id: "ID_RITS_BLOK_150", naam: "Bloktand rits 1,5m", prijs: 11.95 },
+        "2":   { id: "ID_RITS_BLOK_200", naam: "Bloktand rits 2,0m", prijs: 13.95 },
+        "2.5": { id: "ID_RITS_BLOK_250", naam: "Bloktand rits 2,5m", prijs: 15.95 },
+        "3":   { id: "ID_RITS_BLOK_300", naam: "Bloktand rits 3,0m", prijs: 17.95 },
+        "3.5": { id: "ID_RITS_BLOK_350", naam: "Bloktand rits 3,5m", prijs: 19.95 },
+        "4":   { id: "ID_RITS_BLOK_400", naam: "Bloktand rits 4,0m", prijs: 21.95 },
+        "6":   { id: "ID_RITS_BLOK_600", naam: "Bloktand rits 6,0m", prijs: 29.95 }
+      },
+      spiraal: {
+        "1.5": { id: "ID_RITS_SPIR_150", naam: "Spiraalrits 1,5m", prijs: 9.95 },
+        "2":   { id: "ID_RITS_SPIR_200", naam: "Spiraalrits 2,0m", prijs: 11.95 },
+        "2.5": { id: "ID_RITS_SPIR_250", naam: "Spiraalrits 2,5m", prijs: 13.95 },
+        "3":   { id: "ID_RITS_SPIR_300", naam: "Spiraalrits 3,0m", prijs: 15.95 },
+        "3.5": { id: "ID_RITS_SPIR_350", naam: "Spiraalrits 3,5m", prijs: 17.95 },
+        "4":   { id: "ID_RITS_SPIR_400", naam: "Spiraalrits 4,0m", prijs: 19.95 },
+        "6":   { id: "ID_RITS_SPIR_600", naam: "Spiraalrits 6,0m", prijs: 27.95 }
+      }
+    },
+
+    vensterfolie: { id: "ID_VENSTERFOLIE", naam: "Premium Vensterfolie 0.5mm (120cm breed)", prijs: 14.95, unit: "meter" },
+    trekband:     { id: "ID_TREKBAND_SET", naam: "Trekbandset: 1m Polyester 1366 band (25mm) + RVS klemgesp", prijs: 9.95, unit: "set" },
+
+    loxx: {
+      rvs:   { id: "ID_LOXX_RVS",   naam: "Loxx drukknoop RVS", prijs: 3.95 },
+      koper: { id: "ID_LOXX_KOPER", naam: "Loxx drukknoop Koper/Vernikkeld", prijs: 4.50 }
+    },
+
+    draaisluiting: {
+      prym: { id: "ID_DRAAI_PRYM", naam: "Draaisluiting Prym Koper-vernikkeld (zilverkleurig)", prijs: 2.25 },
+      mh:   { id: "ID_DRAAI_MH",   naam: "Draaisluiting MH Messing (goudkleurig)", prijs: 2.50 }
+    },
+    draai_kous: { id: "ID_DRAAI_KOUS", naam: "Zeilkous voor draaisluiting", prijs: 0.65 },
+    draai_ring: { id: "ID_DRAAI_RING", naam: "Tegenring voor draaisluiting", prijs: 0.45 },
+
+    drukknoop: {
+      ykk:    { id: "ID_DRUK_YKK",    naam: "Drukknoop RVS - YKK", prijs: 1.20 },
+      dot:    { id: "ID_DRUK_DOT",    naam: "Drukknoop RVS - DOT", prijs: 1.25 },
+      fasnap: { id: "ID_DRUK_FASNAP", naam: "Drukknoop Fasnap (koper/vernikkeld)", prijs: 1.40 },
+      prym:   { id: "ID_DRUK_PRYM",   naam: "Drukknoop Prym (antraciet)", prijs: 1.35 }
+    },
+
+    zeilkous_carmo: { id: "ID_CARMO_KOUS", naam: "Carmo kunststof zeilkous", prijs: 0.55 },
+    holpijp:        { id: "ID_HOLPIJP",    naam: "Holpijp (om gaten te slaan)", prijs: 12.95 },
+    stansblok:      { id: "ID_STANSBLOK",  naam: "Stansblok (slagonderlegger)", prijs: 9.95 },
+    koord: {
+      wit_6:   { id: "ID_KOORD_WIT_6",   naam: "Elastisch koord 6mm - Wit", prijs: 2.25 },
+      wit_8:   { id: "ID_KOORD_WIT_8",   naam: "Elastisch koord 8mm - Wit", prijs: 2.75 },
+      zwart_6: { id: "ID_KOORD_ZWART_6", naam: "Elastisch koord 6mm - Zwart", prijs: 2.25 },
+      zwart_8: { id: "ID_KOORD_ZWART_8", naam: "Elastisch koord 8mm - Zwart", prijs: 2.75 }
+    },
+    rijgknop: {
+      rondknop: { id: "ID_RONDKNOP",    naam: "Rondknop (kunststof)", prijs: 0.75 },
+      noorse:   { id: "ID_NOORSE_KNOP", naam: "Noorse knop (RVS)", prijs: 1.95 }
     }
   };
+
+  var DRUK_MERKEN = {
+    rvs:   [{ key: "ykk", label: "YKK" }, { key: "dot", label: "DOT" }],
+    koper: [{ key: "fasnap", label: "Fasnap (koper/vernikkeld)" }, { key: "prym", label: "Prym (antraciet)" }]
+  };
+
+  var RITS_LENGTES = ["1.5", "2", "2.5", "3", "3.5", "4", "6"];
 
   var TOTAL_INPUT_STEPS = 6;
   var RESULT_STEP = 7;
@@ -57,15 +115,43 @@ window.esailsWizard = (function () {
   var state;
   function resetState() {
     state = {
-      currentStep: 1, toepassing: null, boot_type: null, boot_lengte: 7.0,
-      doek_type: null, kleur: null, bevestiging: null,
-      extra_ramen: false, extra_ritsen: false, extra_trekbandjes: false,
+      currentStep: 1,
+      toepassing: null,
+      boot_type: null,
+      boot_lengte: 7.0,
+      boot_breedte: 2.5,
+      doek_type: null,
+      kleur: null,
+
+      extra_ramen: false,
+      extra_ritsen: false,
+      rits_type: null,
+      rits_lengte: null,
+      rits_aantal: 1,
+      extra_trekbandjes: false,
+      trekband_sets: 1,
+
+      bevestiging: null,
+      loxx_materiaal: null,
+      draai_merk: null,
+      druk_materiaal: null,
+      druk_merk: null,
+      koord_kleur: null,
+      koord_dikte: null,
+      rijgknop_type: null,
+      zeil_holpijp: false,
+      zeil_stansblok: false,
+
       bundle: {}
     };
   }
 
+  /* -------------------- HELPERS -------------------- */
+  var root;
+  function $(id) { return document.getElementById(id); }
+  function money(n) { return n.toFixed(2).replace('.', ','); }
+
   /* -------------------- HTML-TEMPLATE -------------------- */
-  /* De volledige wizard als string. Wordt in de mount geïnjecteerd. */
   function wizardHTML() {
     return '' +
     '<div class="esails-wizard-header">' +
@@ -75,7 +161,6 @@ window.esailsWizard = (function () {
       '<div class="esails-step-indicator" id="esailsStepIndicator">Stap 1 van 6: Toepassing</div>' +
     '</div>' +
 
-    /* STAP 1 */
     '<div class="esails-wizard-step active" data-step="1">' +
       '<h3>Wat wil je gaan maken of vervangen?</h3>' +
       '<div class="esails-card-grid">' +
@@ -85,7 +170,6 @@ window.esailsWizard = (function () {
       '</div>' +
     '</div>' +
 
-    /* STAP 2 */
     '<div class="esails-wizard-step" data-step="2">' +
       '<h3>Type vaartuig en afmetingen</h3>' +
       '<p class="esails-step-subtitle">Dit helpt ons de benodigde hoeveelheid materialen te berekenen.</p>' +
@@ -97,19 +181,21 @@ window.esailsWizard = (function () {
         '<label for="esailsBootLengte">Totale lengte van de boot: <span id="esailsLengteWeergave">7.0</span> meter</label>' +
         '<input type="range" id="esailsBootLengte" min="4" max="15" step="0.5" value="7">' +
       '</div>' +
+      '<div class="esails-slider-wrapper">' +
+        '<label for="esailsBootBreedte">Breedte (te overspannen): <span id="esailsBreedteWeergave">2.5</span> meter</label>' +
+        '<input type="range" id="esailsBootBreedte" min="1" max="6" step="0.1" value="2.5">' +
+      '</div>' +
     '</div>' +
 
-    /* STAP 3 */
     '<div class="esails-wizard-step" data-step="3">' +
       '<h3>Kies de prestatieklasse van het doek</h3>' +
       '<div class="esails-card-grid">' +
         cardBadge('doek_type','premium_acryl','Meest gekozen','Premium Maritiem Acryl','Luxe geweven look, ademend (voorkomt schimmel), extreme UV-stabiliteit en kleurvastheid.') +
         cardSimpleDesc('doek_type','heavy_pvc','Heavy-Duty PVC','100% waterdicht vrachtwagenzeil-kwaliteit. Oersterk, vlekbestendig en eenvoudig afneembaar.') +
-        cardSimpleDesc('doek_type','polyester_comfort','Lichtgewicht Polyester','Soepel, compact op te vouwen en zeer hanteerbaar. Ideaal voor lichtere zomerafdekking.') +
+        cardBadge('doek_type','polyester_comfort','Budget','Lichtgewicht Polyester','Soepel, compact op te vouwen en zeer hanteerbaar. Iets minder hoogwaardig, ideaal voor lichtere zomerafdekking.') +
       '</div>' +
     '</div>' +
 
-    /* STAP 4 */
     '<div class="esails-wizard-step" data-step="4">' +
       '<h3>Kies de gewenste kleur</h3>' +
       '<p class="esails-step-subtitle">We koppelen hier automatisch de juiste kleur professioneel zeilmakersgaren aan.</p>' +
@@ -121,29 +207,26 @@ window.esailsWizard = (function () {
       '</div>' +
     '</div>' +
 
-    /* STAP 5 */
     '<div class="esails-wizard-step" data-step="5">' +
       '<h3>Extra opties en toevoegingen</h3>' +
-      '<p class="esails-step-subtitle">Selecteer de extra componenten die je wilt toevoegen aan je project. Meerdere keuzes mogelijk.</p>' +
+      '<p class="esails-step-subtitle">Selecteer de extra componenten die je wilt toevoegen. Meerdere keuzes mogelijk.</p>' +
       '<div class="esails-card-grid">' +
         multiCard('extra_ramen','🪟','Premium Raamfolie','Voeg hoogwaardige, UV-gestabiliseerde vensterfolie toe voor optimaal zicht.') +
-        multiCard('extra_ritsen','🤐','YKK Heavy-Duty Ritsen','Voeg deelbare ritsen toe voor het maken van een achterdeur of oprolbare delen.') +
-        multiCard('extra_trekbandjes','🎗️','Trekbandjes met Gespen','Handige spanbandjes inclusief rvs gespen om de kap perfect strak te fixeren.') +
+        multiCardSub('extra_ritsen','🤐','Ritsen','Deelbare ritsen voor een achterdeur of oprolbare delen.', ritsenSubHTML()) +
+        multiCardSub('extra_trekbandjes','🎗️','Trekbandjes met Gespen','Polyester 1366 band (25mm) + RVS klemgesp. 1 set = 1 meter band + 1 gesp.', trekbandSubHTML()) +
       '</div>' +
     '</div>' +
 
-    /* STAP 6 */
     '<div class="esails-wizard-step" data-step="6">' +
       '<h3>Welk bevestigingssysteem gebruik je?</h3>' +
       '<div class="esails-card-grid">' +
-        cardSimpleDesc('bevestiging','tenax','Tenax / Loxx Systeem','Zelfborgende drukknoppen. Kunnen niet losscheuren door wind.') +
-        cardSimpleDesc('bevestiging','draaisluiting','Traditionele Draaisluitingen','Klassieke messing/koperen draaiers met zeilkousen in het doek.') +
-        cardSimpleDesc('bevestiging','dot_drukknoop','DOT Drukknopen','Standaard RVS maritieme drukknopen voor snelle montage.') +
-        cardSimpleDesc('bevestiging','zeiloog_koord','Zeilringen &amp; Elastisch Koord','Ideaal voor vlakke dekzeilen en winterafdekkingen.') +
+        cardSub('bevestiging','loxx','Loxx Systeem','Zelfborgende drukknoppen. Kunnen niet losscheuren door wind.', loxxSubHTML()) +
+        cardSub('bevestiging','draaisluiting','Draaisluitingen / Tourniquets','Klassieke draaiers. Inclusief bijbehorende kousen en ringen in het doek.', draaiSubHTML()) +
+        cardSub('bevestiging','drukknoop','Drukknopen','Maritieme drukknopen voor snelle montage.', drukSubHTML()) +
+        cardSub('bevestiging','zeiloog_koord','Zeilringen &amp; Elastisch Koord','Ideaal voor vlakke dekzeilen en winterafdekkingen.', zeilSubHTML()) +
       '</div>' +
     '</div>' +
 
-    /* STAP 7 */
     '<div class="esails-wizard-step" data-step="7">' +
       '<div class="esails-success-banner">' +
         '<h3>✓ Jouw eSails Maatwerk Advies is klaar!</h3>' +
@@ -162,18 +245,66 @@ window.esailsWizard = (function () {
       '</div>' +
     '</div>' +
 
-    /* NAVIGATIE */
     '<div class="esails-wizard-navigation" id="esailsNav">' +
       '<button type="button" class="esails-btn esails-btn-secondary" id="esailsBtnPrev" disabled>Vorige</button>' +
       '<button type="button" class="esails-btn esails-btn-primary" id="esailsBtnNext" disabled>Volgende</button>' +
     '</div>';
   }
 
-  /* -------- kleine template-helpers (voorkomt typefouten/herhaling) -------- */
+  /* ---------- sub-option HTML ---------- */
+  function lengteOpties() {
+    var labels = { "1.5":"1,5m", "2":"2m", "2.5":"2,5m", "3":"3m", "3.5":"3,5m", "4":"4m", "6":"6m" };
+    var h = '';
+    for (var i = 0; i < RITS_LENGTES.length; i++) { var l = RITS_LENGTES[i]; h += pill('rits_lengte', l, labels[l]); }
+    return h;
+  }
+  function ritsenSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Type:</span>' +
+        pill('rits_type','bloktand','Bloktand') + pill('rits_type','spiraal','Spiraalrits') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Lengte:</span>' + lengteOpties() + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Aantal:</span>' + stepper('rits_aantal', 1) + '</div>' +
+    '</div>';
+  }
+  function trekbandSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Aantal sets:</span>' + stepper('trekband_sets', 1) + '</div>' +
+    '</div>';
+  }
+  function loxxSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Materiaal:</span>' +
+        pill('loxx_materiaal','rvs','RVS') + pill('loxx_materiaal','koper','Koper/Vernikkeld') + '</div></div>';
+  }
+  function draaiSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Type:</span>' +
+        pill('draai_merk','prym','Prym (zilverkleurig)') + pill('draai_merk','mh','MH Messing (goudkleurig)') + '</div>' +
+      '<p class="esails-sub-note">Kousen en tegenringen worden automatisch meegeleverd.</p></div>';
+  }
+  function drukSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Materiaal:</span>' +
+        pill('druk_materiaal','rvs','RVS') + pill('druk_materiaal','koper','Koper/Vernikkeld') + '</div>' +
+      '<div class="esails-sub-row" id="esailsDrukMerkRow" style="display:none;"><span class="esails-sub-label">Merk:</span><span id="esailsDrukMerkOpts"></span></div></div>';
+  }
+  function zeilSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Koord kleur:</span>' +
+        pill('koord_kleur','wit','Wit') + pill('koord_kleur','zwart','Zwart') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Koord dikte:</span>' +
+        pill('koord_dikte','6','6mm') + pill('koord_dikte','8','8mm') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Rijgknop op boot:</span>' +
+        pill('rijgknop_type','rondknop','Rondknop (kunststof)') + pill('rijgknop_type','noorse','Noorse knop (RVS)') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Gereedschap:</span>' +
+        toggle('zeil_holpijp','Holpijp') + toggle('zeil_stansblok','Stansblok') + '</div>' +
+      '<p class="esails-sub-note">Carmo kunststof zeilkousen worden automatisch meegeleverd.</p></div>';
+  }
+
+  /* ---------- bouwstenen ---------- */
   function card(key, val, icon, titel, tekst) {
     return '<div class="esails-selection-card" data-key="' + key + '" data-value="' + val + '">' +
-      '<div class="esails-card-icon">' + icon + '</div>' +
-      '<h4>' + titel + '</h4><p>' + tekst + '</p></div>';
+      '<div class="esails-card-icon">' + icon + '</div><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
   }
   function cardSimple(key, val, titel) {
     return '<div class="esails-selection-card" data-key="' + key + '" data-value="' + val + '"><h4>' + titel + '</h4></div>';
@@ -187,60 +318,83 @@ window.esailsWizard = (function () {
   }
   function colorCard(val, hex, titel, extraStyle) {
     return '<div class="esails-color-card" data-key="kleur" data-value="' + val + '">' +
-      '<div class="esails-color-swatch" style="background-color:' + hex + ';' + extraStyle + '"></div>' +
-      '<span>' + titel + '</span></div>';
+      '<div class="esails-color-swatch" style="background-color:' + hex + ';' + extraStyle + '"></div><span>' + titel + '</span></div>';
   }
   function multiCard(extraKey, icon, titel, tekst) {
     return '<div class="esails-selection-card esails-multi-card" data-extra-key="' + extraKey + '">' +
       '<div class="esails-card-icon">' + icon + '</div><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
   }
-
-  /* -------------------- DOM-REFERENTIES -------------------- */
-  var root; // de mount
-  function $(id) { return document.getElementById(id); }
+  function multiCardSub(extraKey, icon, titel, tekst, subHTML) {
+    return '<div class="esails-selection-card esails-multi-card esails-has-sub" data-extra-key="' + extraKey + '">' +
+      '<div class="esails-card-icon">' + icon + '</div><h4>' + titel + '</h4><p>' + tekst + '</p>' + subHTML + '</div>';
+  }
+  function cardSub(key, val, titel, tekst, subHTML) {
+    return '<div class="esails-selection-card esails-has-sub" data-key="' + key + '" data-value="' + val + '">' +
+      '<h4>' + titel + '</h4><p>' + tekst + '</p>' + subHTML + '</div>';
+  }
+  function pill(subKey, val, label) {
+    return '<button type="button" class="esails-pill" data-subkey="' + subKey + '" data-subval="' + val + '">' + label + '</button>';
+  }
+  function toggle(subKey, label) {
+    return '<button type="button" class="esails-pill esails-toggle" data-toggle="' + subKey + '">' + label + '</button>';
+  }
+  function stepper(subKey, startVal) {
+    return '<span class="esails-stepper">' +
+      '<button type="button" data-step-key="' + subKey + '" data-step-delta="-1">-</button>' +
+      '<input type="text" id="esails-stepper-' + subKey + '" value="' + startVal + '" readonly>' +
+      '<button type="button" data-step-key="' + subKey + '" data-step-delta="1">+</button></span>';
+  }
 
   /* -------------------- INIT -------------------- */
   function init() {
     root = $('esails-wizard-mount');
-    if (!root) return false;            // mount nog niet aanwezig
-    if (root.getAttribute('data-ready') === '1') return true; // al gedaan
+    if (!root) return false;
+    if (root.getAttribute('data-ready') === '1') return true;
 
     resetState();
     root.innerHTML = wizardHTML();
     root.setAttribute('data-ready', '1');
 
     bindEvents();
-    updateSliderLabel(state.boot_lengte);
+    updateSliderLabel('lengte', state.boot_lengte);
+    updateSliderLabel('breedte', state.boot_breedte);
     renderCurrentStep();
     return true;
   }
 
-  /* -------------------- EVENTS (gedelegeerd = robuust) -------------------- */
+  /* -------------------- EVENTS -------------------- */
   function bindEvents() {
-    // Eén click-listener op de root vangt alles op, ook dynamisch gerenderde elementen.
     root.addEventListener('click', function (e) {
-      var card = e.target.closest('.esails-selection-card[data-key], .esails-color-card[data-key]');
-      if (card && root.contains(card)) { onSelect(card); return; }
-
+      var pillBtn = e.target.closest('.esails-pill');
+      if (pillBtn && root.contains(pillBtn)) {
+        e.stopPropagation();
+        if (pillBtn.hasAttribute('data-toggle')) onToggle(pillBtn);
+        else onPill(pillBtn);
+        return;
+      }
+      var stepBtn = e.target.closest('button[data-step-key]');
+      if (stepBtn && root.contains(stepBtn)) {
+        e.stopPropagation();
+        onStepper(stepBtn.getAttribute('data-step-key'), parseInt(stepBtn.getAttribute('data-step-delta'), 10));
+        return;
+      }
+      var c = e.target.closest('.esails-selection-card[data-key], .esails-color-card[data-key]');
+      if (c && root.contains(c) && !c.classList.contains('esails-multi-card')) { onSelect(c); return; }
       var multi = e.target.closest('.esails-multi-card');
       if (multi && root.contains(multi)) { onMultiSelect(multi); return; }
-
       var qtyBtn = e.target.closest('button[data-item-key]');
       if (qtyBtn && root.contains(qtyBtn)) {
         adjustQty(qtyBtn.getAttribute('data-item-key'), parseInt(qtyBtn.getAttribute('data-delta'), 10));
         return;
       }
-
       if (e.target.closest('#esailsBtnPrev')) { prevStep(); return; }
       if (e.target.closest('#esailsBtnNext')) { nextStep(); return; }
       if (e.target.closest('#esailsBtnAddToCart')) { submitToLightspeed(); return; }
     });
 
-    // Slider apart (input-event)
     root.addEventListener('input', function (e) {
-      if (e.target && e.target.id === 'esailsBootLengte') {
-        updateSliderLabel(e.target.value);
-      }
+      if (e.target && e.target.id === 'esailsBootLengte') updateSliderLabel('lengte', e.target.value);
+      if (e.target && e.target.id === 'esailsBootBreedte') updateSliderLabel('breedte', e.target.value);
     });
   }
 
@@ -264,24 +418,80 @@ window.esailsWizard = (function () {
     evaluateNavButtons();
   }
 
-  function updateSliderLabel(val) {
-    state.boot_lengte = parseFloat(val);
-    var label = $('esailsLengteWeergave');
-    if (label) label.innerText = parseFloat(val).toFixed(1);
+  function onPill(btn) {
+    var subKey = btn.getAttribute('data-subkey');
+    var subVal = btn.getAttribute('data-subval');
+    state[subKey] = subVal;
+    var siblings = root.querySelectorAll('.esails-pill[data-subkey="' + subKey + '"]');
+    for (var i = 0; i < siblings.length; i++) siblings[i].classList.remove('active');
+    btn.classList.add('active');
+    if (subKey === 'druk_materiaal') { state.druk_merk = null; renderDrukMerken(subVal); }
     evaluateNavButtons();
   }
 
-  /* -------------------- NAVIGATIE -------------------- */
+  function onToggle(btn) {
+    var key = btn.getAttribute('data-toggle');
+    state[key] = !state[key];
+    btn.classList.toggle('active', state[key]);
+    evaluateNavButtons();
+  }
+
+  function onStepper(key, delta) {
+    var v = state[key] + delta;
+    if (v < 1) v = 1;
+    state[key] = v;
+    var input = $('esails-stepper-' + key);
+    if (input) input.value = v;
+    evaluateNavButtons();
+  }
+
+  function renderDrukMerken(materiaal) {
+    var row = $('esailsDrukMerkRow');
+    var opts = $('esailsDrukMerkOpts');
+    if (!row || !opts) return;
+    var merken = DRUK_MERKEN[materiaal] || [];
+    var h = '';
+    for (var i = 0; i < merken.length; i++) h += pill('druk_merk', merken[i].key, merken[i].label);
+    opts.innerHTML = h;
+    row.style.display = merken.length ? 'flex' : 'none';
+  }
+
+  function updateSliderLabel(which, val) {
+    if (which === 'lengte') {
+      state.boot_lengte = parseFloat(val);
+      var l = $('esailsLengteWeergave');
+      if (l) l.innerText = parseFloat(val).toFixed(1);
+    } else {
+      state.boot_breedte = parseFloat(val);
+      var b = $('esailsBreedteWeergave');
+      if (b) b.innerText = parseFloat(val).toFixed(1);
+    }
+    evaluateNavButtons();
+  }
+
+  /* -------------------- VALIDATIE / NAVIGATIE -------------------- */
   function isStepValid(step) {
     switch (step) {
       case 1: return !!state.toepassing;
       case 2: return !!state.boot_type;
       case 3: return !!state.doek_type;
       case 4: return !!state.kleur;
-      case 5: return true;
-      case 6: return !!state.bevestiging;
+      case 5: return step5Valid();
+      case 6: return step6Valid();
       default: return true;
     }
+  }
+  function step5Valid() {
+    if (state.extra_ritsen) { if (!state.rits_type || !state.rits_lengte) return false; }
+    return true;
+  }
+  function step6Valid() {
+    if (!state.bevestiging) return false;
+    if (state.bevestiging === 'loxx') return !!state.loxx_materiaal;
+    if (state.bevestiging === 'draaisluiting') return !!state.draai_merk;
+    if (state.bevestiging === 'drukknoop') return !!state.druk_materiaal && !!state.druk_merk;
+    if (state.bevestiging === 'zeiloog_koord') return !!state.koord_kleur && !!state.koord_dikte && !!state.rijgknop_type;
+    return false;
   }
 
   function nextStep() {
@@ -292,12 +502,8 @@ window.esailsWizard = (function () {
       renderCurrentStep();
     }
   }
-
   function prevStep() {
-    if (state.currentStep > 1) {
-      state.currentStep--;
-      renderCurrentStep();
-    }
+    if (state.currentStep > 1) { state.currentStep--; renderCurrentStep(); }
   }
 
   function renderCurrentStep() {
@@ -310,16 +516,15 @@ window.esailsWizard = (function () {
     var bar = $('esailsProgressBar');
     if (bar) bar.style.width = ((shown / TOTAL_INPUT_STEPS) * 100) + '%';
 
-    var names = ["Toepassing", "Vaartuig & Lengte", "Materiaalkeuze", "Kleurstelling", "Extra Opties", "Bevestigingsmethode"];
+    var names = ["Toepassing", "Vaartuig & Afmetingen", "Materiaalkeuze", "Kleurstelling", "Extra Opties", "Bevestigingsmethode"];
     var ind = $('esailsStepIndicator');
     if (ind) {
       ind.innerText = state.currentStep <= TOTAL_INPUT_STEPS
         ? 'Stap ' + state.currentStep + ' van ' + TOTAL_INPUT_STEPS + ': ' + names[state.currentStep - 1]
         : 'Jouw Maatwerk Advies';
     }
-
     evaluateNavButtons();
-    if (root.scrollIntoView) root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* GEEN scrollIntoView meer. */
   }
 
   function evaluateNavButtons() {
@@ -327,9 +532,7 @@ window.esailsWizard = (function () {
     var btnNext = $('esailsBtnNext');
     var nav = $('esailsNav');
     if (!btnPrev || !btnNext || !nav) return;
-
     nav.style.display = 'flex';
-
     if (state.currentStep === RESULT_STEP) {
       btnNext.style.display = 'none';
       btnPrev.disabled = false;
@@ -340,10 +543,12 @@ window.esailsWizard = (function () {
     btnNext.disabled = !isStepValid(state.currentStep);
   }
 
-  /* -------------------- BUNDEL OPBOUWEN -------------------- */
-  function lineFrom(key, qty, notitie) {
-    var f = CONFIG.fournituren[key];
-    return { id: f.id, naam: f.naam, prijs: f.prijs, qty: qty, unit: f.unit, notitie: notitie };
+  /* -------------------- BUNDEL -------------------- */
+  function addLine(key, obj, qty, notitie) {
+    state.bundle[key] = {
+      id: obj.id, naam: obj.naam, prijs: obj.prijs,
+      qty: qty, unit: obj.unit || 'stuks', notitie: notitie || ''
+    };
   }
 
   function buildBundle() {
@@ -353,60 +558,62 @@ window.esailsWizard = (function () {
     if (state.toepassing === 'dekzeil') factor = 1.6;
     if (state.toepassing === 'bimini') factor = 0.9;
 
-    var metersDoek = Math.ceil(state.boot_lengte * factor);
+    var doekBreedteM = DOEK_BREEDTE_CM / 100;
+    var oppervlak = state.boot_lengte * state.boot_breedte * factor;
+    var metersDoek = Math.ceil(oppervlak / doekBreedteM);
+    if (metersDoek < 1) metersDoek = 1;
+
     var doekObj = CONFIG.stoffen[state.doek_type][state.kleur];
+    addLine('stof', doekObj, metersDoek,
+      'Berekend op ' + state.boot_lengte + 'm x ' + state.boot_breedte + 'm, doekbreedte ' + DOEK_BREEDTE_CM + 'cm.');
 
-    state.bundle.stof = {
-      id: doekObj.id, naam: doekObj.naam, prijs: doekObj.prijs, qty: metersDoek, unit: doekObj.unit,
-      notitie: 'Berekend advies op basis van een ' + state.boot_type + ' (' + state.boot_lengte + 'm).'
-    };
-
-    var klossen = state.boot_lengte > 9 ? 2 : 1;
+    var klossen = metersDoek > 12 ? 2 : 1;
     var colorEl = root.querySelector('.esails-color-card.selected span');
     var kleurNaam = colorEl ? colorEl.innerText : 'Gekozen kleur';
     state.bundle.garen = {
-      id: CONFIG.fournituren.garen.id, naam: CONFIG.fournituren.garen.naam + ' - (' + kleurNaam + ')',
-      prijs: CONFIG.fournituren.garen.prijs, qty: klossen, unit: CONFIG.fournituren.garen.unit,
+      id: CONFIG.garen.id, naam: CONFIG.garen.naam + ' - (' + kleurNaam + ')',
+      prijs: CONFIG.garen.prijs, qty: klossen, unit: CONFIG.garen.unit,
       notitie: 'UV-bestendig garen tegen rotting op de naden.'
     };
 
     if (state.extra_ramen) {
-      state.bundle.vensterfolie = {
-        id: CONFIG.fournituren.vensterfolie.id, naam: CONFIG.fournituren.vensterfolie.naam,
-        prijs: CONFIG.fournituren.vensterfolie.prijs, qty: Math.ceil(state.boot_lengte * 0.4),
-        unit: CONFIG.fournituren.vensterfolie.unit, notitie: 'Krasbestendige en UV-gestabiliseerde raamfolie.'
-      };
+      addLine('vensterfolie', CONFIG.vensterfolie, Math.ceil(state.boot_lengte * 0.4),
+        'Krasbestendige en UV-gestabiliseerde raamfolie.');
     }
-    if (state.extra_ritsen) {
-      state.bundle.ritsen = {
-        id: CONFIG.fournituren.ykk_rits.id, naam: CONFIG.fournituren.ykk_rits.naam,
-        prijs: CONFIG.fournituren.ykk_rits.prijs, qty: 2,
-        unit: CONFIG.fournituren.ykk_rits.unit, notitie: 'Zware, zoutwaterbestendige YKK spiraalritsen.'
-      };
+    if (state.extra_ritsen && state.rits_type && state.rits_lengte) {
+      var ritsObj = CONFIG.ritsen[state.rits_type][state.rits_lengte];
+      addLine('rits', { id: ritsObj.id, naam: ritsObj.naam, prijs: ritsObj.prijs, unit: 'stuks' },
+        state.rits_aantal, 'Deelbare rits voor achterdeur of oprolbaar deel.');
     }
     if (state.extra_trekbandjes) {
-      state.bundle.trekbandjes = {
-        id: CONFIG.fournituren.trekbandjes.id, naam: CONFIG.fournituren.trekbandjes.naam,
-        prijs: CONFIG.fournituren.trekbandjes.prijs, qty: 4,
-        unit: CONFIG.fournituren.trekbandjes.unit, notitie: 'Stevige spanbandsets inclusief roestvrijstalen gespen.'
-      };
+      addLine('trekband', CONFIG.trekband, state.trekband_sets, '1 set = 1 meter band + 1 RVS klemgesp.');
     }
 
-    var basis = Math.ceil(state.boot_lengte * 3);
-    if (state.bevestiging === 'tenax') {
-      state.bundle.tenax_knop = lineFrom('tenax_knop', basis, 'Zelfborgende drukknopen (bovendeel).');
-      state.bundle.tenax_schroef = lineFrom('tenax_schroef', basis, 'Zelftappende parkers voor polyester of hout.');
-      state.bundle.tenax_sleutel = lineFrom('tenax_sleutel', 1, 'Essentieel gereedschap voor Tenax montage.');
+    var basis = Math.ceil((state.boot_lengte + state.boot_breedte) * 2);
+    if (basis < 4) basis = 4;
+
+    if (state.bevestiging === 'loxx') {
+      var loxxObj = CONFIG.loxx[state.loxx_materiaal];
+      addLine('loxx', { id: loxxObj.id, naam: loxxObj.naam, prijs: loxxObj.prijs, unit: 'stuks' }, basis, 'Zelfborgende Loxx drukknopen.');
     } else if (state.bevestiging === 'draaisluiting') {
-      state.bundle.draaisluiting = lineFrom('draaisluiting', Math.ceil(basis * 0.8), 'Traditionele draaiers inclusief tegenringen.');
-    } else if (state.bevestiging === 'dot_drukknoop') {
-      state.bundle.dot_drukknoop = lineFrom('dot_drukknoop', basis, 'Complete RVS DOT sets.');
+      var draaiObj = CONFIG.draaisluiting[state.draai_merk];
+      var draaiAantal = Math.ceil(basis * 0.8);
+      addLine('draaisluiting', { id: draaiObj.id, naam: draaiObj.naam, prijs: draaiObj.prijs, unit: 'stuks' }, draaiAantal, 'Traditionele draaier.');
+      addLine('draai_kous', CONFIG.draai_kous, draaiAantal, 'Bijbehorende kous in het doek.');
+      addLine('draai_ring', CONFIG.draai_ring, draaiAantal, 'Bijbehorende tegenring.');
+    } else if (state.bevestiging === 'drukknoop') {
+      var drukObj = CONFIG.drukknoop[state.druk_merk];
+      addLine('drukknoop', { id: drukObj.id, naam: drukObj.naam, prijs: drukObj.prijs, unit: 'stuks' }, basis, 'Maritieme drukknoop.');
     } else if (state.bevestiging === 'zeiloog_koord') {
-      state.bundle.zeiloog_set = lineFrom('zeiloog_set', 1, 'Inclusief holpijp en stempelset.');
-      state.bundle.elastisch_koord = lineFrom('elastisch_koord', Math.ceil(state.boot_lengte * 2.5), 'Duurzaam elastisch schokkoord.');
+      var koordObj = CONFIG.koord[state.koord_kleur + '_' + state.koord_dikte];
+      var koordMeters = Math.ceil((state.boot_lengte + state.boot_breedte) * 2.5);
+      addLine('koord', { id: koordObj.id, naam: koordObj.naam, prijs: koordObj.prijs, unit: 'meter' }, koordMeters, 'Elastisch schokkoord langs de rand.');
+      addLine('carmo_kous', CONFIG.zeilkous_carmo, basis, 'Carmo kunststof zeilkousen in het doek.');
+      var knopObj = CONFIG.rijgknop[state.rijgknop_type];
+      addLine('rijgknop', { id: knopObj.id, naam: knopObj.naam, prijs: knopObj.prijs, unit: 'stuks' }, basis, 'Knoppen op de boot om het koord omheen te rijgen.');
+      if (state.zeil_holpijp) addLine('holpijp', CONFIG.holpijp, 1, 'Voor het slaan van de gaten.');
+      if (state.zeil_stansblok) addLine('stansblok', CONFIG.stansblok, 1, 'Slagonderlegger.');
     }
-
-    state.bundle.microvezel = lineFrom('microvezel', 1, 'Aanbevolen: voor pluisvrije reiniging van je nieuwe materiaal.');
 
     renderBoard();
   }
@@ -450,23 +657,12 @@ window.esailsWizard = (function () {
 
   function calcTotal() {
     var total = 0;
-    Object.keys(state.bundle).forEach(function (key) {
-      total += state.bundle[key].qty * state.bundle[key].prijs;
-    });
+    Object.keys(state.bundle).forEach(function (key) { total += state.bundle[key].qty * state.bundle[key].prijs; });
     var el = $('esailsTotalAmount');
     if (el) el.innerText = '€ ' + money(total);
   }
 
-  function money(n) { return n.toFixed(2).replace('.', ','); }
-
-  /* -------------------- WINKELWAGEN (Lightspeed eCom / C-Series) --------------------
-     Lightspeed gebruikt GEEN /cart/add/{id}/ (dat is Shopify-syntax).
-     Toevoegen gebeurt via een form-POST naar /cart met velden:
-        product  = <product-ID>
-        quantity = <aantal>
-     We posten elk product via een verborgen form naar een verborgen iframe,
-     zodat de pagina niet bij elk product herlaadt, en gaan daarna naar /cart.
-  ------------------------------------------------------------------------------------ */
+  /* -------------------- WINKELWAGEN -------------------- */
   function submitToLightspeed() {
     var btn = $('esailsBtnAddToCart');
     if (!btn) return;
@@ -476,16 +672,16 @@ window.esailsWizard = (function () {
     if (btnText) btnText.style.display = 'none';
     if (loader) loader.style.display = 'block';
 
-    var items = Object.keys(state.bundle)
-      .map(function (k) { return state.bundle[k]; })
+    var items = Object.keys(state.bundle).map(function (k) { return state.bundle[k]; })
       .filter(function (it) { return it.qty > 0; });
 
-    // Veiligheidscheck: placeholder-ID's nog niet vervangen?
     var bad = items.find(function (it) { return /^ID_/.test(String(it.id)); });
     if (bad) {
       alert('Configuratiefout: product-ID "' + bad.id + '" is nog een placeholder.\n' +
-            'Vervang in de JavaScript (CONFIG) alle "ID_..."-waarden door de echte Lightspeed product-ID\'s.');
-      resetButton(btn, btnText, loader);
+            'Vervang in wizard.js (CONFIG) alle "ID_..."-waarden door echte Lightspeed product-ID\'s.');
+      btn.disabled = false;
+      if (btnText) btnText.style.display = 'block';
+      if (loader) loader.style.display = 'none';
       return;
     }
 
@@ -520,7 +716,6 @@ window.esailsWizard = (function () {
     form.appendChild(hidden('product', productId));
     form.appendChild(hidden('quantity', quantity));
     document.body.appendChild(form);
-
     var done = false;
     function finish() {
       if (done) return;
@@ -531,7 +726,7 @@ window.esailsWizard = (function () {
     }
     iframe.addEventListener('load', finish);
     form.submit();
-    setTimeout(finish, 1500); // fallback als 'load' niet vuurt
+    setTimeout(finish, 1500);
   }
 
   function hidden(name, value) {
@@ -542,21 +737,15 @@ window.esailsWizard = (function () {
     return input;
   }
 
-  function resetButton(btn, btnText, loader) {
-    btn.disabled = false;
-    if (btnText) btnText.style.display = 'block';
-    if (loader) loader.style.display = 'none';
-  }
-
   return { init: init };
 })();
 
-/* -------------------- STARTER (wacht tot mount bestaat) -------------------- */
+/* -------------------- STARTER -------------------- */
 (function () {
   var tries = 0;
   function start() {
-    if (window.esailsWizard.init()) return; // gelukt
-    if (tries++ < 40) setTimeout(start, 150); // probeer ~6s lang
+    if (window.esailsWizard.init()) return;
+    if (tries++ < 40) setTimeout(start, 150);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
