@@ -41,7 +41,13 @@ window.esailsWizard = (function () {
       }
     },
 
-    garen: { id: "ID_GAREN_MATCH", naam: "Zeilmakersgaren UV-bestendig", prijs: 18.50, unit: "klos" },
+    /* Garen per doekkleur - elk een eigen Lightspeed product-ID */
+    garen: {
+      jet_black: { id: "ID_GAREN_ZWART", naam: "Zeilmakersgaren UV-bestendig - Zwart", prijs: 18.50, unit: "klos" },
+      navy_blue: { id: "ID_GAREN_BLAUW", naam: "Zeilmakersgaren UV-bestendig - Navy", prijs: 18.50, unit: "klos" },
+      dark_grey: { id: "ID_GAREN_GRIJS", naam: "Zeilmakersgaren UV-bestendig - Antraciet/Grijs", prijs: 18.50, unit: "klos" },
+      ecru:      { id: "ID_GAREN_ECRU",  naam: "Zeilmakersgaren UV-bestendig - Ecru", prijs: 18.50, unit: "klos" }
+    },
 
     ritsen: {
       bloktand: {
@@ -122,6 +128,7 @@ window.esailsWizard = (function () {
       boot_breedte: 2.5,
       doek_type: null,
       kleur: null,
+      wil_garen: true,
 
       extra_ramen: false,
       extra_ritsen: false,
@@ -204,6 +211,13 @@ window.esailsWizard = (function () {
         colorCard('navy_blue','#0f1c3f','Navy Blue (Donkerblauw)','') +
         colorCard('dark_grey','#4a4a4a','Antraciet / Grijs','') +
         colorCard('ecru','#e8e3d3','Ecru / Hennep','border:1px solid #ccc;') +
+      '</div>' +
+      '<div class="esails-garen-keuze" id="esailsGarenKeuze">' +
+        '<div class="esails-garen-info">' +
+          '<strong>Bijpassend garen bestellen?</strong>' +
+          '<span>Professioneel UV-bestendig zeilmakersgaren in de kleur van je doek. Aanbevolen.</span>' +
+        '</div>' +
+        '<button type="button" class="esails-pill esails-toggle active" data-toggle="wil_garen">Garen toevoegen</button>' +
       '</div>' +
     '</div>' +
 
@@ -567,14 +581,11 @@ window.esailsWizard = (function () {
     addLine('stof', doekObj, metersDoek,
       'Berekend op ' + state.boot_lengte + 'm x ' + state.boot_breedte + 'm, doekbreedte ' + DOEK_BREEDTE_CM + 'cm.');
 
-    var klossen = metersDoek > 12 ? 2 : 1;
-    var colorEl = root.querySelector('.esails-color-card.selected span');
-    var kleurNaam = colorEl ? colorEl.innerText : 'Gekozen kleur';
-    state.bundle.garen = {
-      id: CONFIG.garen.id, naam: CONFIG.garen.naam + ' - (' + kleurNaam + ')',
-      prijs: CONFIG.garen.prijs, qty: klossen, unit: CONFIG.garen.unit,
-      notitie: 'UV-bestendig garen tegen rotting op de naden.'
-    };
+    if (state.wil_garen) {
+      var klossen = metersDoek > 12 ? 2 : 1;
+      var garenObj = CONFIG.garen[state.kleur];
+      addLine('garen', garenObj, klossen, 'UV-bestendig garen in de kleur van je doek, tegen rotting op de naden.');
+    }
 
     if (state.extra_ramen) {
       addLine('vensterfolie', CONFIG.vensterfolie, Math.ceil(state.boot_lengte * 0.4),
