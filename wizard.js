@@ -22,105 +22,126 @@ window.esailsWizard = (function () {
   var CONFIG = {
     stoffen: {
       premium_acryl: {
-        jet_black: { id: "ID_ACRYL_ZWART", naam: "Sunbrella Plus - Jet Black (Zwart)", prijs: 34.95, unit: "meter" },
-        navy_blue: { id: "ID_ACRYL_BLAUW", naam: "Sunbrella Plus - Navy Blue (Donkerblauw)", prijs: 34.95, unit: "meter" },
-        dark_grey: { id: "ID_ACRYL_GRIJS", naam: "Sunbrella Plus - Antraciet", prijs: 34.95, unit: "meter" },
-        ecru:      { id: "ID_ACRYL_ECRU",  naam: "Sunbrella Plus - Ecru", prijs: 34.95, unit: "meter" }
+        jet_black: { id: "292542117", naam: "Sunbrella Plus - Jet Black (Zwart)", prijs: 34.95, unit: "meter" },
+        navy_blue: { id: "292542080", naam: "Sunbrella Plus - Captain Navy", prijs: 34.95, unit: "meter" },
+        dark_grey: { id: "322578937", naam: "Sunbrella Plus - Graphite", prijs: 36.95, unit: "meter" },
+        ecru:      { id: "313551544",  naam: "Sunbrella Plus - Natural (Ecru)", prijs: 36.95, unit: "meter" }
       },
       heavy_pvc: {
-        jet_black: { id: "ID_PVC_ZWART", naam: "Heavy-Duty PVC - Zwart", prijs: 19.95, unit: "meter" },
-        navy_blue: { id: "ID_PVC_BLAUW", naam: "Heavy-Duty PVC - Marine Blauw", prijs: 19.95, unit: "meter" },
-        dark_grey: { id: "ID_PVC_GRIJS", naam: "Heavy-Duty PVC - Grijs", prijs: 19.95, unit: "meter" },
-        ecru:      { id: "ID_PVC_ECRU",  naam: "Heavy-Duty PVC - Off-White", prijs: 19.95, unit: "meter" }
+        jet_black: { id: "ID_PVC_ZWART", naam: "Sunbrella PVC 152cm - Zwart", prijs: 19.95, unit: "meter" },
+        navy_blue: { id: "ID_PVC_BLAUW", naam: "Sunbrella PVC 152cm - Marine Blauw", prijs: 19.95, unit: "meter" },
+        dark_grey: { id: "ID_PVC_GRIJS", naam: "Sunbrella PVC 152cm - Grijs", prijs: 19.95, unit: "meter" },
+        ecru:      { id: "ID_PVC_ECRU",  naam: "Sunbrella PVC 152cm - Off-White", prijs: 19.95, unit: "meter" }
       },
       polyester_comfort: {
-        jet_black: { id: "ID_POLY_ZWART", naam: "eSails Comfort Polyester - Zwart", prijs: 24.95, unit: "meter" },
-        navy_blue: { id: "ID_POLY_BLAUW", naam: "eSails Comfort Polyester - Navy", prijs: 24.95, unit: "meter" },
-        dark_grey: { id: "ID_POLY_GRIJS", naam: "eSails Comfort Polyester - Grijs", prijs: 24.95, unit: "meter" },
+        jet_black: { id: "306360554", naam: "Poly Marine Polyester - Zwart", prijs: 14.95, unit: "meter" },
+        navy_blue: { id: "306360503", naam: "Poly Marine Polyester - Captain Navy", prijs: 14.95, unit: "meter" },
+        dark_grey: { id: "306360540", naam: "Poly Marine Polyester - Antraciet", prijs: 14.95, unit: "meter" },
         ecru:      { id: "ID_POLY_ECRU",  naam: "eSails Comfort Polyester - Ecru", prijs: 24.95, unit: "meter" }
       }
     },
 
     /* Garen per doekkleur - elk een eigen Lightspeed product-ID */
     garen: {
-      jet_black: { id: "ID_GAREN_ZWART", naam: "Zeilmakersgaren UV-bestendig - Zwart", prijs: 18.50, unit: "klos" },
-      navy_blue: { id: "ID_GAREN_BLAUW", naam: "Zeilmakersgaren UV-bestendig - Navy", prijs: 18.50, unit: "klos" },
-      dark_grey: { id: "ID_GAREN_GRIJS", naam: "Zeilmakersgaren UV-bestendig - Antraciet/Grijs", prijs: 18.50, unit: "klos" },
-      ecru:      { id: "ID_GAREN_ECRU",  naam: "Zeilmakersgaren UV-bestendig - Ecru", prijs: 18.50, unit: "klos" }
+      jet_black: { id: "256120441", naam: "Coats Terko M36 garen - Zwart", prijs: 9.95, unit: "klos" },
+      navy_blue: { id: "256699248", naam: "Coats Terko M36 garen - Captain Navy", prijs: 9.95, unit: "klos" },
+      dark_grey: { id: "256699141", naam: "Coats Terko M36 garen - Antraciet", prijs: 9.95, unit: "klos" },
+      ecru:      { id: "256699436",  naam: "Coats Terko M36 garen - Naturel", prijs: 9.95, unit: "klos" }
     },
 
     ritsen: {
       bloktand: {
-        "1.5": { id: "ID_RITS_BLOK_150", naam: "Bloktand rits 1,5m", prijs: 11.95 },
-        "2":   { id: "ID_RITS_BLOK_200", naam: "Bloktand rits 2,0m", prijs: 13.95 },
-        "2.5": { id: "ID_RITS_BLOK_250", naam: "Bloktand rits 2,5m", prijs: 15.95 },
-        "3":   { id: "ID_RITS_BLOK_300", naam: "Bloktand rits 3,0m", prijs: 17.95 },
-        "3.5": { id: "ID_RITS_BLOK_350", naam: "Bloktand rits 3,5m", prijs: 19.95 },
+        "1.5": { id: "256147828", naam: "YKK Bloktand rits deelbaar 10mm zwart - 1,5m", prijs: 11.81 },
+        "2":   { id: "256147830", naam: "YKK Bloktand rits deelbaar 10mm zwart - 2,0m", prijs: 13.62 },
+        "2.5": { id: "256147834", naam: "YKK Bloktand rits deelbaar 10mm zwart - 2,5m", prijs: 15.44 },
+        "3":   { id: "302671813", naam: "YKK Bloktand rits deelbaar 10mm zwart - 3,0m", prijs: 17.24 },
+        "3.5": { id: "280523686", naam: "YKK Bloktand rits deelbaar 10mm zwart - 3,5m", prijs: 18.65 },
         "4":   { id: "ID_RITS_BLOK_400", naam: "Bloktand rits 4,0m", prijs: 21.95 },
-        "6":   { id: "ID_RITS_BLOK_600", naam: "Bloktand rits 6,0m", prijs: 29.95 }
+        "6":   { id: "260460194", naam: "YKK Bloktand rits deelbaar 10mm zwart - 6,0m", prijs: 28.14 }
       },
       spiraal: {
-        "1.5": { id: "ID_RITS_SPIR_150", naam: "Spiraalrits 1,5m", prijs: 9.95 },
-        "2":   { id: "ID_RITS_SPIR_200", naam: "Spiraalrits 2,0m", prijs: 11.95 },
-        "2.5": { id: "ID_RITS_SPIR_250", naam: "Spiraalrits 2,5m", prijs: 13.95 },
-        "3":   { id: "ID_RITS_SPIR_300", naam: "Spiraalrits 3,0m", prijs: 15.95 },
-        "3.5": { id: "ID_RITS_SPIR_350", naam: "Spiraalrits 3,5m", prijs: 17.95 },
-        "4":   { id: "ID_RITS_SPIR_400", naam: "Spiraalrits 4,0m", prijs: 19.95 },
-        "6":   { id: "ID_RITS_SPIR_600", naam: "Spiraalrits 6,0m", prijs: 27.95 }
+        "1.5": { id: "256059624", naam: "YKK Spiraalrits deelbaar 10mm zwart - 1,5m", prijs: 10.54 },
+        "2":   { id: "256059634", naam: "YKK Spiraalrits deelbaar 10mm zwart - 2,0m", prijs: 12.00 },
+        "2.5": { id: "256059643", naam: "YKK Spiraalrits deelbaar 10mm zwart - 2,5m", prijs: 13.93 },
+        "3":   { id: "256059651", naam: "YKK Spiraalrits deelbaar 10mm zwart - 3,0m", prijs: 15.84 },
+        "3.5": { id: "256059664", naam: "YKK Spiraalrits deelbaar 10mm zwart - 3,5m", prijs: 16.25 },
+        "4":   { id: "256059669", naam: "YKK Spiraalrits deelbaar 10mm zwart - 4,0m", prijs: 17.22 },
+        "6":   { id: "256059695", naam: "YKK Spiraalrits deelbaar 10mm zwart - 6,0m", prijs: 21.97 }
       }
     },
 
-    vensterfolie: { id: "ID_VENSTERFOLIE", naam: "Premium Vensterfolie 0.5mm (120cm breed)", prijs: 14.95, unit: "meter" },
-    trekband:     { id: "ID_TREKBAND_SET", naam: "Trekbandset: 1m Polyester 1366 band (25mm) + klemgesp", prijs: 9.95, unit: "set" },
+    vensterfolie: { id: "253834832", naam: "Achilles Vinistar Super raamfolie 0,5mm (137cm breed)", prijs: 11.65, unit: "meter" },
+    trekband: {
+      naam: "Trekbandset (1m band + klemgesp)",
+      delen: [
+        { id: "260762571", naam: "Polyester 1366 band 25mm - Zwart (per meter)", prijs: 1.22 },
+        { id: "313387985", naam: "Klemgesp RVS 25mm", prijs: 2.95 }
+      ]
+    },
     bandbeugel: {
-      kunststof_zwart: { id: "ID_BEUGEL_KS_ZWART", naam: "Bandbeugel kunststof - Zwart", prijs: 1.95 },
-      kunststof_wit:   { id: "ID_BEUGEL_KS_WIT",   naam: "Bandbeugel kunststof - Wit", prijs: 1.95 },
-      rvs:             { id: "ID_BEUGEL_RVS",       naam: "Bandbeugel RVS (luxe)", prijs: 4.95 }
+      kunststof_zwart: { id: "269081614", naam: "Bandbeugel nylon - Zwart 25mm", prijs: 0.74 },
+      kunststof_wit:   { id: "269081652",   naam: "Bandbeugel nylon - Wit 25mm", prijs: 0.74 },
+      rvs:             { id: "256947996",       naam: "Bandbeugel RVS (luxe) 25mm", prijs: 5.49 }
     },
 
     loxx: {
-      rvs:   { id: "ID_LOXX_RVS",   naam: "Loxx drukknoop RVS", prijs: 3.95 },
-      koper: { id: "ID_LOXX_KOPER", naam: "Loxx drukknoop Koper/Vernikkeld", prijs: 4.50 }
+      rvs:   { id: "253532240",   naam: "Loxx kop RVS (origineel)", prijs: 3.49 },
+      koper: { id: "265497536", naam: "Loxx kop Koper-Vernikkeld", prijs: 1.89 }
     },
     loxx_schroef: {
-      zelftapper: { id: "ID_LOXX_ZELFTAPPER", naam: "Loxx bevestiging - Zelftapper (schroef)", prijs: 0.65 },
-      bout_moer:  { id: "ID_LOXX_BOUTMOER",   naam: "Loxx bevestiging - Bout en moer", prijs: 0.95 }
+      zelftapper: { id: "253532032", naam: "Loxx bevestiging - Zelftapper (schroef) RVS", prijs: 0.89 },
+      bout_moer:  { id: "255769033",   naam: "Loxx bevestiging - Bout RVS M5x10mm", prijs: 1.69 }
     },
 
     draaisluiting: {
       prym: {
-        koper:   { id: "ID_DRAAI_PRYM_KOPER",   naam: "Draaisluiting Prym - Koper-Vernikkeld (zilver)", prijs: 2.25 },
+        koper:   { id: "257993275",   naam: "Draaisluiting Prym - Messing-Vernikkeld (zilver) #9065", prijs: 0.99 },
         messing: { id: "ID_DRAAI_PRYM_MESSING", naam: "Draaisluiting Prym - Messing (goud)", prijs: 2.40 }
       },
       mh: {
-        koper:   { id: "ID_DRAAI_MH_KOPER",   naam: "Draaisluiting MH - Koper-Vernikkeld (zilver)", prijs: 2.50 },
+        koper:   { id: "260022585",   naam: "Draaisluiting MH - Messing-Vernikkeld (zilver) H11mm", prijs: 1.45 },
         messing: { id: "ID_DRAAI_MH_MESSING", naam: "Draaisluiting MH - Messing (goud)", prijs: 2.65 }
       }
     },
-    draai_kous: { id: "ID_DRAAI_KOUS", naam: "Zeilkous voor draaisluiting", prijs: 0.65 },
-    draai_ring: { id: "ID_DRAAI_RING", naam: "Tegenring voor draaisluiting", prijs: 0.45 },
+    draai_kous: { id: "258015200", naam: "Prym Tourniquet Kous & Ring (zeilkous in doek)", prijs: 0.59 },
 
     drukknoop: {
-      ykk:    { id: "ID_DRUK_YKK",    naam: "Drukknoop RVS - YKK", prijs: 1.20 },
-      dot:    { id: "ID_DRUK_DOT",    naam: "Drukknoop RVS - DOT", prijs: 1.25 },
-      fasnap: { id: "ID_DRUK_FASNAP", naam: "Drukknoop Fasnap (koper/vernikkeld)", prijs: 1.40 },
-      prym:   { id: "ID_DRUK_PRYM",   naam: "Drukknoop Prym (antraciet)", prijs: 1.35 }
+      ykk:    { naam: "Drukknoop RVS - YKK", delen: [
+        { id: "319599669", naam: "YKK Drukknoop RVS - Deel A", prijs: 0.59 },
+        { id: "319599676", naam: "YKK Drukknoop RVS - Deel B", prijs: 0.73 },
+        { id: "319599686", naam: "YKK Drukknoop RVS - Deel C", prijs: 0.59 }
+      ] },
+      dot:    { naam: "Drukknoop RVS - DOT", delen: [
+        { id: "257994841", naam: "DOT Drukknoop RVS - Deel A", prijs: 0.73 },
+        { id: "257994829", naam: "DOT Drukknoop RVS - Deel B", prijs: 0.77 },
+        { id: "257997395", naam: "DOT Drukknoop RVS - Deel C (raamclip 24mm)", prijs: 1.79 }
+      ] },
+      fasnap: { naam: "Drukknoop Fasnap (koper/vernikkeld)", delen: [
+        { id: "286980532", naam: "Fasnap Drukknoop KV - Deel A", prijs: 0.49 },
+        { id: "286980536", naam: "Fasnap Drukknoop KV - Deel B", prijs: 0.59 },
+        { id: "286980544", naam: "Fasnap Drukknoop KV - Deel C", prijs: 0.49 }
+      ] },
+      prym:   { naam: "Drukknoop Prym (koper/vernikkeld)", delen: [
+        { id: "257994790", naam: "Prym Drukknoop KV - Deel A (stift 5mm)", prijs: 0.49 },
+        { id: "257994796", naam: "Prym Drukknoop KV - Deel B (type 3000)", prijs: 0.49 },
+        { id: "257994803", naam: "Prym Drukknoop KV - Deel C (type 3001)", prijs: 0.49 }
+      ] }
     },
 
     zeilkous_carmo: {
-      wit: { id: "ID_CARMO_WIT", naam: "Carmo kunststof zeilkous - Wit", prijs: 0.55 }
+      wit: { id: "259195725", naam: "Carmo kunststof zeilkous - Wit (opening 20mm)", prijs: 0.89 }
     },
-    holpijp:        { id: "ID_HOLPIJP",    naam: "Holpijp (om gaten te slaan)", prijs: 12.95 },
-    stansblok:      { id: "ID_STANSBLOK",  naam: "Stansblok (slagonderlegger)", prijs: 9.95 },
+    holpijp:        { id: "313343786",    naam: "Holpijp Rond 10mm (om gaten te slaan)", prijs: 8.95 },
+    stansblok:      { id: "299203891",  naam: "Stansblok nylon rood (slagonderlegger)", prijs: 16.95 },
     koord: {
-      wit_6:   { id: "ID_KOORD_WIT_6",   naam: "Elastisch koord 6mm - Wit", prijs: 2.25 },
-      wit_8:   { id: "ID_KOORD_WIT_8",   naam: "Elastisch koord 8mm - Wit", prijs: 2.75 },
-      zwart_6: { id: "ID_KOORD_ZWART_6", naam: "Elastisch koord 6mm - Zwart", prijs: 2.25 },
-      zwart_8: { id: "ID_KOORD_ZWART_8", naam: "Elastisch koord 8mm - Zwart", prijs: 2.75 }
+      wit_6:   { id: "259527590",   naam: "Elastisch koord 6mm - Wit", prijs: 0.75 },
+      wit_8:   { id: "259527714",   naam: "Elastisch koord 8mm - Wit", prijs: 0.99 },
+      zwart_6: { id: "259527665", naam: "Elastisch koord 6mm - Zwart", prijs: 0.83 },
+      zwart_8: { id: "259419002", naam: "Elastisch koord 8mm - Zwart", prijs: 0.99 }
     },
     rijgknop: {
-      rondknop: { id: "ID_RONDKNOP",    naam: "Rondknop (kunststof)", prijs: 0.75 },
-      noorse:   { id: "ID_NOORSE_KNOP", naam: "Noorse knop (RVS)", prijs: 1.95 }
+      rondknop: { id: "259998021",    naam: "MH Rondknop asymmetrisch 30x24mm - Zwart", prijs: 0.68 },
+      noorse:   { id: "257072753", naam: "Marinetech Noorse knop RVS 11x10mm", prijs: 1.39 }
     }
   };
 
@@ -453,10 +474,22 @@ window.esailsWizard = (function () {
     });
   }
 
+  function updateKleurOpties(doekType) {
+    var ecruCard = root.querySelector('.esails-color-card[data-value="ecru"]');
+    if (!ecruCard) return;
+    var verberg = (doekType === 'polyester_comfort'); // Polyester (budget) heeft geen ecru
+    ecruCard.style.display = verberg ? 'none' : '';
+    if (verberg && state.kleur === 'ecru') {
+      state.kleur = null;
+      ecruCard.classList.remove('selected');
+    }
+  }
+
   function onSelect(element) {
     var key = element.getAttribute('data-key');
     var value = element.getAttribute('data-value');
     state[key] = value;
+    if (key === 'doek_type') updateKleurOpties(value);
     var stepContainer = element.closest('.esails-wizard-step');
     if (stepContainer) {
       var cards = stepContainer.querySelectorAll('.esails-selection-card, .esails-color-card');
@@ -666,7 +699,10 @@ window.esailsWizard = (function () {
         state.rits_aantal, 'Deelbare rits voor achterdeur of oprolbaar deel.');
     }
     if (state.extra_trekbandjes) {
-      addLine('trekband', CONFIG.trekband, state.trekband_sets, '1 set = 1 meter band + 1 klemgesp.');
+      CONFIG.trekband.delen.forEach(function (deel, i) {
+        addLine('trekband_' + i, { id: deel.id, naam: deel.naam, prijs: deel.prijs, unit: 'stuks' },
+          state.trekband_sets, '1 set = 1 meter band + 1 klemgesp.');
+      });
       if (state.trekband_beugel) {
         var beugelObj = CONFIG.bandbeugel[state.trekband_beugel];
         addLine('bandbeugel', { id: beugelObj.id, naam: beugelObj.naam, prijs: beugelObj.prijs, unit: 'stuks' },
@@ -686,11 +722,14 @@ window.esailsWizard = (function () {
       var draaiObj = CONFIG.draaisluiting[state.draai_merk][state.draai_uitvoering];
       var draaiAantal = Math.ceil(basis * 0.8);
       addLine('draaisluiting', { id: draaiObj.id, naam: draaiObj.naam, prijs: draaiObj.prijs, unit: 'stuks' }, draaiAantal, 'Traditionele draaier.');
-      addLine('draai_kous', CONFIG.draai_kous, draaiAantal, 'Bijbehorende kous in het doek.');
-      addLine('draai_ring', CONFIG.draai_ring, draaiAantal, 'Bijbehorende tegenring.');
+      addLine('draai_kous', CONFIG.draai_kous, draaiAantal, 'Bijbehorende kous & ring in het doek.');
     } else if (state.bevestiging === 'drukknoop') {
       var drukObj = CONFIG.drukknoop[state.druk_merk];
-      addLine('drukknoop', { id: drukObj.id, naam: drukObj.naam, prijs: drukObj.prijs, unit: 'stuks' }, basis, 'Maritieme drukknoop.');
+      drukObj.delen.forEach(function (deel, i) {
+        addLine('drukknoop_' + state.druk_merk + '_' + i,
+          { id: deel.id, naam: deel.naam, prijs: deel.prijs, unit: 'stuks' },
+          basis, 'Maritieme drukknoop — onderdeel ' + (i + 1) + ' van ' + drukObj.delen.length + '.');
+      });
     } else if (state.bevestiging === 'zeiloog_koord') {
       var koordObj = CONFIG.koord[state.koord_kleur + '_' + state.koord_dikte];
       var koordMeters = Math.ceil((state.boot_lengte + state.boot_breedte) * 2.5);
@@ -797,10 +836,10 @@ window.esailsWizard = (function () {
   function postOne(iframe, productId, quantity, onDone) {
     var form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/cart';
+    // Lightspeed verwacht het product-ID in het URL-pad: POST /cart/add/<id>/ met veld 'quantity'
+    form.action = '/cart/add/' + productId + '/';
     form.target = 'esailsCartFrame';
     form.style.display = 'none';
-    form.appendChild(hidden('product', productId));
     form.appendChild(hidden('quantity', quantity));
     document.body.appendChild(form);
     var done = false;
