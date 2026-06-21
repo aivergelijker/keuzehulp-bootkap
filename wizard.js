@@ -20,33 +20,59 @@ window.esailsWizard = (function () {
 
   /* -------------------- CONFIGURATIE -------------------- */
   var CONFIG = {
+    /* --- Buiskap & Bimini doeken ---
+       Per kleur: hex (staal), label (weergave in stap 4), garen (sleutel in CONFIG.garen) */
     stoffen: {
       premium_acryl: {
-        jet_black: { id: "292542117", naam: "Sunbrella Plus - Jet Black (Zwart)", prijs: 34.95, unit: "meter" },
-        navy_blue: { id: "292542080", naam: "Sunbrella Plus - Captain Navy", prijs: 34.95, unit: "meter" },
-        dark_grey: { id: "322578937", naam: "Sunbrella Plus - Graphite", prijs: 36.95, unit: "meter" },
-        ecru:      { id: "313551544",  naam: "Sunbrella Plus - Natural (Ecru)", prijs: 36.95, unit: "meter" }
+        captain_navy: { id: "292542080", naam: "Sunbrella Plus - Captain Navy", prijs: 34.95, unit: "meter", hex: "#0f1c3f", label: "Captain Navy (donkerblauw)", garen: "navy" },
+        jet_black:    { id: "292542117", naam: "Sunbrella Plus - Jet Black", prijs: 34.95, unit: "meter", hex: "#1a1a1a", label: "Jet Black (zwart)", garen: "zwart" },
+        dune:         { id: "ID_SUNBRELLA_DUNE", naam: "Sunbrella Plus - Dune", prijs: 36.95, unit: "meter", hex: "#c9b58a", label: "Dune (beige)", garen: "beige" },
+        natural:      { id: "313551544", naam: "Sunbrella Plus - Natural", prijs: 36.95, unit: "meter", hex: "#ece6d6", label: "Natural (wit)", garen: "naturel" }
       },
-      heavy_pvc: {
-        jet_black: { id: "ID_PVC_ZWART", naam: "Sunbrella PVC 152cm - Zwart", prijs: 19.95, unit: "meter" },
-        navy_blue: { id: "ID_PVC_BLAUW", naam: "Sunbrella PVC 152cm - Marine Blauw", prijs: 19.95, unit: "meter" },
-        dark_grey: { id: "ID_PVC_GRIJS", naam: "Sunbrella PVC 152cm - Grijs", prijs: 19.95, unit: "meter" },
-        ecru:      { id: "ID_PVC_ECRU",  naam: "Sunbrella PVC 152cm - Off-White", prijs: 19.95, unit: "meter" }
+      regular_acryl: {
+        admiral:   { id: "ID_SAULEDA_ADMIRAL", naam: "Sauleda Acryl - Admiral", prijs: 24.95, unit: "meter", hex: "#0f1c3f", label: "Admiral (donkerblauw)", garen: "navy" },
+        negro:     { id: "ID_SAULEDA_NEGRO", naam: "Sauleda Acryl - Negro", prijs: 24.95, unit: "meter", hex: "#1a1a1a", label: "Negro (zwart)", garen: "zwart" },
+        vison:     { id: "ID_SAULEDA_VISON", naam: "Sauleda Acryl - Vison", prijs: 24.95, unit: "meter", hex: "#b9a489", label: "Vison (beige)", garen: "beige" },
+        antracita: { id: "ID_SAULEDA_ANTRACITA", naam: "Sauleda Acryl - Antracita", prijs: 24.95, unit: "meter", hex: "#3a3a3a", label: "Antracita (antraciet)", garen: "antraciet" }
       },
       polyester_comfort: {
-        jet_black: { id: "306360554", naam: "Poly Marine Polyester - Zwart", prijs: 14.95, unit: "meter" },
-        navy_blue: { id: "306360503", naam: "Poly Marine Polyester - Captain Navy", prijs: 14.95, unit: "meter" },
-        dark_grey: { id: "306360540", naam: "Poly Marine Polyester - Antraciet", prijs: 14.95, unit: "meter" },
-        ecru:      { id: "ID_POLY_ECRU",  naam: "eSails Comfort Polyester - Ecru", prijs: 24.95, unit: "meter" }
+        captain_navy: { id: "306360503", naam: "Poly Marine Polyester - Captain Navy", prijs: 14.95, unit: "meter", hex: "#0f1c3f", label: "Captain Navy (donkerblauw)", garen: "navy" },
+        zwart:        { id: "306360554", naam: "Poly Marine Polyester - Zwart", prijs: 14.95, unit: "meter", hex: "#1a1a1a", label: "Zwart", garen: "zwart" },
+        silver:       { id: "ID_POLY_SILVER", naam: "Poly Marine Polyester - Silver", prijs: 14.95, unit: "meter", hex: "#b7b7b7", label: "Silver (lichtgrijs)", garen: "lichtgrijs" },
+        antraciet:    { id: "306360540", naam: "Poly Marine Polyester - Antraciet", prijs: 14.95, unit: "meter", hex: "#3a3a3a", label: "Antraciet", garen: "antraciet" }
+      },
+
+      /* --- Dekzeil & Winterkleed doeken (placeholder ID's + prijzen) --- */
+      polymar_pvc: {
+        konings_blauw: { id: "ID_MEHLER_KONINGSBLAUW", naam: "Mehler Polymar PVC - Konings Blauw", prijs: 22.95, unit: "meter", hex: "#0047ab", label: "Konings Blauw (blauw)", garen: "royal_blauw" },
+        mosgroen:      { id: "ID_MEHLER_MOSGROEN", naam: "Mehler Polymar PVC - Mosgroen", prijs: 22.95, unit: "meter", hex: "#46512c", label: "Mosgroen (donkergroen)", garen: "groen" },
+        karmijn_rood:  { id: "ID_MEHLER_KARMIJNROOD", naam: "Mehler Polymar PVC - Karmijn Rood", prijs: 22.95, unit: "meter", hex: "#9e1b32", label: "Karmijn Rood (rood)", garen: "rood" }
+      },
+      weathermax_80: {
+        royal_blue: { id: "ID_WMAX_ROYALBLUE", naam: "WeatherMax 80 PU - Royal Blue", prijs: 27.95, unit: "meter", hex: "#0047ab", label: "Royal Blue (blauw)", garen: "royal_blauw" }
+      },
+      ferrari_705: {
+        antraciet: { id: "ID_FERRARI_ANTRACIET", naam: "Serge Ferrari 705 PVC - Antraciet", prijs: 32.95, unit: "meter", hex: "#3a3a3a", label: "Antraciet", garen: "antraciet" },
+        wit:       { id: "ID_FERRARI_WIT", naam: "Serge Ferrari 705 PVC - Wit", prijs: 32.95, unit: "meter", hex: "#f2f0e9", label: "Wit", garen: "wit" },
+        ivoor:     { id: "ID_FERRARI_IVOOR", naam: "Serge Ferrari 705 PVC - Ivoor", prijs: 32.95, unit: "meter", hex: "#efe7d0", label: "Ivoor", garen: "ivoor" },
+        mosgroen:  { id: "ID_FERRARI_MOSGROEN", naam: "Serge Ferrari 705 PVC - Mosgroen", prijs: 32.95, unit: "meter", hex: "#46512c", label: "Mosgroen (donkergroen)", garen: "groen" }
       }
     },
 
-    /* Garen per doekkleur - elk een eigen Lightspeed product-ID */
+    /* Garen per garenkleur - gekoppeld via 'garen'-sleutel bij elke doekkleur.
+       ID_GAREN_* = nog te vervangen door echt Lightspeed product-ID. */
     garen: {
-      jet_black: { id: "256120441", naam: "Coats Terko M36 garen - Zwart", prijs: 9.95, unit: "klos" },
-      navy_blue: { id: "256699248", naam: "Coats Terko M36 garen - Captain Navy", prijs: 9.95, unit: "klos" },
-      dark_grey: { id: "256699141", naam: "Coats Terko M36 garen - Antraciet", prijs: 9.95, unit: "klos" },
-      ecru:      { id: "256699436",  naam: "Coats Terko M36 garen - Naturel", prijs: 9.95, unit: "klos" }
+      zwart:       { id: "256120441", naam: "Coats Terko M36 garen - Zwart", prijs: 9.95, unit: "klos" },
+      navy:        { id: "256699248", naam: "Coats Terko M36 garen - Captain Navy", prijs: 9.95, unit: "klos" },
+      antraciet:   { id: "256699141", naam: "Coats Terko M36 garen - Antraciet", prijs: 9.95, unit: "klos" },
+      naturel:     { id: "256699436", naam: "Coats Terko M36 garen - Naturel", prijs: 9.95, unit: "klos" },
+      beige:       { id: "ID_GAREN_BEIGE", naam: "Coats Terko M36 garen - Beige", prijs: 9.95, unit: "klos" },
+      lichtgrijs:  { id: "ID_GAREN_LICHTGRIJS", naam: "Coats Terko M36 garen - Lichtgrijs", prijs: 9.95, unit: "klos" },
+      royal_blauw: { id: "ID_GAREN_ROYALBLAUW", naam: "Coats Terko M36 garen - Koningsblauw", prijs: 9.95, unit: "klos" },
+      groen:       { id: "ID_GAREN_GROEN", naam: "Coats Terko M36 garen - Mosgroen", prijs: 9.95, unit: "klos" },
+      rood:        { id: "ID_GAREN_ROOD", naam: "Coats Terko M36 garen - Karmijn Rood", prijs: 9.95, unit: "klos" },
+      wit:         { id: "ID_GAREN_WIT", naam: "Coats Terko M36 garen - Wit", prijs: 9.95, unit: "klos" },
+      ivoor:       { id: "ID_GAREN_IVOOR", naam: "Coats Terko M36 garen - Ivoor", prijs: 9.95, unit: "klos" }
     },
 
     ritsen: {
@@ -71,6 +97,11 @@ window.esailsWizard = (function () {
     },
 
     vensterfolie: { id: "253834832", naam: "Achilles Vinistar Super raamfolie 0,5mm (137cm breed)", prijs: 11.65, unit: "meter" },
+    mallendoek: { id: "ID_MALLENDOEK_LDPE", naam: "Gerecycled Mallendoek LDPE - Transparant 0,18mm (300cm breed)", prijs: 4.95, unit: "meter", rolbreedte: 3.0 },
+    tape_3m: {
+      "9":  { id: "ID_TAPE_3M_9MM",  naam: "3M dubbelzijdig montagetape - 9mm breed", prijs: 7.95, unit: "rol" },
+      "12": { id: "ID_TAPE_3M_12MM", naam: "3M dubbelzijdig montagetape - 12mm breed", prijs: 9.95, unit: "rol" }
+    },
     trekband: {
       naam: "Trekbandset (1m band + klemgesp)",
       delen: [
@@ -128,11 +159,17 @@ window.esailsWizard = (function () {
       ] }
     },
 
-    zeilkous_carmo: {
-      wit: { id: "259195725", naam: "Carmo kunststof zeilkous - Wit (opening 20mm)", prijs: 0.89 }
+    zeilring: {
+      rvs:        { id: "ID_ZEILRING_16_RVS", naam: "Zeilring 16mm - RVS", prijs: 0.99 },
+      vernikkeld: { id: "ID_ZEILRING_16_VERNIKKELD", naam: "Zeilring 16mm - Vernikkeld", prijs: 0.89 },
+      messing:    { id: "ID_ZEILRING_16_MESSING", naam: "Zeilring 16mm - Messing", prijs: 1.19 }
     },
-    holpijp:        { id: "313343786",    naam: "Holpijp Rond 10mm (om gaten te slaan)", prijs: 8.95 },
-    stansblok:      { id: "299203891",  naam: "Stansblok nylon rood (slagonderlegger)", prijs: 16.95 },
+    /* Optionele gereedschapsets per bevestiging (incl. gratis stansblok). Placeholder ID's + prijzen. */
+    gereedschap: {
+      tourniquet_set: { id: "ID_GEREEDSCHAP_TOURNIQUET", naam: "Tourniquet Holpijp & Stempel set (+gratis stansblok)", prijs: 39.95, unit: "set" },
+      drukknoop_set:  { id: "ID_GEREEDSCHAP_DRUKKNOOP", naam: "3mm Holpijp & Drukknoop Stempel set (+gratis stansblok)", prijs: 34.95, unit: "set" },
+      zeilring_set:   { id: "ID_GEREEDSCHAP_ZEILRING16", naam: "16mm Holpijp & Stempel set (+gratis stansblok)", prijs: 44.95, unit: "set" }
+    },
     koord: {
       wit_6:   { id: "259527590",   naam: "Elastisch koord 6mm - Wit", prijs: 0.75 },
       wit_8:   { id: "259527714",   naam: "Elastisch koord 8mm - Wit", prijs: 0.99 },
@@ -158,8 +195,62 @@ window.esailsWizard = (function () {
 
   var RITS_LENGTES = ["1.5", "2", "2.5", "3", "3.5", "4", "6"];
 
-  var TOTAL_INPUT_STEPS = 6;
-  var RESULT_STEP = 7;
+  /* Welke doeken zijn zichtbaar bij welke toepassing (stap 1 stuurt stap 3) */
+  var DOEK_PER_TOEPASSING = {
+    buiskap: ["premium_acryl", "regular_acryl", "polyester_comfort"],
+    bimini:  ["premium_acryl", "regular_acryl", "polyester_comfort"],
+    dekzeil: ["polymar_pvc", "weathermax_80", "ferrari_705"]
+  };
+
+  /* -------------------- "NIET VERGETEN?" LIJST (stap 7) --------------------
+     Volledig config-gestuurd: voeg hier een item toe om het in de lijst te tonen.
+     - varianten aanwezig  -> elke variant heeft eigen id + prijs (+ label getoond als pill)
+     - geen varianten      -> 1 vast id + prijs op itemniveau
+     Placeholder ID's (ID_...) en prijzen nog vervangen door echte Lightspeed-waarden. */
+  var CHECKLIST = [
+    {
+      key: "tape50", icon: "🧷",
+      titel: "Dubbelzijdig tape — rol 50m (3M)",
+      tekst: "Sterk 3M dubbelzijdig montagetape op rol van 50 meter.",
+      naam: "3M dubbelzijdig tape 50m", varLabel: "Breedte:",
+      varianten: [
+        { val: "6",  label: "6mm",  id: "ID_TAPE50_6MM",  prijs: 24.95 },
+        { val: "9",  label: "9mm",  id: "ID_TAPE50_9MM",  prijs: 27.95 },
+        { val: "12", label: "12mm", id: "ID_TAPE50_12MM", prijs: 29.95 },
+        { val: "15", label: "15mm", id: "ID_TAPE50_15MM", prijs: 32.95 }
+      ]
+    },
+    {
+      key: "glaspotlood", icon: "✏️",
+      titel: "Glaspotloden",
+      tekst: "Markeerpotlood om af te tekenen op doek, glas en folie. Per stuk.",
+      naam: "Glaspotlood", varianten: null,
+      id: "ID_GLASPOTLOOD", prijs: 1.95
+    },
+    {
+      key: "cleaner", icon: "🧴",
+      titel: "303 Multi-Surface Cleaner",
+      tekst: "Reiniger voor doek, ramen en oppervlakken.",
+      naam: "303 Multi-Surface Cleaner", varLabel: "Inhoud:",
+      varianten: [
+        { val: "473", label: "473 ml", id: "ID_303_CLEANER_473", prijs: 14.95 },
+        { val: "946", label: "946 ml", id: "ID_303_CLEANER_946", prijs: 24.95 }
+      ]
+    },
+    {
+      key: "guard", icon: "🛡️",
+      titel: "303 Fabric Guard",
+      tekst: "Impregneermiddel dat het doek water- en vuilafstotend maakt.",
+      naam: "303 Fabric Guard", varLabel: "Inhoud:",
+      varianten: [
+        { val: "473", label: "473 ml", id: "ID_303_GUARD_473", prijs: 22.95 },
+        { val: "946", label: "946 ml", id: "ID_303_GUARD_946", prijs: 39.95 }
+      ]
+    }
+  ];
+
+  var TOTAL_INPUT_STEPS = 7;
+  var RESULT_STEP = 8;
 
   /* -------------------- STATE -------------------- */
   var state;
@@ -173,8 +264,10 @@ window.esailsWizard = (function () {
       doek_type: null,
       kleur: null,
       wil_garen: true,
+      extra_mallendoek: false,
 
       extra_ramen: false,
+      tape_breedte: 'geen',   // 'geen' | '9' | '12'
       extra_ritsen: false,
       rits_type: null,
       rits_lengte: null,
@@ -188,17 +281,24 @@ window.esailsWizard = (function () {
       loxx_schroef: null,      // 'zelftapper' | 'bout_moer'
       draai_merk: null,        // 'prym' | 'mh'
       draai_uitvoering: null,  // 'koper' | 'messing'
+      draai_gereedschap: false,
       druk_materiaal: null,
       druk_merk: null,
+      druk_gereedschap: false,
       koord_kleur: null,
       koord_dikte: null,
       rijgknop_type: null,
-      carmo_kleur: null,       // 'wit'
-      zeil_holpijp: false,
-      zeil_stansblok: false,
+      zeilring_materiaal: null,  // 'rvs' | 'vernikkeld' | 'messing'
+      zeil_gereedschap: false,
 
       bundle: {}
     };
+    /* Vlakke state-keys per checklist-item: chk_<key> (aan/uit), _qty, _var */
+    CHECKLIST.forEach(function (item) {
+      state['chk_' + item.key] = false;
+      state['chk_' + item.key + '_qty'] = 1;
+      if (item.varianten) state['chk_' + item.key + '_var'] = item.varianten[0].val;
+    });
   }
 
   /* -------------------- HELPERS -------------------- */
@@ -212,8 +312,8 @@ window.esailsWizard = (function () {
     '<div class="esails-wizard-header">' +
       '<h2>Bootkap &amp; Dekzeil Keuzehulp</h2>' +
       '<p>Stel in een paar stappen jouw ideale materiaalpakket samen</p>' +
-      '<div class="esails-progress-wrapper"><div class="esails-progress-bar" id="esailsProgressBar" style="width:16.6%;"></div></div>' +
-      '<div class="esails-step-indicator" id="esailsStepIndicator">Stap 1 van 6: Toepassing</div>' +
+      '<div class="esails-progress-wrapper"><div class="esails-progress-bar" id="esailsProgressBar" style="width:14.2%;"></div></div>' +
+      '<div class="esails-step-indicator" id="esailsStepIndicator">Stap 1 van 7: Toepassing</div>' +
     '</div>' +
 
     '<div class="esails-wizard-step active" data-step="1">' +
@@ -245,21 +345,28 @@ window.esailsWizard = (function () {
     '<div class="esails-wizard-step" data-step="3">' +
       '<h3>Kies de prestatieklasse van het doek</h3>' +
       '<div class="esails-card-grid">' +
-        cardBadge('doek_type','premium_acryl','Meest gekozen','Premium Maritiem Acryl','Luxe geweven look, ademend (voorkomt schimmel), extreme UV-stabiliteit en kleurvastheid.') +
-        cardBadgePlaceholder('doek_type','heavy_pvc','Heavy-Duty PVC','100% waterdicht vrachtwagenzeil-kwaliteit. Oersterk, vlekbestendig en eenvoudig afneembaar.') +
-        cardBadge('doek_type','polyester_comfort','Budget','Lichtgewicht Polyester','Soepel, compact op te vouwen en zeer hanteerbaar. Iets minder hoogwaardig, ideaal voor lichtere zomerafdekking.','esails-badge-budget') +
+        /* Buiskap & Bimini */
+        doekCard('premium_acryl',['buiskap','bimini'],'Meest gekozen','','Premium Maritiem Acryl (Sunbrella)','Luxe geweven look, ademend (voorkomt schimmel), extreme UV-stabiliteit en kleurvastheid.') +
+        doekCard('regular_acryl',['buiskap','bimini'],'Voordelig alternatief','','Regular Maritiem Acryl (Sauleda)','Geweven acryldoek met vergelijkbare eigenschappen als Sunbrella, scherper geprijsd. Ademend en goed UV-bestendig.') +
+        doekCard('polyester_comfort',['buiskap','bimini'],'Budget','esails-badge-budget','Budget Lichtgewicht Polyester (Poly Marine)','Soepel, compact op te vouwen en zeer hanteerbaar. Iets minder hoogwaardig, ideaal voor lichtere zomerafdekking.') +
+        /* Dekzeil & Winterkleed */
+        doekCard('polymar_pvc',['dekzeil'],'Brandvertragend','','Polymar PVC Doek (Mehler)','100% waterdicht en brandvertragend PVC-doek. Oersterk, vlekbestendig en eenvoudig afneembaar.') +
+        doekCard('weathermax_80',['dekzeil'],'SaturaMax garen','','80 PU Coated (WheaterMax)','Robuust PU-gecoat doek, genaaid met SaturaMax garen. Sterk, slijtvast en uitstekend bestand tegen weer en wind.') +
+        doekCard('ferrari_705',['dekzeil'],'Premium keuze','','Ferrari 705 PVC Doek (Serge Ferrari)','Premium Précontraint PVC van Serge Ferrari. Maximale dimensiestabiliteit, scheurvast en zeer duurzaam.') +
+      '</div>' +
+      '<div class="esails-garen-keuze" id="esailsMallendoekKeuze">' +
+        '<div class="esails-garen-info">' +
+          '<strong>Eerst een mal maken? Bestel gerecycled mallendoek mee</strong>' +
+          '<span>Transparante gerecyclede LDPE-folie (0,18 mm, 300 cm breed) om eerst een nauwkeurige mal van je boot te maken. We rekenen automatisch de benodigde strekkende meters uit.</span>' +
+        '</div>' +
+        '<button type="button" class="esails-pill esails-toggle esails-toggle-off" data-toggle="extra_mallendoek"><span class="esails-cross">✕</span> Geen mallendoek</button>' +
       '</div>' +
     '</div>' +
 
     '<div class="esails-wizard-step" data-step="4">' +
       '<h3>Kies de gewenste kleur</h3>' +
-      '<p class="esails-step-subtitle">We koppelen hier automatisch de juiste kleur professioneel zeilmakersgaren aan.</p>' +
-      '<div class="esails-color-grid">' +
-        colorCard('jet_black','#1a1a1a','Jet Black (Zwart)','') +
-        colorCard('navy_blue','#0f1c3f','Navy Blue (Donkerblauw)','') +
-        colorCard('dark_grey','#4a4a4a','Antraciet / Grijs','') +
-        colorCard('ecru','#e8e3d3','Ecru / Hennep','border:1px solid #ccc;') +
-      '</div>' +
+      '<p class="esails-step-subtitle">De kleuren hieronder horen bij het door jou gekozen doek. We koppelen automatisch het bijpassende zeilmakersgaren.</p>' +
+      '<div class="esails-color-grid" id="esailsColorGrid"></div>' +
       '<div class="esails-garen-keuze" id="esailsGarenKeuze">' +
         '<div class="esails-garen-info">' +
           '<strong>Bijpassend garen bestellen?</strong>' +
@@ -273,7 +380,7 @@ window.esailsWizard = (function () {
       '<h3>Extra opties en toevoegingen</h3>' +
       '<p class="esails-step-subtitle">Selecteer de extra componenten die je wilt toevoegen. Meerdere keuzes mogelijk.</p>' +
       '<div class="esails-card-grid">' +
-        multiCard('extra_ramen','🪟','Premium Raamfolie','Voeg hoogwaardige, UV-gestabiliseerde vensterfolie toe voor optimaal zicht.') +
+        multiCardSub('extra_ramen','🪟','Premium Raamfolie','Voeg hoogwaardige, UV-gestabiliseerde vensterfolie toe voor optimaal zicht.', ramenSubHTML()) +
         multiCardSub('extra_ritsen','🤐','Ritsen','Deelbare ritsen voor een achterdeur of oprolbare delen.', ritsenSubHTML()) +
         multiCardSub('extra_trekbandjes','🎗️','Trekbandjes met Gespen','Polyester 1366 band (25mm) met RVS klemgesp om de kap strak te fixeren.', trekbandSubHTML()) +
       '</div>' +
@@ -290,6 +397,12 @@ window.esailsWizard = (function () {
     '</div>' +
 
     '<div class="esails-wizard-step" data-step="7">' +
+      '<h3>Niet vergeten?</h3>' +
+      '<p class="esails-step-subtitle">Handige extra\'s om je bestelling compleet te maken. Allemaal optioneel.</p>' +
+      '<div class="esails-card-grid">' + checklistHTML() + '</div>' +
+    '</div>' +
+
+    '<div class="esails-wizard-step" data-step="8">' +
       '<div class="esails-success-banner">' +
         '<h3>✓ Jouw eSails Maatwerk Advies is klaar!</h3>' +
         '<p>Op basis van je keuzes hebben we het ideale pakket samengesteld. Pas de aantallen naar wens aan.</p>' +
@@ -319,6 +432,38 @@ window.esailsWizard = (function () {
     var h = '';
     for (var i = 0; i < RITS_LENGTES.length; i++) { var l = RITS_LENGTES[i]; h += pill('rits_lengte', l, labels[l]); }
     return h;
+  }
+  /* ---------- "Niet vergeten?" lijst (config-gestuurd) ---------- */
+  function checklistHTML() {
+    var h = '';
+    CHECKLIST.forEach(function (item) {
+      h += multiCardSub('chk_' + item.key, item.icon, item.titel, item.tekst, checklistSubHTML(item));
+    });
+    return h;
+  }
+  function checklistSubHTML(item) {
+    var rows = '';
+    if (item.varianten) {
+      var subkey = 'chk_' + item.key + '_var';
+      var pills = '';
+      item.varianten.forEach(function (v, idx) {
+        pills += '<button type="button" class="esails-pill' + (idx === 0 ? ' active' : '') +
+          '" data-subkey="' + subkey + '" data-subval="' + v.val + '">' + v.label + '</button>';
+      });
+      rows += '<div class="esails-sub-row"><span class="esails-sub-label">' + (item.varLabel || 'Variant:') + '</span>' + pills + '</div>';
+    }
+    rows += '<div class="esails-sub-row"><span class="esails-sub-label">Aantal:</span>' + stepper('chk_' + item.key + '_qty', 1) + '</div>';
+    return '<div class="esails-sub">' + rows + '</div>';
+  }
+
+  function ramenSubHTML() {
+    return '<div class="esails-sub">' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Dubbelzijdig 3M tape:</span>' +
+        '<button type="button" class="esails-pill active" data-subkey="tape_breedte" data-subval="geen">Geen</button>' +
+        pill('tape_breedte','9','9mm breed') +
+        pill('tape_breedte','12','12mm breed') + '</div>' +
+      '<p class="esails-sub-note">Sterk dubbelzijdig montagetape van 3M om de raamfolie strak en blijvend te bevestigen.</p>' +
+    '</div>';
   }
   function ritsenSubHTML() {
     return '<div class="esails-sub">' +
@@ -350,13 +495,19 @@ window.esailsWizard = (function () {
       '<div class="esails-sub-row"><span class="esails-sub-label">Merk:</span>' +
         pill('draai_merk','prym','Prym') + pill('draai_merk','mh','MH') + '</div>' +
       '<div class="esails-sub-row" id="esailsDraaiUitvRow" style="display:none;"><span class="esails-sub-label">Uitvoering:</span><span id="esailsDraaiUitvOpts"></span></div>' +
-      '<p class="esails-sub-note">Kousen en tegenringen worden automatisch meegeleverd.</p></div>';
+      '<div class="esails-sub-row"><span class="esails-sub-label">Gereedschap:</span>' +
+        toggle('draai_gereedschap','Holpijp & stempelset toevoegen') + '</div>' +
+      '<p class="esails-sub-note">Kousen en tegenringen worden automatisch meegeleverd.</p>' +
+      '<p class="esails-sub-note">⚠️ Zonder de Tourniquet Holpijp &amp; Stempelset kun je de tourniquets niet zelf in het doek zetten. Inclusief gratis stansblok.</p></div>';
   }
   function drukSubHTML() {
     return '<div class="esails-sub">' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Materiaal:</span>' +
         pill('druk_materiaal','rvs','RVS') + pill('druk_materiaal','koper','Koper/Vernikkeld') + '</div>' +
-      '<div class="esails-sub-row" id="esailsDrukMerkRow" style="display:none;"><span class="esails-sub-label">Merk:</span><span id="esailsDrukMerkOpts"></span></div></div>';
+      '<div class="esails-sub-row" id="esailsDrukMerkRow" style="display:none;"><span class="esails-sub-label">Merk:</span><span id="esailsDrukMerkOpts"></span></div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Gereedschap:</span>' +
+        toggle('druk_gereedschap','Holpijp & stempelset toevoegen') + '</div>' +
+      '<p class="esails-sub-note">⚠️ Zonder de 3mm Holpijp &amp; Drukknoop Stempelset kun je de drukknopen niet zelf zetten. Inclusief gratis stansblok.</p></div>';
   }
   function zeilSubHTML() {
     return '<div class="esails-sub">' +
@@ -364,12 +515,13 @@ window.esailsWizard = (function () {
         pill('koord_kleur','wit','Wit') + pill('koord_kleur','zwart','Zwart') + '</div>' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Koord dikte:</span>' +
         pill('koord_dikte','6','6mm') + pill('koord_dikte','8','8mm') + '</div>' +
+      '<div class="esails-sub-row"><span class="esails-sub-label">Zeilring 16mm:</span>' +
+        pill('zeilring_materiaal','rvs','RVS') + pill('zeilring_materiaal','vernikkeld','Vernikkeld') + pill('zeilring_materiaal','messing','Messing') + '</div>' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Rijgknop op boot:</span>' +
         pill('rijgknop_type','rondknop','Rondknop (kunststof)') + pill('rijgknop_type','noorse','Noorse knop (RVS)') + '</div>' +
       '<div class="esails-sub-row"><span class="esails-sub-label">Gereedschap:</span>' +
-        toggle('zeil_holpijp','Holpijp') + toggle('zeil_stansblok','Stansblok') + '</div>' +
-      '<div class="esails-sub-row"><span class="esails-sub-label">Carmo zeilkous kleur:</span>' +
-        pill('carmo_kleur','wit','Wit') + '</div></div>';
+        toggle('zeil_gereedschap','Holpijp & stempelset toevoegen') + '</div>' +
+      '<p class="esails-sub-note">⚠️ Zonder de 16mm Holpijp &amp; Stempelset kun je de zeilringen niet zelf zetten. Inclusief gratis stansblok.</p></div>';
   }
 
   /* ---------- bouwstenen ---------- */
@@ -392,9 +544,11 @@ window.esailsWizard = (function () {
     return '<div class="esails-selection-card" data-key="' + key + '" data-value="' + val + '">' +
       '<span class="esails-badge esails-badge-placeholder">&nbsp;</span><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
   }
-  function colorCard(val, hex, titel, extraStyle) {
-    return '<div class="esails-color-card" data-key="kleur" data-value="' + val + '">' +
-      '<div class="esails-color-swatch" style="background-color:' + hex + ';' + extraStyle + '"></div><span>' + titel + '</span></div>';
+  /* Doekkaart met badge + koppeling aan toepassing(en) uit stap 1 */
+  function doekCard(val, toepassingen, badge, badgeClass, titel, tekst) {
+    var cls = 'esails-badge' + (badgeClass ? ' ' + badgeClass : '');
+    return '<div class="esails-selection-card" data-key="doek_type" data-value="' + val + '" data-toepassing="' + toepassingen.join(' ') + '">' +
+      '<span class="' + cls + '">' + badge + '</span><h4>' + titel + '</h4><p>' + tekst + '</p></div>';
   }
   function multiCard(extraKey, icon, titel, tekst) {
     return '<div class="esails-selection-card esails-multi-card" data-extra-key="' + extraKey + '">' +
@@ -474,14 +628,46 @@ window.esailsWizard = (function () {
     });
   }
 
-  function updateKleurOpties(doekType) {
-    var ecruCard = root.querySelector('.esails-color-card[data-value="ecru"]');
-    if (!ecruCard) return;
-    var verberg = (doekType === 'polyester_comfort'); // Polyester (budget) heeft geen ecru
-    ecruCard.style.display = verberg ? 'none' : '';
-    if (verberg && state.kleur === 'ecru') {
-      state.kleur = null;
-      ecruCard.classList.remove('selected');
+  function updateDoekOpties() {
+    var allowed = DOEK_PER_TOEPASSING[state.toepassing] || [];
+    var cards = root.querySelectorAll('.esails-selection-card[data-key="doek_type"]');
+    for (var i = 0; i < cards.length; i++) {
+      var val = cards[i].getAttribute('data-value');
+      var show = allowed.indexOf(val) !== -1;
+      cards[i].style.display = show ? '' : 'none';
+      if (!show && state.doek_type === val) {
+        state.doek_type = null;
+        state.kleur = null;
+        cards[i].classList.remove('selected');
+      }
+    }
+  }
+
+  function isLightHex(hex) {
+    var h = String(hex).replace('#', '');
+    if (h.length !== 6) return false;
+    var r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 180;
+  }
+
+  /* Bouwt de kleurkaarten op basis van het gekozen doek (stap 3) */
+  function renderKleurOpties() {
+    var grid = $('esailsColorGrid');
+    if (!grid) return;
+    var doek = CONFIG.stoffen[state.doek_type];
+    if (!doek) { grid.innerHTML = ''; return; }
+    var html = '';
+    Object.keys(doek).forEach(function (colorKey) {
+      var c = doek[colorKey];
+      var border = isLightHex(c.hex) ? 'border:1px solid #ccc;' : '';
+      html += '<div class="esails-color-card" data-key="kleur" data-value="' + colorKey + '">' +
+        '<div class="esails-color-swatch" style="background-color:' + c.hex + ';' + border + '"></div>' +
+        '<span>' + c.label + '</span></div>';
+    });
+    grid.innerHTML = html;
+    if (state.kleur && doek[state.kleur]) {
+      var sel = grid.querySelector('.esails-color-card[data-value="' + state.kleur + '"]');
+      if (sel) sel.classList.add('selected');
     }
   }
 
@@ -489,7 +675,7 @@ window.esailsWizard = (function () {
     var key = element.getAttribute('data-key');
     var value = element.getAttribute('data-value');
     state[key] = value;
-    if (key === 'doek_type') updateKleurOpties(value);
+    if (key === 'doek_type') state.kleur = null;
     var stepContainer = element.closest('.esails-wizard-step');
     if (stepContainer) {
       var cards = stepContainer.querySelectorAll('.esails-selection-card, .esails-color-card');
@@ -523,7 +709,22 @@ window.esailsWizard = (function () {
     state[key] = !state[key];
     btn.classList.toggle('active', state[key]);
     if (key === 'wil_garen') updateGarenButton(btn);
+    if (key === 'extra_mallendoek') updateMallendoekButton(btn);
     evaluateNavButtons();
+  }
+
+  function updateMallendoekButton(btn) {
+    if (!btn) btn = root.querySelector('[data-toggle="extra_mallendoek"]');
+    if (!btn) return;
+    if (state.extra_mallendoek) {
+      btn.classList.add('active');
+      btn.classList.remove('esails-toggle-off');
+      btn.innerHTML = '<span class="esails-check">✓</span> Mallendoek toevoegen';
+    } else {
+      btn.classList.remove('active');
+      btn.classList.add('esails-toggle-off');
+      btn.innerHTML = '<span class="esails-cross">✕</span> Geen mallendoek';
+    }
   }
 
   function updateGarenButton(btn) {
@@ -606,7 +807,7 @@ window.esailsWizard = (function () {
     if (state.bevestiging === 'loxx') return !!state.loxx_materiaal && !!state.loxx_schroef;
     if (state.bevestiging === 'draaisluiting') return !!state.draai_merk && !!state.draai_uitvoering;
     if (state.bevestiging === 'drukknoop') return !!state.druk_materiaal && !!state.druk_merk;
-    if (state.bevestiging === 'zeiloog_koord') return !!state.koord_kleur && !!state.koord_dikte && !!state.rijgknop_type && !!state.carmo_kleur;
+    if (state.bevestiging === 'zeiloog_koord') return !!state.koord_kleur && !!state.koord_dikte && !!state.rijgknop_type && !!state.zeilring_materiaal;
     return false;
   }
 
@@ -628,11 +829,14 @@ window.esailsWizard = (function () {
     var active = root.querySelector('.esails-wizard-step[data-step="' + state.currentStep + '"]');
     if (active) active.classList.add('active');
 
+    if (state.currentStep === 3) updateDoekOpties();
+    if (state.currentStep === 4) renderKleurOpties();
+
     var shown = Math.min(state.currentStep, TOTAL_INPUT_STEPS);
     var bar = $('esailsProgressBar');
     if (bar) bar.style.width = ((shown / TOTAL_INPUT_STEPS) * 100) + '%';
 
-    var names = ["Toepassing", "Vaartuig & Afmetingen", "Materiaalkeuze", "Kleurstelling", "Extra Opties", "Bevestigingsmethode"];
+    var names = ["Toepassing", "Vaartuig & Afmetingen", "Materiaalkeuze", "Kleurstelling", "Extra Opties", "Bevestigingsmethode", "Niet vergeten?"];
     var ind = $('esailsStepIndicator');
     if (ind) {
       ind.innerText = state.currentStep <= TOTAL_INPUT_STEPS
@@ -685,13 +889,24 @@ window.esailsWizard = (function () {
 
     if (state.wil_garen) {
       var klossen = metersDoek > 12 ? 2 : 1;
-      var garenObj = CONFIG.garen[state.kleur];
-      addLine('garen', garenObj, klossen, 'UV-bestendig garen in de kleur van je doek, tegen rotting op de naden.');
+      var garenObj = CONFIG.garen[doekObj.garen];
+      addLine('garen', garenObj, klossen, 'UV-bestendig garen, bijpassend bij ' + doekObj.label + ', tegen rotting op de naden.');
+    }
+
+    if (state.extra_mallendoek) {
+      var mallenMeters = Math.ceil(oppervlak / CONFIG.mallendoek.rolbreedte);
+      if (mallenMeters < 1) mallenMeters = 1;
+      addLine('mallendoek', CONFIG.mallendoek, mallenMeters,
+        'Strekkende meters berekend op ' + oppervlak.toFixed(1) + ' m² mal, rolbreedte ' + CONFIG.mallendoek.rolbreedte + 'm. Om eerst een mal van je boot te maken.');
     }
 
     if (state.extra_ramen) {
       addLine('vensterfolie', CONFIG.vensterfolie, Math.ceil(state.boot_lengte * 0.4),
         'Krasbestendige en UV-gestabiliseerde raamfolie.');
+      if (state.tape_breedte === '9' || state.tape_breedte === '12') {
+        addLine('tape_3m', CONFIG.tape_3m[state.tape_breedte], 1,
+          'Dubbelzijdig 3M montagetape (' + state.tape_breedte + 'mm) om de raamfolie te bevestigen.');
+      }
     }
     if (state.extra_ritsen && state.rits_type && state.rits_lengte) {
       var ritsObj = CONFIG.ritsen[state.rits_type][state.rits_lengte];
@@ -723,6 +938,7 @@ window.esailsWizard = (function () {
       var draaiAantal = Math.ceil(basis * 0.8);
       addLine('draaisluiting', { id: draaiObj.id, naam: draaiObj.naam, prijs: draaiObj.prijs, unit: 'stuks' }, draaiAantal, 'Traditionele draaier.');
       addLine('draai_kous', CONFIG.draai_kous, draaiAantal, 'Bijbehorende kous & ring in het doek.');
+      if (state.draai_gereedschap) addLine('draai_gereedschap', CONFIG.gereedschap.tourniquet_set, 1, 'Holpijp & stempelset om de tourniquets te zetten (incl. gratis stansblok).');
     } else if (state.bevestiging === 'drukknoop') {
       var drukObj = CONFIG.drukknoop[state.druk_merk];
       drukObj.delen.forEach(function (deel, i) {
@@ -730,16 +946,31 @@ window.esailsWizard = (function () {
           { id: deel.id, naam: deel.naam, prijs: deel.prijs, unit: 'stuks' },
           basis, 'Maritieme drukknoop — onderdeel ' + (i + 1) + ' van ' + drukObj.delen.length + '.');
       });
+      if (state.druk_gereedschap) addLine('druk_gereedschap', CONFIG.gereedschap.drukknoop_set, 1, '3mm Holpijp & stempelset om de drukknopen te zetten (incl. gratis stansblok).');
     } else if (state.bevestiging === 'zeiloog_koord') {
       var koordObj = CONFIG.koord[state.koord_kleur + '_' + state.koord_dikte];
       var koordMeters = Math.ceil((state.boot_lengte + state.boot_breedte) * 2.5);
       addLine('koord', { id: koordObj.id, naam: koordObj.naam, prijs: koordObj.prijs, unit: 'meter' }, koordMeters, 'Elastisch schokkoord langs de rand.');
-      addLine('carmo_kous', CONFIG.zeilkous_carmo[state.carmo_kleur], basis, 'Carmo kunststof zeilkousen in het doek.');
+      addLine('zeilring', CONFIG.zeilring[state.zeilring_materiaal], basis, 'Zeilring 16mm in het doek.');
       var knopObj = CONFIG.rijgknop[state.rijgknop_type];
       addLine('rijgknop', { id: knopObj.id, naam: knopObj.naam, prijs: knopObj.prijs, unit: 'stuks' }, basis, 'Knoppen op de boot om het koord omheen te rijgen.');
-      if (state.zeil_holpijp) addLine('holpijp', CONFIG.holpijp, 1, 'Voor het slaan van de gaten.');
-      if (state.zeil_stansblok) addLine('stansblok', CONFIG.stansblok, 1, 'Slagonderlegger.');
+      if (state.zeil_gereedschap) addLine('zeil_gereedschap', CONFIG.gereedschap.zeilring_set, 1, '16mm Holpijp & stempelset om de zeilringen te zetten (incl. gratis stansblok).');
     }
+
+    /* "Niet vergeten?"-lijst (stap 7) */
+    CHECKLIST.forEach(function (item) {
+      if (!state['chk_' + item.key]) return;
+      var qty = state['chk_' + item.key + '_qty'] || 1;
+      var prod;
+      if (item.varianten) {
+        var v = state['chk_' + item.key + '_var'] || item.varianten[0].val;
+        var found = item.varianten.filter(function (x) { return x.val === v; })[0] || item.varianten[0];
+        prod = { id: found.id, naam: item.naam + ' - ' + found.label, prijs: found.prijs, unit: 'stuks' };
+      } else {
+        prod = { id: item.id, naam: item.naam, prijs: item.prijs, unit: 'stuks' };
+      }
+      addLine('chk_' + item.key, prod, qty, 'Extra uit de “Niet vergeten?”-lijst.');
+    });
 
     renderBoard();
   }
