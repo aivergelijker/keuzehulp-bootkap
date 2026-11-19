@@ -1,0 +1,11 @@
+{
+  "name": "esails-keuzehulp",
+  "version": "3.0.0",
+  "private": true,
+  "description": "eSails 3-in-1 keuzehulp: bootkap & dekzeil, afdekzeil op maat, zonwering",
+  "scripts": {
+    "build": "node tools/build.js",
+    "test": "node --test test/*.test.js",
+    "catalog": "python3 -I tools/build_catalog.py"
+  }
+}
