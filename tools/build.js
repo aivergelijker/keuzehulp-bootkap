@@ -12,6 +12,7 @@ const out = [
   src('core.js'),
   src('catalog.js').replace(/return (\{[\s\S]*\});\s*\}\);\s*$/, (m, j) => 'return ' + JSON.stringify(JSON.parse(j)) + ';\n});\n'),
   src('pakket.js'),
+  src('bouwtekening.js'),
   src('live.js'),
   `(function(w){w.ESKH_CSS=${JSON.stringify(css)};})(window);`,
   src('ui.js')

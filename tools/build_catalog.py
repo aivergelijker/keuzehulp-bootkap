@@ -145,9 +145,23 @@ add('draai_prym_stempel', 257994150, 'Prym stempel tourniquet type 370 (15 × 9 
 add('draai_mh_holpijp', 259989808, 'Paffrath holpijp tourniquet 17 × 11 mm', perOrder=True, tool=True)
 add('draai_mh_stempel', 260002692, 'MH stempel tourniquet 17 × 11 mm', perOrder=True, tool=True)
 # --- Drukknopen A/B (in het doek) + C (op de boot)
+DRUK_NAAM = {
+    'ykk_a': 'YKK drukknoop deel A — RVS',
+    'ykk_b': 'YKK drukknoop deel B — RVS',
+    'ykk_c': 'YKK drukknoop deel C — RVS',
+    'dot_a': 'DOT Durable drukknoop deel A — RVS',
+    'dot_b': 'DOT Durable drukknoop deel B — RVS',
+    'dot_c': 'DOT Durable drukknoop deel C — Parker-schroef RVS 9 mm',
+    'fasnap_a': 'Fasnap drukknoop deel A — koper-vernikkeld',
+    'fasnap_b': 'Fasnap drukknoop deel B — koper-vernikkeld',
+    'fasnap_c': 'Fasnap drukknoop deel C — koper-vernikkeld',
+    'prym_a': 'Prym drukknoop deel A — koper-vernikkeld (stift 5 mm)',
+    'prym_b': 'Prym drukknoop deel B — koper-vernikkeld (type 3000)',
+    'prym_c': 'Prym drukknoop deel C — messing-vernikkeld (type 3001/23)',
+}
 for merk, ids in {'ykk': (319599669, 319599676, 319599686), 'dot': (257994841, 257994829, 257994859),
                   'fasnap': (286980532, 286980536, 286980544), 'prym': (257994790, 257994796, 257994803)}.items():
-    for deel, vid in zip('abc', ids): add('druk_%s_%s' % (merk, deel), vid, **({'verpakking': 10} if merk == 'dot' else {}))
+    for deel, vid in zip('abc', ids): add('druk_%s_%s' % (merk, deel), vid, DRUK_NAAM[merk + '_' + deel], **({'verpakking': 10} if merk == 'dot' else {}))
 add('druk_dot_c_bout', 258002241, 'DOT drukknoop deel C — bout RVS M5 × 9 mm', verpakking=10)
 add('druk_dot_c_popnagel', 257994867, 'DOT drukknoop deel C — popnagel RVS 8 mm', verpakking=10)
 add('druk_dot_c_raamclip', 257997395, 'DOT drukknoop deel C — raamclip RVS 24 mm', verpakking=10)
@@ -164,9 +178,9 @@ add('koordhaak', 302548075, 'Koordhaak nylon wit (6–10 mm koord)')
 add('musketon', 259143564, 'Musketonhaak nylon zwart (8 mm)')
 add('koordklem', 277045622, 'Koordklem rond RVS 8 mm (koordeinden afwerken)')
 add('rondknop', 259998021, 'MH rondknop asymmetrisch zwart 30 × 24 mm'); add('noorse_knop', 257072753, 'Marinetech Noorse knop RVS 11 × 10 mm')
-# --- Klittenband (naaibaar, per meter)
-for w, haak, lus in ((25, 260597286, 260606379), (50, 260607937, 260609573)):
-    add('klit_%d_haak' % w, haak, 'Klittenband zwart %d mm — haak (hard)' % w, 'm'); add('klit_%d_lus' % w, lus, 'Klittenband zwart %d mm — lus (zacht)' % w, 'm')
+# --- Klittenband (zelfklevend, per meter): geen naaimachine of gereedschap nodig
+for w, haak, lus in ((25, 260555711, 260556996), (50, 260556506, 260557218)):
+    add('klit_%d_haak' % w, haak, 'Klittenband zelfklevend zwart %d mm — haak (hard)' % w, 'm'); add('klit_%d_lus' % w, lus, 'Klittenband zelfklevend zwart %d mm — lus (zacht)' % w, 'm')
 # --- Bootkap extra's
 add('raamfolie', 293617490, 'Achilles Vinistar Super raamfolie 0,4 mm (137 cm breed)', 'm', rolCm=137)
 add('raamfolie_05', 323098115, 'Achilles Vinistar Smoke Tint raamfolie 0,5 mm (137 cm breed)', 'm', rolCm=137)

@@ -230,18 +230,18 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 | draai_prym_stempel | Prym stempel tourniquet type 370 (15 × 9 mm) | 257994150 | € 134.75 | st | ja | ✅ |
 | draai_mh_holpijp | Paffrath holpijp tourniquet 17 × 11 mm | 259989808 | € 68.50 | st | ja | ✅ |
 | draai_mh_stempel | MH stempel tourniquet 17 × 11 mm | 260002692 | € 138.25 | st | ja | ✅ |
-| druk_ykk_a | YKK YKK | Drukknoop | RVS | Deel A | 319599669 | € 0.59 | st |  | ✅ |
-| druk_ykk_b | YKK YKK | Drukknoop | RVS | Deel B | 319599676 | € 0.73 | st |  | ✅ |
-| druk_ykk_c | YKK YKK | Drukknoop | RVS | Deel C | 319599686 | € 0.59 | st |  | ✅ |
-| druk_dot_a | DOT® Fasteners DOT | Durable | Drukknoop | Deel A | RVS | 257994841 | € 0.73 | st |  | ✅ (per 10) |
-| druk_dot_b | DOT® Fasteners DOT | Durable | Drukknoop | Deel B | RVS | 257994829 | € 0.77 | st |  | ✅ (per 10) |
-| druk_dot_c | DOT® Fasteners DOT | Durable | Drukknoop | Deel C | Parker | RVS | 9 mm | 257994859 | € 1.79 | st |  | ✅ (per 10) |
-| druk_fasnap_a | Fasnap Fasnap | Drukknoop | Deel A | Koper-Vernikkeld | 286980532 | € 0.49 | st |  | ✅ |
-| druk_fasnap_b | Fasnap Fasnap | Drukknoop | Deel B | Koper-Vernikkeld | 286980536 | € 0.59 | st |  | ✅ |
-| druk_fasnap_c | Fasnap Fasnap | Drukknoop | Deel C | Koper-Vernikkeld | 286980544 | € 0.49 | st |  | ✅ |
-| druk_prym_a | Prym Prym | Drukknoop | Koper-Vernikkeld | Deel A | Stift 5 mm | 257994790 | € 0.49 | st |  | ✅ |
-| druk_prym_b | Prym Prym | Drukknoop | Koper-Vernikkeld | Deel B | Type 3000 | 257994796 | € 0.49 | st |  | ✅ |
-| druk_prym_c | Prym Prym | Drukknoop | Messing-Vernikkeld | Deel C | Type 3001 / 23 | 257994803 | € 0.49 | st |  | ✅ |
+| druk_ykk_a | YKK drukknoop deel A — RVS | 319599669 | € 0.59 | st |  | ✅ |
+| druk_ykk_b | YKK drukknoop deel B — RVS | 319599676 | € 0.73 | st |  | ✅ |
+| druk_ykk_c | YKK drukknoop deel C — RVS | 319599686 | € 0.59 | st |  | ✅ |
+| druk_dot_a | DOT Durable drukknoop deel A — RVS | 257994841 | € 0.73 | st |  | ✅ (per 10) |
+| druk_dot_b | DOT Durable drukknoop deel B — RVS | 257994829 | € 0.77 | st |  | ✅ (per 10) |
+| druk_dot_c | DOT Durable drukknoop deel C — Parker-schroef RVS 9 mm | 257994859 | € 1.79 | st |  | ✅ (per 10) |
+| druk_fasnap_a | Fasnap drukknoop deel A — koper-vernikkeld | 286980532 | € 0.49 | st |  | ✅ |
+| druk_fasnap_b | Fasnap drukknoop deel B — koper-vernikkeld | 286980536 | € 0.59 | st |  | ✅ |
+| druk_fasnap_c | Fasnap drukknoop deel C — koper-vernikkeld | 286980544 | € 0.49 | st |  | ✅ |
+| druk_prym_a | Prym drukknoop deel A — koper-vernikkeld (stift 5 mm) | 257994790 | € 0.49 | st |  | ✅ |
+| druk_prym_b | Prym drukknoop deel B — koper-vernikkeld (type 3000) | 257994796 | € 0.49 | st |  | ✅ |
+| druk_prym_c | Prym drukknoop deel C — messing-vernikkeld (type 3001/23) | 257994803 | € 0.49 | st |  | ✅ |
 | druk_dot_c_bout | DOT drukknoop deel C — bout RVS M5 × 9 mm | 258002241 | € 1.99 | st |  | ✅ (per 10) |
 | druk_dot_c_popnagel | DOT drukknoop deel C — popnagel RVS 8 mm | 257994867 | € 1.29 | st |  | ✅ (per 10) |
 | druk_dot_c_raamclip | DOT drukknoop deel C — raamclip RVS 24 mm | 257997395 | € 1.79 | st |  | ✅ (per 10) |
@@ -265,10 +265,10 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 | koordklem | Koordklem rond RVS 8 mm (koordeinden afwerken) | 277045622 | € 0.28 | st |  | ✅ |
 | rondknop | MH rondknop asymmetrisch zwart 30 × 24 mm | 259998021 | € 0.68 | st |  | ✅ |
 | noorse_knop | Marinetech Noorse knop RVS 11 × 10 mm | 257072753 | € 1.39 | st |  | ✅ |
-| klit_25_haak | Klittenband zwart 25 mm — haak (hard) | 260597286 | € 0.99 | m |  | ✅ |
-| klit_25_lus | Klittenband zwart 25 mm — lus (zacht) | 260606379 | € 0.99 | m |  | ✅ |
-| klit_50_haak | Klittenband zwart 50 mm — haak (hard) | 260607937 | € 1.39 | m |  | ✅ |
-| klit_50_lus | Klittenband zwart 50 mm — lus (zacht) | 260609573 | € 1.39 | m |  | ✅ |
+| klit_25_haak | Klittenband zelfklevend zwart 25 mm — haak (hard) | 260555711 | € 1.69 | m |  | ✅ |
+| klit_25_lus | Klittenband zelfklevend zwart 25 mm — lus (zacht) | 260556996 | € 1.69 | m |  | ✅ |
+| klit_50_haak | Klittenband zelfklevend zwart 50 mm — haak (hard) | 260556506 | € 1.99 | m |  | ✅ |
+| klit_50_lus | Klittenband zelfklevend zwart 50 mm — lus (zacht) | 260557218 | € 1.99 | m |  | ✅ |
 | raamfolie | Achilles Vinistar Super raamfolie 0,4 mm (137 cm breed) | 293617490 | € 9.32 | m |  | ✅ |
 | raamfolie_05 | Achilles Vinistar Smoke Tint raamfolie 0,5 mm (137 cm breed) | 323098115 | € 16.95 | m |  | ✅ |
 | tape_6 | Seam Stick dubbelzijdig tape 6 mm (rol 50 m) | 302835931 | € 5.20 | st | ja | ✅ |

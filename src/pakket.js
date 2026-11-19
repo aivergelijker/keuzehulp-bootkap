@@ -82,17 +82,14 @@
     var bev = BEVESTIGING[item.bevestiging] || {};
     var afstand = C.num(item.afstandCm || bev.afstand || 25, 10, 100);
     var randTot = model.randCm * aantal;
-    var punten = 0;
-    if (item.bevestiging === 'zuignap') {
-      punten = (Math.ceil(model.breedte / afstand) + Math.ceil(model.hoogte / afstand)) * 2 * aantal;
-    } else if (bev.afstand) {
-      punten = (model.gesloten ? C.puntenRondom(model.randCm, afstand) : C.puntenLangs(model.randCm, afstand)) * aantal;
-    }
+    // bevestigers: in elke hoek één, daartussen gelijk verdeeld (zie C.puntenPlan)
+    var puntenPlan = bev.afstand ? C.puntenPlan(model.rand, afstand) : { totaal: 0, zijden: [] };
+    var punten = puntenPlan.totaal * aantal;
     // stiklengte (m): alle paneelranden + zoom, voor garenverbruik
     var stikCm = panels.reduce(function (s, p) { return s + 2 * (p.w + p.h) * p.qty; }, 0) + plan.extraNaadCm;
     var naadCm = (model.naadCm || 0) * aantal + plan.extraNaadCm;
 
-    return { def: def, model: model, plan: plan, aantal: aantal, dk: dk, punten: punten, afstand: afstand,
+    return { def: def, model: model, plan: plan, aantal: aantal, dk: dk, punten: punten, puntenPlan: puntenPlan, afstand: afstand, zoom: zoom,
              randCm: randTot, stikCm: stikCm, naadCm: naadCm, opt: opt };
   }
 
@@ -142,7 +139,7 @@
     }
 
     /* bevestiging */
-    var bevNotitie = n + ' bevestigingspunten, om de ' + b.afstand + ' cm over ' + (b.randCm / 100).toFixed(1).replace('.', ',') + ' m rand.';
+    var bevNotitie = n + ' bevestigingspunten: één in elke hoek, daartussen gelijk verdeeld (max. ±' + b.afstand + ' cm) over ' + (b.randCm / 100).toFixed(1).replace('.', ',') + ' m rand.';
     switch (item.bevestiging) {
       case 'loxx': {
         var kop = { rvs: 'loxx_kop_rvs', kv: 'loxx_kop_kv', chroom: 'loxx_kop_chroom', zwart: 'loxx_kop_zwart' }[o.loxxKop || 'rvs'];
@@ -154,8 +151,10 @@
           R.add('loxx_moer', R.p('loxx_moer_rvs'), n, 'Eén moer per bout.', { groep: 'bevestiging' });
         }
         if (basis === 'doekdeel') R.add('loxx_basis', R.p('loxx_doekdeel_kv'), n, 'Voor doek-op-doek: de kop klikt in het doekdeel.', { groep: 'bevestiging' });
-        R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Om de Loxx-koppen in het doek te monteren.', { groep: 'bevestiging' });
-        if (gereedschap) R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat voor de kop in het doek.', { groep: 'gereedschap' });
+        if (gereedschap) {
+          R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Om de Loxx-koppen in het doek te monteren.', { groep: 'gereedschap' });
+          R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat voor de kop in het doek.', { groep: 'gereedschap' });
+        }
         break;
       }
       case 'druk': {
@@ -201,7 +200,7 @@
         break;
       }
       case 'zuignap': {
-        R.add('zuignap', R.p('zuignap'), n, n + ' zuignappen, om de ' + b.afstand + ' cm. Geen boren.', { groep: 'bevestiging' });
+        R.add('zuignap', R.p('zuignap'), n, n + ' zuignappen: één in elke hoek, daartussen gelijk verdeeld. Geen boren.', { groep: 'bevestiging' });
         R.add('ring', R.p('ring_10_rvs'), n, 'Eén zeilring per zuignap: voorkomt uitscheuren.', { groep: 'bevestiging' });
         if (gereedschap) R.add('ring_set', R.p('ring_10_set'), 1, 'Holpijp + stempel 10 mm voor de zeilringen.', { groep: 'gereedschap' });
         break;
@@ -215,8 +214,8 @@
       case 'klit': {
         var w = o.klitBreedte === 50 ? 50 : 25;
         var m = Math.ceil(b.randCm / 100);
-        R.add('klit_haak', R.p('klit_' + w + '_haak'), m, 'Harde kant, ' + m + ' m.', { groep: 'bevestiging' });
-        R.add('klit_lus', R.p('klit_' + w + '_lus'), m, 'Zachte kant, ' + m + ' m.', { groep: 'bevestiging' });
+        R.add('klit_haak', R.p('klit_' + w + '_haak'), m, 'Zelfklevend, harde kant, ' + m + ' m. Plak op een schone, vetvrije ondergrond.', { groep: 'bevestiging' });
+        R.add('klit_lus', R.p('klit_' + w + '_lus'), m, 'Zelfklevend, zachte kant, ' + m + ' m.', { groep: 'bevestiging' });
         break;
       }
     }
@@ -252,6 +251,7 @@
     var map = {}, volgorde = [];
     (project.items || []).forEach(function (item, idx) {
       var r = regelsVoorItem(item, cat);
+      r.item = item;
       perItem.push(r);
       r.regels.forEach(function (ln) {
         var m = map[ln.vid];
@@ -260,14 +260,59 @@
         if (m.items.indexOf(idx) < 0) m.items.push(idx);
       });
     });
+    // Een set "Holpijp & stempel" voor zeilringen bevat al een gratis stansblok:
+    // dan geen los stansblok meer bestellen voor drukknopen of tourniquets.
+    var sb = cat.p.stansblok && String(cat.p.stansblok.vid);
+    var setVids = Object.keys(cat.p).filter(function (k) { return /^ring_\d+_set$/.test(k); }).map(function (k) { return String(cat.p[k].vid); });
+    var heeftSet = volgorde.some(function (v) { return setVids.indexOf(v) >= 0; });
+    if (heeftSet && sb && map[sb]) { delete map[sb]; volgorde.splice(volgorde.indexOf(sb), 1); }
     (project.onderhoud || []).forEach(function (o) {
       var p = cat.p[o.key];
       if (!p || !(o.qty > 0)) return;
       if (!map[p.vid]) { map[p.vid] = { key: o.key, vid: String(p.vid), url: p.url, naam: p.naam, unit: p.unit, prijs: p.prijs, qty: 0, notitie: '', groep: 'onderhoud', items: [], img: p.img || null }; volgorde.push(String(p.vid)); }
       map[p.vid].qty = Math.max(map[p.vid].qty, o.qty);
     });
+    var snijplannen = combineerDoek(perItem, map, cat);
     var regels = volgorde.map(function (v) { return map[v]; });
-    return { regels: regels, perItem: perItem, totaal: totaal(regels) };
+    return { regels: regels, perItem: perItem, snijplannen: snijplannen, totaal: totaal(regels) };
+  }
+
+  /* Items met hetzelfde doek (en dezelfde kleur) delen één snijplan: kleine
+     stukken van verschillende items passen dan naast elkaar op de rol, in
+     plaats van dat elk item apart naar hele meters wordt afgerond. Hetzelfde
+     geldt voor raamfolie. */
+  function combineerDoek(perItem, map, cat) {
+    var groepen = {}, lijst = [];
+    function groep(vid, info) {
+      if (!groepen[vid]) { groepen[vid] = Object.assign({ vid: vid, items: [], panels: [], los: 0 }, info); lijst.push(groepen[vid]); }
+      return groepen[vid];
+    }
+    perItem.forEach(function (r, idx) {
+      var b = r.berekening;
+      if (b.dk) {
+        var g = groep(String(b.dk.kleur.vid), { soort: 'doek', dk: b.dk, rolCm: b.dk.doek.rolCm, naam: b.dk.doek.naam + ' — ' + b.dk.kleur.naam });
+        g.items.push(idx); g.los += b.plan.meters;
+        b.model.panels.forEach(function (p) { g.panels.push({ naam: p.naam, w: p.w, h: p.h, qty: (p.qty || 1) * b.aantal, zoomCm: b.zoom, item: idx }); });
+      }
+      var fr = r.regels.filter(function (ln) { return ln.key === 'raamfolie'; })[0];
+      var rf = r.item.extras && r.item.extras.raamfolie;
+      if (fr && rf) {
+        var gf = groep(String(fr.vid), { soort: 'raamfolie', rolCm: cat.p.raamfolie.rolCm, naam: fr.naam });
+        gf.items.push(idx); gf.los += fr.qty;
+        gf.panels.push({ naam: 'Raamfolie', w: C.num(rf.breedte, 10, 500), h: C.num(rf.hoogte, 10, 200), qty: Math.max(1, rf.aantal || 1) * b.aantal, zoomCm: 3, item: idx });
+      }
+    });
+    lijst.forEach(function (g) {
+      g.plan = C.snijplan(g.panels, g.rolCm, {});
+      var m = map[g.vid];
+      if (!m) return;
+      m.qty = g.plan.meters;
+      if (g.items.length > 1) {
+        m.notitie = 'Gezamenlijk snijplan voor items ' + g.items.map(function (i) { return i + 1; }).join(', ') + ': ' + g.plan.stukken.length +
+          ' stukken op een rol van ' + g.rolCm + ' cm breed, incl. zoom en snijmarge.' + (g.los > g.plan.meters ? ' Dat scheelt ' + (g.los - g.plan.meters) + ' m t.o.v. elk item apart.' : '');
+      }
+    });
+    return lijst;
   }
 
   function totaal(regels, prijzen) {

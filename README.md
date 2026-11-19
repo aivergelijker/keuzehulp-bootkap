@@ -31,10 +31,11 @@ Een klant kan meerdere items in één pakket zetten, bijvoorbeeld 3 ramen en een
 
 | Bestand | Rol |
 |---|---|
-| `src/core.js` | Rekenmodellen per vorm en een snijplan per rolbreedte. Dit is shelf-packing met kolommen, rotatie en de goedkoopste splitsrichting voor panelen die breder zijn dan de rol. Doek wordt altijd in hele meters besteld. |
+| `src/core.js` | Rekenmodellen per vorm en een snijplan per rolbreedte. Dit is shelf-packing met kolommen, rotatie en de goedkoopste splitsrichting voor panelen die breder zijn dan de rol. Doek wordt altijd in hele meters besteld. Items met hetzelfde doek en dezelfde kleur delen één snijplan, net als raamfolie. |
 | `src/pakket.js` | Zet de keuzes om in exacte winkelwagenregels (variant-ID + aantal). |
 | `src/catalog.js` | **Gegenereerd** door `tools/build_catalog.py` uit een crawl van esails.nl. Het bevat alle doeken, kleuren, garen en onderdelen met variant-ID's. |
 | `src/live.js` | Haalt live prijs en voorraad op via `/<product>.html?format=json`. Zet de regels één voor één in de winkelwagen via `POST /cart/add/<vid>/` en controleert daarna `/cart/?format=json`. Pusht ook GTM-events. |
+| `src/bouwtekening.js` | Indicatieve bouwtekening per item: stukkenlijst, tekening per stuk met maten en bevestigingspunten, snijplan met posities en werkvolgorde. Altijd met disclaimer (voorbeeld, geen maatwerkadvies). |
 | `src/ui.js` + `src/style.css` | De wizard zelf. |
 
 - **Live prijzen:** de prijzen in de catalogus zijn alleen een vangnet. In de shop toont de tool altijd de actuele prijs incl. btw en de voorraadstatus (op voorraad / op bestelling / niet leverbaar).

@@ -75,10 +75,11 @@ test('bevestigingsonderdelen hebben gelijke aantallen per punt', () => {
   const a = druk.find(r => r.key === 'druk_a').qty;
   assert.strictEqual(druk.find(r => r.key === 'druk_b').qty, a);
   assert.strictEqual(druk.find(r => r.key === 'druk_c').qty, a);
-  // buiskap 300 x 220: rand = 2*300 + 220 = 820 cm, om de 25 cm -> ceil(820/25)+1 = 34 punten -> DOT per 10: 40
+  // buiskap 300 x 220, max. 25 cm (+10% speling): hoeken vast, zijkant 300 -> 11 vakken, voorkant 220 -> 8 vakken,
+  // open rand: 11 + 8 + 11 + 1 = 31 punten -> DOT per 10: 40
   assert.strictEqual(a, 40);
   const ykk = P.regelsVoorItem({ ...base, bevestiging: 'druk', opt: { drukMerk: 'ykk' } }, cat).regels;
-  assert.strictEqual(ykk.find(r => r.key === 'druk_a').qty, 34, 'YKK niet afgerond');
+  assert.strictEqual(ykk.find(r => r.key === 'druk_a').qty, 31, 'YKK niet afgerond');
   for (const c of ['bout', 'popnagel', 'raamclip', 'parker']) {
     const r = P.regelsVoorItem({ ...base, bevestiging: 'druk', opt: { drukMerk: 'dot', drukC: c } }, cat).regels;
     r.filter(x => /^druk_[abc]$/.test(x.key)).forEach(x => assert.strictEqual(x.qty % 10, 0, 'DOT ' + x.naam + ' per 10'));

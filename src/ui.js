@@ -6,7 +6,7 @@
    ===================================================================== */
 (function (root) {
   'use strict';
-  var C = root.EsailsCore, P = root.EsailsPakket, CAT = root.EsailsCatalog, LIVE = root.EsailsLive;
+  var C = root.EsailsCore, P = root.EsailsPakket, CAT = root.EsailsCatalog, LIVE = root.EsailsLive, BT = root.EsailsBouwtekening;
   var MOUNT_IDS = ['esails-keuzehulp', 'esails-wizard-mount', 'esails-jacuzzi-mount', 'esails-zonwering-mount'];
   var STORE_KEY = 'eskh_state_v1';
   var TELEFOON = '023-5329517';
@@ -558,7 +558,7 @@
       draai: ['🔄', 'Tourniquets: draaiers op de boot, kousen in het doek. Ijzersterk.'],
       ring: ['⭕', 'Zeilringen in de rand, met elastisch koord om knoppen of haken.'],
       tunnel: ['〰️', 'Koord door een zoom rondom: aantrekken en klaar. Simpel en strak.'],
-      klit: ['🧷', 'Klittenband langs de rand. Geen gereedschap nodig.'],
+      klit: ['🧷', 'Zelfklevend klittenband langs de rand. Geen gereedschap nodig.'],
       zuignap: ['🪟', 'Zuignappen aan de binnenzijde van het glas, met een zeilring per zuignap.'],
       balkon: ['🏙️', 'Zeilringen in de rand, elastiek met koordhaken om de spijlen.']
     };
@@ -599,19 +599,19 @@
       var afst = d.afstandCm || bv.afstand;
       var punten = 0;
       try { punten = P.berekenItem(Object.assign({}, previewItem(), { afstandCm: afst }), CAT).punten; } catch (e) { }
-      h += '<div class="eskh-field"><label>Afstand tussen bevestigers: <strong>' + afst + ' cm</strong> → ' + punten + ' stuks</label>' +
+      h += '<div class="eskh-field"><label>Maximale afstand tussen bevestigers: <strong>' + afst + ' cm</strong> → ' + punten + ' stuks</label>' +
         '<input type="range" min="10" max="' + (b === 'zuignap' || b === 'balkon' ? 80 : 60) + '" step="5" value="' + afst + '" data-afstand aria-label="Afstand tussen bevestigers"></div>' +
-        '<p class="eskh-note">Advies: 20–30 cm voor kappen (windvast), 30–50 cm voor zeilen en zonwering.</p>';
+        '<p class="eskh-note">In elke hoek komt een bevestiger; daartussen verdelen we ze gelijk, zodat ze recht en symmetrisch op elke zijde staan. Advies: 20–30 cm voor kappen (windvast), 30–50 cm voor zeilen en zonwering.</p>';
     }
     var heeftTool = b === 'loxx' || b === 'druk' || b === 'draai' || b === 'ring' || b === 'zuignap' || b === 'balkon';
-    if (heeftTool) h += toggleRij('gereedschap', 'Gereedschap meebestellen', 'Holpijp, stempel en/of stansblok om de onderdelen zelf in het doek te zetten. Zonder gereedschap lukt het niet. Heb je het al? Zet dit uit.', d.gereedschap !== false);
+    if (heeftTool) h += toggleRij('gereedschap', 'Gereedschap meebestellen', 'Holpijp, stempel, stansblok en/of montagesleutel om de onderdelen zelf in het doek te zetten. Zonder gereedschap lukt het niet. Heb je het al? Zet dit uit.', d.gereedschap !== false);
     return h + '</div>';
   }
 
   /* ---------------- overzicht ---------------- */
   var ONDERHOUD = [
     ['fabric_guard', '🛡️', 'Impregneer na verloop van tijd (acryl en polyester).'],
-    ['multi_cleaner', '🧴', 'Reinigt doek, ramen en kunststof.'],
+    ['multi_cleaner', '🧴', 'Reinigt doek, kunststof en andere buitenoppervlakken. Niet voor ramen of raamfolie.'],
     ['glaspotlood', '✏️', 'Aftekenen op doek, folie en glas.'],
     ['zeilnaalden', '🪡', 'Voor handwerk en reparaties.'],
     ['stansblok', '🟥', 'Extra stansblok als ondergrond.']
@@ -630,17 +630,37 @@
     if (!S.items.length) return '<p>Je pakket is leeg.</p><button type="button" class="eskh-btn eskh-btn-primary" data-act="nieuw">Begin opnieuw</button>';
     var pk = pakket();
     var h = '';
+    // doekgroep per item (items met hetzelfde doek + kleur delen één snijplan)
+    var doekGroep = {};
+    (pk.snijplannen || []).forEach(function (g) { if (g.soort === 'doek') g.items.forEach(function (i) { doekGroep[i] = g; }); });
     // per item
     S.items.forEach(function (it, i) {
       var r = pk.perItem[i];
-      var dk = r.berekening.dk;
+      var b = r.berekening, dk = b.dk;
+      var g = doekGroep[i], gedeeld = g && g.items.length > 1;
+      var doekTxt = gedeeld ? 'deelt ' + g.plan.meters + ' m doek met item ' + g.items.filter(function (j) { return j !== i; }).map(function (j) { return j + 1; }).join(', ') : b.plan.meters + ' m doek';
       h += '<div class="eskh-item"><div class="eskh-item-head"><div><strong>' + esc(itemLabel(it, i)) + '</strong><span>' +
-        esc(dk.doek.naam + ' ' + dk.kleur.naam) + ' · ' + esc(P.BEVESTIGING[it.bevestiging].naam) + ' · ' + r.berekening.plan.meters + ' m doek</span></div>' +
+        esc(dk.doek.naam + ' ' + dk.kleur.naam) + ' · ' + esc(P.BEVESTIGING[it.bevestiging].naam) + ' · ' + esc(doekTxt) + '</span></div>' +
         '<div class="eskh-item-acts"><button type="button" data-edit="' + i + '">Wijzig</button><button type="button" data-dup="' + i + '">Dupliceer</button><button type="button" data-del="' + i + '">Verwijder</button></div></div>' +
-        '<details class="eskh-plan"><summary>Snijplan &amp; berekening</summary>' + snijplanSVG(r.berekening.plan, dk.kleur.hex) +
-        '<p class="eskh-note">Netto oppervlak ' + nl(r.berekening.model.oppervlakM2 * r.berekening.aantal) + ' m² · rand ' + nl(r.berekening.randCm / 100) + ' m' +
-        (r.berekening.punten ? ' · ' + r.berekening.punten + ' bevestigingspunten (om de ' + r.berekening.afstand + ' cm)' : '') + '. Incl. ' + C.R.zoomCm + ' cm zoom per rand en snijmarge.</p></details></div>';
+        '<details class="eskh-plan"><summary>Bouwtekening &amp; berekening <span>(voorbeeld)</span></summary>' +
+        '<p class="eskh-note">Netto oppervlak ' + nl(b.model.oppervlakM2 * b.aantal) + ' m² · rand ' + nl(b.randCm / 100) + ' m' +
+        (b.punten ? ' · ' + b.punten + ' bevestigingspunten (in elke hoek, daartussen max. ±' + b.afstand + ' cm)' : '') + '. Incl. ' + nl(b.zoom, 0) + ' cm zoom per rand en snijmarge.</p>' +
+        BT.html(it, b, { snijplan: !gedeeld }) +
+        (gedeeld ? '<p class="eskh-note">De stukken van dit item staan in het gezamenlijke snijplan hieronder.</p>' : '') + '</details></div>';
     });
+    // gezamenlijke snijplannen (alleen als items doek of raamfolie delen)
+    var gedeeldePlannen = (pk.snijplannen || []).filter(function (g) { return g.items.length > 1; });
+    if (gedeeldePlannen.length) {
+      h += '<div class="eskh-box eskh-gezamenlijk"><strong>Gezamenlijk snijplan</strong>' +
+        '<p class="eskh-note">Items met hetzelfde doek snijden we uit één stuk: dat scheelt doek. Het nummer voor de naam is het item.</p>';
+      gedeeldePlannen.forEach(function (g) {
+        var label = function (p) { return (p.item + 1) + '· ' + p.naam.replace(/ \(baan.*\)/, ''); };
+        var los = g.los > g.plan.meters ? ' <em>(' + (g.los - g.plan.meters) + ' m minder dan elk item apart)</em>' : '';
+        h += '<details class="eskh-plan" open><summary>' + esc(g.naam) + ': ' + g.plan.meters + ' m voor item ' + g.items.map(function (i) { return i + 1; }).join(', ') + los + '</summary>' +
+          BT.snijplanSVG(g.plan, { kleur: g.dk ? g.dk.kleur.hex : '#e5f0ff', label: label }) + BT.snijlijstHTML(g.plan, label) + '</details>';
+      });
+      h += '<p class="eskh-bt-disclaimer">' + esc(BT.DISCLAIMER) + '</p></div>';
+    }
     h += '<button type="button" class="eskh-btn eskh-btn-ghost eskh-add" data-act="nieuw">+ Nog iets toevoegen (bootkap, hoes of zonwering)</button>';
 
     // regels
@@ -859,7 +879,15 @@
       return;
     }
     if (act === 'cart-retry') { retryWinkelwagen(); return; }
-    if (act === 'print') { window.print(); return; }
+    if (act === 'print') {
+      // bouwtekeningen en snijplannen openklappen voor de print, daarna terugzetten
+      var dicht = [].slice.call(root$.querySelectorAll('details:not([open])'));
+      dicht.forEach(function (el) { el.open = true; });
+      var terug = function () { dicht.forEach(function (el) { el.open = false; }); window.removeEventListener('afterprint', terug); };
+      window.addEventListener('afterprint', terug);
+      window.print();
+      return;
+    }
     // Bevestiging in de pagina zelf: window.confirm wordt door sommige (in-app) browsers stil geblokkeerd.
     if (act === 'reset') { S.resetVraag = true; render(); return; }
     if (act === 'reset-nee') { S.resetVraag = false; render(); return; }
@@ -929,7 +957,7 @@
      Init
      ------------------------------------------------------------------ */
   function init() {
-    if (!C || !P || !CAT || !LIVE) return false;
+    if (!C || !P || !CAT || !LIVE || !BT) return false;
     var el = null;
     for (var i = 0; i < MOUNT_IDS.length && !el; i++) el = document.getElementById(MOUNT_IDS[i]);
     if (!el) return false;

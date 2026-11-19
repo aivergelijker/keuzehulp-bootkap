@@ -1788,7 +1788,7 @@
   "druk_ykk_a": {
    "vid": "319599669",
    "url": "ykk-drukknoop-rvs-deel-a.html",
-   "naam": "YKK YKK | Drukknoop | RVS | Deel A",
+   "naam": "YKK drukknoop deel A — RVS",
    "prijs": 0.59,
    "unit": "st",
    "img": 490544394
@@ -1796,7 +1796,7 @@
   "druk_ykk_b": {
    "vid": "319599676",
    "url": "ykk-drukknoop-rvs-deel-b.html",
-   "naam": "YKK YKK | Drukknoop | RVS | Deel B",
+   "naam": "YKK drukknoop deel B — RVS",
    "prijs": 0.73,
    "unit": "st",
    "img": 490544396
@@ -1804,7 +1804,7 @@
   "druk_ykk_c": {
    "vid": "319599686",
    "url": "ykk-drukknoop-rvs-deel-c.html",
-   "naam": "YKK YKK | Drukknoop | RVS | Deel C",
+   "naam": "YKK drukknoop deel C — RVS",
    "prijs": 0.59,
    "unit": "st",
    "img": 490544402
@@ -1812,7 +1812,7 @@
   "druk_dot_a": {
    "vid": "257994841",
    "url": "dot-drukknoop-rvs-deel-a.html",
-   "naam": "DOT® Fasteners DOT | Durable | Drukknoop | Deel A | RVS",
+   "naam": "DOT Durable drukknoop deel A — RVS",
    "prijs": 0.73,
    "unit": "st",
    "img": 391528000,
@@ -1821,7 +1821,7 @@
   "druk_dot_b": {
    "vid": "257994829",
    "url": "dot-drukknoop-deel-b-rvs.html",
-   "naam": "DOT® Fasteners DOT | Durable | Drukknoop | Deel B | RVS",
+   "naam": "DOT Durable drukknoop deel B — RVS",
    "prijs": 0.77,
    "unit": "st",
    "img": 391527943,
@@ -1830,7 +1830,7 @@
   "druk_dot_c": {
    "vid": "257994859",
    "url": "dot-drukknoop-parker-deel-c-9-mm.html",
-   "naam": "DOT® Fasteners DOT | Durable | Drukknoop | Deel C | Parker | RVS | 9 mm",
+   "naam": "DOT Durable drukknoop deel C — Parker-schroef RVS 9 mm",
    "prijs": 1.79,
    "unit": "st",
    "img": 391528042,
@@ -1839,7 +1839,7 @@
   "druk_fasnap_a": {
    "vid": "286980532",
    "url": "fasnap-drukknoop-deel-a-koper-vernikkeld.html",
-   "naam": "Fasnap Fasnap | Drukknoop | Deel A | Koper-Vernikkeld",
+   "naam": "Fasnap drukknoop deel A — koper-vernikkeld",
    "prijs": 0.49,
    "unit": "st",
    "img": 434865637
@@ -1847,7 +1847,7 @@
   "druk_fasnap_b": {
    "vid": "286980536",
    "url": "fasnap-drukknoop-deel-b-koper-vernikkeld.html",
-   "naam": "Fasnap Fasnap | Drukknoop | Deel B | Koper-Vernikkeld",
+   "naam": "Fasnap drukknoop deel B — koper-vernikkeld",
    "prijs": 0.59,
    "unit": "st",
    "img": 434865651
@@ -1855,7 +1855,7 @@
   "druk_fasnap_c": {
    "vid": "286980544",
    "url": "fasnap-drukknoop-deel-c-koper-vernikkeld.html",
-   "naam": "Fasnap Fasnap | Drukknoop | Deel C | Koper-Vernikkeld",
+   "naam": "Fasnap drukknoop deel C — koper-vernikkeld",
    "prijs": 0.49,
    "unit": "st",
    "img": 434865670
@@ -1863,7 +1863,7 @@
   "druk_prym_a": {
    "vid": "257994790",
    "url": "prym-drukknoop-koper-vernikkeld-deel-a-stift-5-mm.html",
-   "naam": "Prym Prym | Drukknoop | Koper-Vernikkeld | Deel A | Stift 5 mm",
+   "naam": "Prym drukknoop deel A — koper-vernikkeld (stift 5 mm)",
    "prijs": 0.49,
    "unit": "st",
    "img": 391527848
@@ -1871,7 +1871,7 @@
   "druk_prym_b": {
    "vid": "257994796",
    "url": "prym-drukknoop-koper-vernikkeld-deel-b-type-3000.html",
-   "naam": "Prym Prym | Drukknoop | Koper-Vernikkeld | Deel B | Type 3000",
+   "naam": "Prym drukknoop deel B — koper-vernikkeld (type 3000)",
    "prijs": 0.49,
    "unit": "st",
    "img": 391527861
@@ -1879,7 +1879,7 @@
   "druk_prym_c": {
    "vid": "257994803",
    "url": "prym-drukknoop-koper-vernikkeld-deel-c-type-3000-2.html",
-   "naam": "Prym Prym | Drukknoop | Messing-Vernikkeld | Deel C | Type 3001 / 23",
+   "naam": "Prym drukknoop deel C — messing-vernikkeld (type 3001/23)",
    "prijs": 0.49,
    "unit": "st",
    "img": 391527884
@@ -2082,36 +2082,36 @@
    "img": 390279117
   },
   "klit_25_haak": {
-   "vid": "260597286",
-   "url": "klittenband-zwart-haak-hard-25-mm-prijs-per-meter.html",
-   "naam": "Klittenband zwart 25 mm — haak (hard)",
-   "prijs": 0.99,
+   "vid": "260555711",
+   "url": "klittenband-zwart-haak-hard-25-mm-zelfklevend-prij.html",
+   "naam": "Klittenband zelfklevend zwart 25 mm — haak (hard)",
+   "prijs": 1.69,
    "unit": "m",
-   "img": 394903980
+   "img": 484612966
   },
   "klit_25_lus": {
-   "vid": "260606379",
-   "url": "klittenband-zwart-lus-zacht-25-mm-prijs-per-meter.html",
-   "naam": "Klittenband zwart 25 mm — lus (zacht)",
-   "prijs": 0.99,
+   "vid": "260556996",
+   "url": "klittenband-zwart-lus-zacht-25-mm-zelfklevend-prij.html",
+   "naam": "Klittenband zelfklevend zwart 25 mm — lus (zacht)",
+   "prijs": 1.69,
    "unit": "m",
-   "img": 484613215
+   "img": 492575083
   },
   "klit_50_haak": {
-   "vid": "260607937",
-   "url": "klittenband-zwart-haak-hard-50-mm-prijs-per-meter.html",
-   "naam": "Klittenband zwart 50 mm — haak (hard)",
-   "prijs": 1.39,
+   "vid": "260556506",
+   "url": "klittenband-zwart-haak-hard-50-mm-zelfklevend-prij.html",
+   "naam": "Klittenband zelfklevend zwart 50 mm — haak (hard)",
+   "prijs": 1.99,
    "unit": "m",
-   "img": 394906274
+   "img": 484612954
   },
   "klit_50_lus": {
-   "vid": "260609573",
-   "url": "klittenband-zwart-lus-zacht-50-mm-prijs-per-meter.html",
-   "naam": "Klittenband zwart 50 mm — lus (zacht)",
-   "prijs": 1.39,
+   "vid": "260557218",
+   "url": "klittenband-zwart-lus-zacht-50-mm-zelfklevend-prij.html",
+   "naam": "Klittenband zelfklevend zwart 50 mm — lus (zacht)",
+   "prijs": 1.99,
    "unit": "m",
-   "img": 484613002
+   "img": 492575109
   },
   "raamfolie": {
    "vid": "293617490",

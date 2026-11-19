@@ -46,10 +46,12 @@
     var nuttig = rolCm - overlap;
     panels.forEach(function (p) {
       var q = p.qty || 1;
+      var z = p.zoomCm != null ? p.zoomCm : zoom; // zoom per paneel (bijv. tunnelzoom per item)
       for (var k = 0; k < q; k++) {
-        var w = p.w + 2 * zoom, h = p.h + 2 * zoom;
+        var w = p.w + 2 * z, h = p.h + 2 * z;
+        var meta = { item: p.item, nettoW: p.w, nettoH: p.h, zoomCm: z };
         if (Math.min(w, h) <= rolCm) {
-          pieces.push({ naam: p.naam, w: w, h: h });
+          pieces.push(Object.assign({ naam: p.naam, w: w, h: h }, meta));
         } else {
           // breder dan de rol in beide richtingen: splits in banen. Kies de
           // richting die de minste rollengte kost (n banen x baanlengte).
@@ -59,7 +61,7 @@
           var n = dwars === w ? nW : nH;
           var rest = dwars - (n - 1) * nuttig;
           for (var i = 0; i < n; i++) {
-            pieces.push({ naam: p.naam + ' (baan ' + (i + 1) + '/' + n + ')', w: i < n - 1 ? rolCm : Math.max(rest, overlap * 2), h: lang, vast: true });
+            pieces.push(Object.assign({ naam: p.naam + ' (baan ' + (i + 1) + '/' + n + ')', w: i < n - 1 ? rolCm : Math.max(rest, overlap * 2), h: lang, vast: true, baan: true }, meta));
           }
           naden += (n - 1) * lang;
         }
@@ -95,7 +97,7 @@
         var big = Math.max(w, h), small = Math.min(w, h);
         if (strat !== 1 && big <= rolCm) { w = big; h = small; } else { w = small; h = big; }
       }
-      return { naam: s.naam, w: w, h: h, vast: s.vast };
+      return Object.assign({}, s, { w: w, h: h });
     });
     pieces.sort(strat === 2
       ? function (p, q) { return q.w * q.h - p.w * p.h; }
@@ -114,22 +116,25 @@
           for (var c = 0; c < sh.cols.length; c++) {
             var col = sh.cols[c];
             if (w <= col.w + 1e-9 && col.used + h <= sh.h + 1e-9) {
-              placed.push({ naam: s.naam, x: col.x, y: sh.y + col.used, w: w, h: h });
+              placed.push(stuk(s, col.x, sh.y + col.used, w, h));
               col.used += h; return;
             }
           }
           // nieuwe kolom naast de bestaande
           if (sh.usedW + w <= rolCm + 1e-9) {
             sh.cols.push({ x: sh.usedW, w: w, used: h });
-            placed.push({ naam: s.naam, x: sh.usedW, y: sh.y, w: w, h: h });
+            placed.push(stuk(s, sh.usedW, sh.y, w, h));
             sh.usedW += w; return;
           }
         }
       }
       var nieuw = { y: y, h: s.h, usedW: s.w, cols: [{ x: 0, w: s.w, used: s.h }] };
       shelves.push(nieuw);
-      placed.push({ naam: s.naam, x: 0, y: y, w: s.w, h: s.h });
+      placed.push(stuk(s, 0, y, s.w, s.h));
       y += s.h;
+    }
+    function stuk(s, x, yy, w, h) {
+      return { naam: s.naam, x: x, y: yy, w: w, h: h, item: s.item, nettoW: s.nettoW, nettoH: s.nettoH, zoomCm: s.zoomCm, baan: !!s.baan, gedraaid: !s.baan && s.nettoW != null && Math.abs(w - 2 * s.zoomCm - s.nettoW) > 0.5 };
     }
     pieces.forEach(plaats);
     return { y: y, placed: placed };
@@ -156,6 +161,40 @@
        zoomCm      : totale zoomlengte (voor tunnel/klittenband/zoomband)
        oppervlakM2 : netto oppervlak (info + mallendoek)
      --------------------------------------------------------------- */
+  /* ---------------------------------------------------------------
+     BEVESTIGINGSPLAN — hoeken eerst
+     Elke hoek krijgt een bevestiger. De ruimte tussen twee hoeken wordt
+     in gelijke vakken verdeeld: net zoveel dat een vak niet (veel) groter
+     wordt dan de gekozen afstand (max. 10% speling). Zo staan de punten
+     recht op elke zijde en vanzelf symmetrisch.
+       rand.type: 'lus'    gesloten rondom (hoeken gedeeld)
+                  'lijn'   open rand (begin- en eindpunt extra)
+                  'cirkel' rond, geen hoeken: gelijk verdeeld
+     --------------------------------------------------------------- */
+  var SPELING = 1.1;
+  function z(lengte, paneel) { return { lengte: lengte, paneel: paneel }; }
+  function rechthoek(w, h, paneel) {
+    return { type: 'lus', rondom: true, zijden: [z(w, paneel), z(h, paneel), z(w, paneel), z(h, paneel)] };
+  }
+  function verdeelZijde(lengte, afstand) {
+    var n = Math.max(1, ceil(lengte / (afstand * SPELING)));
+    var pos = [];
+    for (var i = 0; i <= n; i++) pos.push(Math.round(lengte * i / n));
+    return { lengte: lengte, vakken: n, tussen: lengte / n, posities: pos };
+  }
+  function puntenPlan(rand, afstand) {
+    if (!rand || !(afstand > 0)) return { totaal: 0, zijden: [] };
+    if (rand.type === 'cirkel') {
+      var omtrek = rand.zijden[0].lengte;
+      var n = Math.max(4, ceil(omtrek / (afstand * SPELING)));
+      var pos = []; for (var i = 0; i < n; i++) pos.push(Math.round(omtrek * i / n));
+      return { type: 'cirkel', totaal: n, zijden: [{ paneel: rand.zijden[0].paneel, lengte: omtrek, vakken: n, tussen: omtrek / n, posities: pos }] };
+    }
+    var zijden = rand.zijden.map(function (zz) { var v = verdeelZijde(zz.lengte, afstand); v.paneel = zz.paneel; return v; });
+    var vakken = zijden.reduce(function (t, v) { return t + v.vakken; }, 0);
+    return { type: rand.type, rondom: !!rand.rondom, totaal: rand.type === 'lus' ? vakken : vakken + 1, zijden: zijden };
+  }
+
   var MODELLEN = {
     /* Buiskap / achtertent: dak + 2 zijkanten + voorkant (+ achterkant) */
     buiskap: function (i) {
@@ -168,14 +207,17 @@
       ];
       if (i.achterkant) panels.push({ naam: 'Achterkant', w: B, h: H });
       var rand = 2 * L + B + (i.achterkant ? B : 0);
-      return { panels: panels, randCm: rand, gesloten: false, zoomCm: rand, oppervlakM2: oppervlak(panels) };
+      var zijden = [z(L, 'Zijkant'), z(B, 'Voorkant'), z(L, 'Zijkant')];
+      if (i.achterkant) zijden.push(z(B, 'Achterkant'));
+      return { panels: panels, randCm: rand, gesloten: false, zoomCm: rand, oppervlakM2: oppervlak(panels),
+               rand: { type: i.achterkant ? 'lus' : 'lijn', zijden: zijden } };
     },
     /* Bimini / zonnedek: één dakpaneel */
     bimini: function (i) {
       var L = num(i.lengte, 50, 600), B = num(i.breedte, 50, 400);
       var panels = [{ naam: 'Bimini-dak', w: L * 1.1, h: B }];
       var rand = 2 * (L * 1.1 + B);
-      return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: oppervlak(panels) };
+      return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: oppervlak(panels), rand: rechthoek(L * 1.1, B, 'Bimini-dak') };
     },
     /* Plat zeil (dekzeil, winterkleed, plat afdekzeil) met overhang rondom */
     plat: function (i) {
@@ -183,7 +225,7 @@
       var w = L + 2 * o, h = B + 2 * o;
       var panels = [{ naam: 'Zeil', w: w, h: h }];
       var rand = 2 * (w + h);
-      return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: oppervlak(panels) };
+      return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: oppervlak(panels), rand: rechthoek(w, h, 'Zeil') };
     },
     /* Blokvormige hoes (bank, loungeset, tafel, kist) met rok tot hoogte H */
     blok: function (i) {
@@ -194,7 +236,8 @@
         { naam: 'Zijkant kort', w: B, h: H, qty: 2 }
       ];
       var onder = 2 * (L + B);
-      return { panels: panels, randCm: onder, gesloten: true, zoomCm: onder, naadCm: onder + 4 * H, oppervlakM2: oppervlak(panels) };
+      return { panels: panels, randCm: onder, gesloten: true, zoomCm: onder, naadCm: onder + 4 * H, oppervlakM2: oppervlak(panels),
+               rand: { type: 'lus', zijden: [z(L, 'Zijkant lang'), z(B, 'Zijkant kort'), z(L, 'Zijkant lang'), z(B, 'Zijkant kort')] } };
     },
     /* Ronde hoes (bbq, ronde tafel, parasolvoet): rond bovenblad + strook */
     rond: function (i) {
@@ -204,7 +247,8 @@
         { naam: 'Bovenblad (rond)', w: D, h: D },
         { naam: 'Rondom-strook', w: omtrek + 4, h: H }
       ];
-      return { panels: panels, randCm: omtrek, gesloten: true, zoomCm: omtrek, naadCm: omtrek + H, oppervlakM2: (Math.PI * D * D / 4 + omtrek * H) / 10000 };
+      return { panels: panels, randCm: omtrek, gesloten: true, zoomCm: omtrek, naadCm: omtrek + H, oppervlakM2: (Math.PI * D * D / 4 + omtrek * H) / 10000,
+               rand: { type: 'cirkel', zijden: [z(omtrek, 'Rondom-strook')] } };
     },
     /* Jacuzzi / hottub: afgeronde hoeken + rok */
     jacuzzi: function (i) {
@@ -215,14 +259,16 @@
         { naam: 'Bovenkant', w: L, h: B },
         { naam: 'Rok (per zijde)', w: omtrek / 4 + 4, h: H, qty: 4 }
       ];
-      return { panels: panels, randCm: omtrek, gesloten: true, zoomCm: omtrek, naadCm: omtrek + 4 * H, oppervlakM2: ((L * B - 4 * Rr * Rr + Math.PI * Rr * Rr) + omtrek * H) / 10000 };
+      var zijde = omtrek / 4;
+      return { panels: panels, randCm: omtrek, gesloten: true, zoomCm: omtrek, naadCm: omtrek + 4 * H, oppervlakM2: ((L * B - 4 * Rr * Rr + Math.PI * Rr * Rr) + omtrek * H) / 10000,
+               rand: { type: 'lus', zijden: [z(zijde, 'Rok (per zijde)'), z(zijde, 'Rok (per zijde)'), z(zijde, 'Rok (per zijde)'), z(zijde, 'Rok (per zijde)')] } };
     },
     /* Zonwering / schaduwdoek voor raam of balkon */
     zonwering: function (i) {
       var B = num(i.breedte, 20, 600), H = num(i.hoogte, 20, 400);
       var panels = [{ naam: 'Zonwering', w: B, h: H }];
       var rand = 2 * (B + H);
-      return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: B * H / 10000, breedte: B, hoogte: H };
+      return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: B * H / 10000, breedte: B, hoogte: H, rand: rechthoek(B, H, 'Zonwering') };
     }
   };
 
@@ -246,6 +292,7 @@
     snijplan: snijplan,
     MODELLEN: MODELLEN,
     puntenLangs: puntenLangs,
+    puntenPlan: puntenPlan,
     puntenRondom: puntenRondom,
     meters: meters,
     lijmGram: lijmGram,

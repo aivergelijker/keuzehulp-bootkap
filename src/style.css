@@ -162,7 +162,30 @@
   .eskh-nav,.eskh-add,.eskh-item-acts,.eskh-share,.eskh-btn,.eskh-stepper button,.eskh-suggest .eskh-chip:not(.is-active){display:none!important}
   .eskh{border:0;max-width:none}
   .eskh-plan{display:block}
+  .eskh-item{break-inside:auto;page-break-before:auto}
+  .eskh-item + .eskh-item{break-before:page;page-break-before:always}
+  .eskh-bt-stukken figure,.eskh-bt-plan,.eskh-bt-tabel tr{break-inside:avoid}
+  .eskh-bt-disclaimer{border-color:#999}
 }
+@page{size:A4;margin:14mm}
 
 .eskh-reset-vraag{font-size:13.5px;display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
 .eskh .eskh-link-danger{color:#b3261e;font-weight:600}
+
+/* bouwtekening */
+.eskh-bt{margin-top:10px}
+.eskh-bt h5{font-size:13.5px;margin:16px 0 6px;color:var(--eskh-primary)}
+.eskh-bt-disclaimer{font-size:12.5px;line-height:1.45;background:#fff8e6;border:1px solid #f0d58a;border-radius:8px;padding:8px 10px;margin:8px 0;color:#5c4400}
+.eskh-bt-note{font-size:12.5px;color:var(--eskh-muted);margin:0 0 6px}
+.eskh-bt-tabel{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0}
+.eskh-bt-tabel th,.eskh-bt-tabel td{text-align:left;padding:5px 6px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+.eskh-bt-tabel th{font-weight:600;color:var(--eskh-muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+.eskh-bt-tabel small{color:var(--eskh-muted)}
+.eskh-bt-stukken{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.eskh-bt-stukken figure{margin:0;border:1px solid #e5e7eb;border-radius:8px;padding:6px;background:#fff}
+.eskh-bt-svg{display:block;max-width:100%;height:auto}
+.eskh-bt-plan{margin-top:6px}
+.eskh-bt-stappen{font-size:13px;line-height:1.5;padding-left:20px;margin:6px 0}
+.eskh-bt-stappen li{margin-bottom:4px}
+.eskh-gezamenlijk em{font-style:normal;color:#15803d;font-weight:600}
+.eskh-bt-stukken figcaption{font-size:11.5px;line-height:1.45;color:var(--eskh-text);padding:4px 4px 2px;border-top:1px dashed #e5e7eb;margin-top:4px}
