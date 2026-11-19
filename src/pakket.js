@@ -17,7 +17,7 @@
       vormen: {
         buiskap: { naam: 'Buiskap / achtertent', model: 'buiskap', doeken: ['sunbrella_plus', 'sauleda_seastar', 'poly_marine'], bevestiging: ['loxx', 'druk', 'draai', 'ring'] },
         bimini:  { naam: 'Bimini / zonnedek', model: 'bimini', doeken: ['sunbrella_plus', 'sauleda_seastar', 'poly_marine'], bevestiging: ['loxx', 'druk', 'ring', 'klit'] },
-        dekzeil: { naam: 'Dekzeil / winterkleed', model: 'plat', doeken: ['ferrari_705', 'mehler_8205', 'mehler_8940'], bevestiging: ['ring', 'tunnel', 'druk', 'loxx'] }
+        dekzeil: { naam: 'Dekzeil / winterkleed', model: 'dekzeil', doeken: ['ferrari_705', 'mehler_8205', 'mehler_8940'], bevestiging: ['ring', 'tunnel', 'druk', 'loxx'] }
       }
     },
     afdekzeil: {
@@ -50,6 +50,7 @@
   };
 
   var TUNNEL_ZOOM_CM = 8; // extra doek per rand voor een koordtunnel
+  var SPLITSBAAR = { dekzeil: 1, blok: 1, jacuzzi: 1, rond: 1 }; // modellen met een rok die uit delen mag bestaan
 
   function vormDef(item) {
     var m = MODULES[item.module];
@@ -74,9 +75,39 @@
     var aantal = Math.max(1, Math.round(item.aantal || 1));
     var dk = doekKleur(cat, item);
     var rol = dk ? dk.doek.rolCm : 150;
-    var zoom = item.bevestiging === 'tunnel' ? C.R.zoomCm + TUNNEL_ZOOM_CM : C.R.zoomCm;
-    var panels = model.panels.map(function (p) { return { naam: p.naam, w: p.w, h: p.h, qty: (p.qty || 1) * aantal }; });
+    // Koordtunnel: bij een enkel zeil rondom (alle randen), anders alleen aan de
+    // onderrand van de stukken die de rand vormen (zijkanten, rok, strook).
+    var tunnel = item.bevestiging === 'tunnel';
+    var rondom = model.rand && model.rand.rondom;
+    var zoom = tunnel && rondom ? C.R.zoomCm + TUNNEL_ZOOM_CM : C.R.zoomCm;
+    var randPanelen = (model.rand && model.rand.zijden || []).map(function (zz) { return zz.paneel; });
+    var panels = model.panels.map(function (p) {
+      var extraH = tunnel && !rondom && randPanelen.indexOf(p.naam) >= 0 ? TUNNEL_ZOOM_CM : 0;
+      return { naam: p.naam, w: p.w, h: p.h, qty: (p.qty || 1) * aantal, zoomCm: zoom, extraH: extraH };
+    });
     var plan = C.snijplan(panels, rol, { zoomCm: zoom });
+
+    // Rokstroken (dekzeil, hoes, jacuzzi, ronde hoes) die langer zijn dan de
+    // rolbreedte mogen uit gelijke delen bestaan, zodat ze dwars op de rol
+    // passen. Alleen als dat minstens 1 m doek scheelt. Elke deelnaad gebruikt
+    // de zoom van beide delen; de extra naden tellen mee voor garen/lijm.
+    var splitNaadCm = 0;
+    if (SPLITSBAAR[def.model]) {
+      var nuttig = rol - 2 * zoom;
+      var alt = panels.map(function (p) {
+        var hoog = p.h + 2 * zoom + (p.extraH || 0);
+        if (randPanelen.indexOf(p.naam) < 0 || p.w + 2 * zoom <= rol || hoog > rol || nuttig <= 0) return p;
+        var k = Math.ceil(p.w / nuttig - 1e-9);
+        return Object.assign({}, p, { naam: p.naam + ' (deel van ' + k + ')', basis: p.naam, delen: k, w: p.w / k, qty: p.qty * k });
+      });
+      if (alt.some(function (p) { return p.delen; })) {
+        var altPlan = C.snijplan(alt, rol, { zoomCm: zoom });
+        if (altPlan.meters <= plan.meters - 1) {
+          panels = alt; plan = altPlan;
+          panels.forEach(function (p) { if (p.delen) splitNaadCm += (p.delen - 1) * p.h * (p.qty / p.delen); });
+        }
+      }
+    }
 
     var opt = item.opt || {};
     var bev = BEVESTIGING[item.bevestiging] || {};
@@ -87,9 +118,9 @@
     var punten = puntenPlan.totaal * aantal;
     // stiklengte (m): alle paneelranden + zoom, voor garenverbruik
     var stikCm = panels.reduce(function (s, p) { return s + 2 * (p.w + p.h) * p.qty; }, 0) + plan.extraNaadCm;
-    var naadCm = (model.naadCm || 0) * aantal + plan.extraNaadCm;
+    var naadCm = (model.naadCm || 0) * aantal + plan.extraNaadCm + splitNaadCm;
 
-    return { def: def, model: model, plan: plan, aantal: aantal, dk: dk, punten: punten, puntenPlan: puntenPlan, afstand: afstand, zoom: zoom,
+    return { def: def, model: model, plan: plan, aantal: aantal, dk: dk, punten: punten, puntenPlan: puntenPlan, afstand: afstand, zoom: zoom, snijPanels: panels,
              randCm: randTot, stikCm: stikCm, naadCm: naadCm, opt: opt };
   }
 
@@ -97,11 +128,15 @@
   function Regels(cat) { this.cat = cat; this.list = []; }
   Regels.prototype.add = function (key, prod, qty, notitie, extra) {
     if (!prod) throw new Error('Product ontbreekt in catalogus: ' + key);
+    // Meterwaar (koord, klittenband, mallendoek): exacte lengte bewaren, zodat
+    // bouwPakket eerst over alle items optelt en pas daarna afrondt.
+    var exact = (prod.unit === 'm' && extra && extra.groep !== 'doek') ? qty : null;
     qty = Math.ceil(qty - 1e-9);
     if (qty <= 0) return;
     if (prod.verpakking > 1) qty = Math.ceil(qty / prod.verpakking) * prod.verpakking; // bijv. DOT: per 10 verpakt
     var r = { key: key, vid: String(prod.vid), url: prod.url, naam: prod.naam, unit: prod.unit || 'st', prijs: prod.prijs, verpakking: prod.verpakking || 1,
               qty: qty, notitie: notitie || '', perOrder: !!prod.perOrder, tool: !!prod.tool, img: prod.img || null };
+    if (exact != null) r.exact = exact;
     if (extra) for (var k in extra) r[k] = extra[k];
     this.list.push(r);
   };
@@ -121,7 +156,7 @@
     /* doek */
     if (b.dk) {
       R.add('doek', { vid: b.dk.kleur.vid, url: b.dk.kleur.url, naam: b.dk.doek.naam + ' — ' + b.dk.kleur.naam, prijs: b.dk.kleur.prijs, unit: 'm', img: b.dk.kleur.img },
-        b.plan.meters, 'Snijplan: ' + b.plan.stukken.length + ' stuk(ken) op een rol van ' + b.dk.doek.rolCm + ' cm breed, incl. zoom en snijmarge.', { groep: 'doek' });
+        b.plan.meters, 'Snijplan: ' + b.plan.stukken.length + ' stuk(ken) op een rol van ' + b.dk.doek.rolCm + ' cm breed, incl. zoom.', { groep: 'doek' });
     }
 
     /* verwerking */
@@ -130,8 +165,9 @@
       if (gram <= 200) R.add('lijm', R.p('saba_250'), 1, 'Voor ±' + Math.round(gram) + ' g lijm (naden + zoom).', { groep: 'verwerking' });
       else R.add('lijm', R.p('saba_1l'), Math.ceil(gram / 900), 'Voor ±' + Math.round(gram) + ' g lijm (naden + zoom).', { groep: 'verwerking' });
       if (item.ontvetter !== false) R.add('ontvetter', R.p('griffon_cleaner'), 1, 'Ontvet de lijmnaden vooraf: essentieel voor een waterdichte hechting.', { groep: 'verwerking' });
-    } else if (item.garen) {
-      var garen = cat.garen[item.garen];
+    } else if (item.garen || (item.module === 'zonwering' && b.dk && b.dk.kleur.garen)) {
+      // zonwering wordt altijd gestikt: ook bij een ouder bewaard pakket zonder garenkeuze
+      var garen = cat.garen[item.garen || b.dk.kleur.garen];
       if (garen) {
         var klossen = Math.max(1, Math.ceil((b.stikCm / 100) * 5 / 800)); // dubbele stiknaad, ~2,5x draad per naadmeter, 800 m per klos
         R.add('garen', garen, klossen, 'UV-bestendig garen, ±' + Math.round(b.stikCm / 100) + ' m stiknaad.', { groep: 'verwerking' });
@@ -190,7 +226,7 @@
         var dikte = item.bevestiging === 'balkon' ? 6 : (o.koordDikte || 6);
         var kk = o.koordKleur || 'zwart';
         var factor = item.bevestiging === 'balkon' ? 1.15 : 1.5; // rijgen in zigzag vraagt meer koord
-        R.add('koord', R.p('shock_' + dikte + '_' + kk), Math.ceil(b.randCm * factor / 100), 'Elastisch koord, incl. rijgmarge.', { groep: 'bevestiging' });
+        R.add('koord', R.p('shock_' + dikte + '_' + kk), b.randCm * factor / 100, 'Elastisch koord, incl. rijgmarge.', { groep: 'bevestiging' });
         var aanslag = item.bevestiging === 'balkon' ? 'koordhaak' : (o.aanslag || 'koordhaak');
         if (aanslag !== 'geen') {
           var aanslagNaam = { koordhaak: 'Haakt het koord vast.', musketon: 'Haakt het koord vast.', rondknop: 'Op de boot/het object; koord wordt erom geslagen.', noorse_knop: 'Op de boot; koord wordt erom geslagen.' }[aanslag];
@@ -207,15 +243,15 @@
       }
       case 'tunnel': {
         var td = o.koordDikte || 6, tk = o.koordKleur || 'zwart';
-        R.add('koord', R.p('shock_' + td + '_' + tk), Math.ceil((b.randCm + 100 * b.aantal) / 100), 'Loopt door de tunnelzoom; strak aantrekken en vastzetten. Tunnel (+' + TUNNEL_ZOOM_CM + ' cm) is meegerekend in het doek.', { groep: 'bevestiging' });
+        R.add('koord', R.p('shock_' + td + '_' + tk), (b.randCm + 100 * b.aantal) / 100, 'Loopt door de tunnelzoom; strak aantrekken en vastzetten. Tunnel (+' + TUNNEL_ZOOM_CM + ' cm) is meegerekend in het doek.', { groep: 'bevestiging' });
         R.add('koordklem', R.p('koordklem'), 2 * b.aantal, 'Om de koordeinden af te werken.', { groep: 'bevestiging' });
         break;
       }
       case 'klit': {
         var w = o.klitBreedte === 50 ? 50 : 25;
-        var m = Math.ceil(b.randCm / 100);
-        R.add('klit_haak', R.p('klit_' + w + '_haak'), m, 'Zelfklevend, harde kant, ' + m + ' m. Plak op een schone, vetvrije ondergrond.', { groep: 'bevestiging' });
-        R.add('klit_lus', R.p('klit_' + w + '_lus'), m, 'Zelfklevend, zachte kant, ' + m + ' m.', { groep: 'bevestiging' });
+        var m = b.randCm / 100, mTxt = (Math.round(m * 10) / 10).toString().replace('.', ',');
+        R.add('klit_haak', R.p('klit_' + w + '_haak'), m, 'Zelfklevend, harde kant, ' + mTxt + ' m. Plak op een schone, vetvrije ondergrond.', { groep: 'bevestiging' });
+        R.add('klit_lus', R.p('klit_' + w + '_lus'), m, 'Zelfklevend, zachte kant, ' + mTxt + ' m.', { groep: 'bevestiging' });
         break;
       }
     }
@@ -223,7 +259,7 @@
     /* extra's */
     var x = item.extras || {};
     if (x.mallendoek) {
-      var mm = Math.ceil(b.model.oppervlakM2 * b.aantal * 1.25 / (cat.p.mallendoek.rolCm / 100));
+      var mm = b.model.oppervlakM2 * b.aantal * 1.25 / (cat.p.mallendoek.rolCm / 100);
       R.add('mallendoek', R.p('mallendoek'), mm, 'Voor een mal van ±' + (b.model.oppervlakM2 * b.aantal).toFixed(1).replace('.', ',') + ' m², 300 cm breed.', { groep: 'extra' });
     }
     if (x.raamfolie && x.raamfolie.breedte > 0 && x.raamfolie.hoogte > 0) {
@@ -255,8 +291,9 @@
       perItem.push(r);
       r.regels.forEach(function (ln) {
         var m = map[ln.vid];
-        if (!m) { m = map[ln.vid] = Object.assign({}, ln, { qty: 0, items: [] }); volgorde.push(ln.vid); }
-        m.qty = ln.perOrder ? Math.max(m.qty, ln.qty) : m.qty + ln.qty;
+        if (!m) { m = map[ln.vid] = Object.assign({}, ln, { qty: 0, items: [] }); if (ln.exact != null) m.exact = 0; volgorde.push(ln.vid); }
+        if (ln.exact != null && m.exact != null) { m.exact += ln.exact; m.qty = Math.ceil(m.exact - 1e-9); }
+        else m.qty = ln.perOrder ? Math.max(m.qty, ln.qty) : m.qty + ln.qty;
         if (m.items.indexOf(idx) < 0) m.items.push(idx);
       });
     });
@@ -292,7 +329,7 @@
       if (b.dk) {
         var g = groep(String(b.dk.kleur.vid), { soort: 'doek', dk: b.dk, rolCm: b.dk.doek.rolCm, naam: b.dk.doek.naam + ' — ' + b.dk.kleur.naam });
         g.items.push(idx); g.los += b.plan.meters;
-        b.model.panels.forEach(function (p) { g.panels.push({ naam: p.naam, w: p.w, h: p.h, qty: (p.qty || 1) * b.aantal, zoomCm: b.zoom, item: idx }); });
+        b.snijPanels.forEach(function (p) { g.panels.push(Object.assign({}, p, { item: idx })); });
       }
       var fr = r.regels.filter(function (ln) { return ln.key === 'raamfolie'; })[0];
       var rf = r.item.extras && r.item.extras.raamfolie;
@@ -309,7 +346,7 @@
       m.qty = g.plan.meters;
       if (g.items.length > 1) {
         m.notitie = 'Gezamenlijk snijplan voor items ' + g.items.map(function (i) { return i + 1; }).join(', ') + ': ' + g.plan.stukken.length +
-          ' stukken op een rol van ' + g.rolCm + ' cm breed, incl. zoom en snijmarge.' + (g.los > g.plan.meters ? ' Dat scheelt ' + (g.los - g.plan.meters) + ' m t.o.v. elk item apart.' : '');
+          ' stukken op een rol van ' + g.rolCm + ' cm breed, incl. zoom.' + (g.los > g.plan.meters ? ' Dat scheelt ' + (g.los - g.plan.meters) + ' m t.o.v. elk item apart.' : '');
       }
     });
     return lijst;

@@ -143,3 +143,88 @@ test('geen los stansblok als er al een zeilringset (met gratis stansblok) in het
   assert.ok(!keys([kap('druk'), kap('ring')]).includes('stansblok'));      // met zeilringset: niet
   assert.ok(keys([kap('druk'), kap('ring')], [{ key: 'stansblok', qty: 1 }]).includes('stansblok')); // zelf extra gekozen: wel
 });
+
+test('balkon 290 × 100 cm: 3 m doek (100 cm hoogte past dwars op de rol, geen dubbele marge)', () => {
+  for (const doek of ['mehler_gaas', 'ferrari_362']) {
+    const it = raam(290, 100, { vorm: 'balkon', bevestiging: 'balkon', doek, kleur: cat.doeken[doek].kleuren[0].vid });
+    const b = P.berekenItem(it, cat);
+    assert.strictEqual(b.plan.lengteCm, 300, doek); // 290 + 2 × 5 cm zoom
+    assert.strictEqual(b.plan.meters, 3, doek);
+  }
+});
+
+test('tunnelzoom alleen aan de onderrand van een hoes, niet op de bovenkant', () => {
+  const k = cat.doeken.ferrari_705.kleuren[0].vid;
+  const it = { module: 'afdekzeil', vorm: 'blok', doek: 'ferrari_705', kleur: k, bevestiging: 'tunnel', verwerking: 'lijmen',
+    maten: { lengte: 200, breedte: 90, hoogte: 75 }, aantal: 1, opt: {}, extras: {} };
+  const b = P.berekenItem(it, cat);
+  const st = BT.stukken(b);
+  const boven = st.find(s => s.naam === 'Bovenkant'), zij = st.find(s => s.naam === 'Zijkant lang');
+  assert.deepStrictEqual([boven.snijW, boven.snijH], [210, 100]);  // alleen 5 cm zoom
+  assert.deepStrictEqual([zij.snijW, zij.snijH], [210, 93]);       // 75 + 2 × 5 + 8 cm tunnel
+});
+
+test('meterwaar wordt eerst over items opgeteld en dan afgerond (klittenband)', () => {
+  // 3 balkons van 100 × 55 cm: rand 3,1 m per stuk -> samen 9,3 m -> 10 m (niet 3 × 4 = 12 m)
+  const items = [1, 2, 3].map(() => raam(100, 55, { vorm: 'balkon', bevestiging: 'klit', opt: { klitBreedte: 25 } }));
+  const pk = P.bouwPakket({ items }, cat);
+  const haak = pk.regels.find(r => r.key === 'klit_haak');
+  assert.strictEqual(haak.qty, 10);
+  const los = P.regelsVoorItem(items[0], cat).regels.find(r => r.key === 'klit_haak');
+  assert.strictEqual(los.qty, 4); // één item alleen: 3,1 m -> 4 m
+});
+
+test('dekzeil: bovenblad + vier rokstroken, bevestigers in de onderrand van de rok', () => {
+  const k = cat.doeken.ferrari_705.kleuren[0].vid;
+  const it = { module: 'bootkap', vorm: 'dekzeil', doek: 'ferrari_705', kleur: k, bevestiging: 'ring', verwerking: 'naaien',
+    maten: { lengte: 700, breedte: 260, hoogte: 30 }, aantal: 1, opt: {}, extras: {} };
+  const b = P.berekenItem(it, cat);
+  assert.deepStrictEqual(b.model.panels.map(p => [p.naam, p.w, p.h, p.qty || 1]),
+    [['Bovenblad', 700, 260, 1], ['Rok lang', 700, 30, 2], ['Rok kort', 260, 30, 2]]);
+  assert.strictEqual(b.randCm, 2 * (700 + 260));            // onderrand van de rok
+  assert.strictEqual(b.model.naadCm, 2 * (700 + 260) + 4 * 30); // rok aan bovenblad + 4 hoeknaden
+  const per = BT.bevestigingPerStuk(b, BT.stukken(b));
+  assert.ok(!per[1], 'geen bevestigers op het bovenblad');
+  assert.ok(per[2].n >= 2 && per[3].n >= 2);
+  assert.ok(BT.werkvolgorde(it, b).some(s => /rokstroken in de hoeken/.test(s)));
+  // tunnel: alleen de rok krijgt de tunnel, niet het bovenblad
+  const t = BT.stukken(P.berekenItem(Object.assign({}, it, { bevestiging: 'tunnel' }), cat));
+  assert.strictEqual(t[0].snijH, 270);
+  assert.strictEqual(t[1].snijH, 30 + 10 + 8);
+});
+
+test('zonwering: 5 cm zoom, gestikt met garen, nooit gelijmd', () => {
+  const it = raam(120, 90, { verwerking: 'naaien', garen: 'wit' });
+  const b = P.berekenItem(it, cat);
+  assert.strictEqual(b.zoom, 5);
+  const st = BT.stukken(b)[0];
+  assert.deepStrictEqual([st.snijW, st.snijH], [130, 100]);
+  const regels = P.regelsVoorItem(it, cat).regels;
+  assert.ok(regels.some(r => r.key === 'garen'), 'garen in het pakket');
+  const stappen = BT.werkvolgorde(it, b).join(' ');
+  assert.match(stappen, /zoom van 5 cm om en stik hem vast/);
+  assert.match(stappen, /Niet lijmen/);
+  assert.match(BT.html(it, b), /stroke="#2563eb"/); // stiklijn in de tekening
+  // gaasdoek heeft een bijpassend garen
+  ['mehler_gaas', 'ferrari_362'].forEach(k => cat.doeken[k].kleuren.forEach(x => assert.ok(cat.garen[x.garen], k + ' ' + x.naam)));
+});
+
+test('dekzeil 700 × 260, rok 30: lange rokstroken uit delen scheelt doek (11 m i.p.v. 15 m)', () => {
+  const k = cat.doeken.ferrari_705.kleuren[0].vid;
+  const it = { module: 'bootkap', vorm: 'dekzeil', doek: 'ferrari_705', kleur: k, bevestiging: 'ring', verwerking: 'naaien',
+    maten: { lengte: 700, breedte: 260, hoogte: 30 }, aantal: 1, opt: {}, extras: {} };
+  const b = P.berekenItem(it, cat);
+  assert.strictEqual(b.plan.meters, 11);
+  const rok = BT.stukken(b).find(s => s.naam === 'Rok lang');
+  assert.strictEqual(rok.delen, 3);
+  assert.strictEqual(rok.qty, 2);
+  assert.ok(rok.snijW <= cat.doeken.ferrari_705.rolCm);
+  assert.ok(b.naadCm > b.model.naadCm, 'deelnaden tellen mee');
+  assert.match(BT.html(it, b), /deelnaden op 233 · 467 cm/);
+  assert.ok(BT.werkvolgorde(it, b).some(s => /delen van de lange rokstroken/.test(s)));
+});
+
+test('zonwering uit een ouder bewaard pakket (verwerking "geen") krijgt toch garen', () => {
+  const regels = P.regelsVoorItem(raam(120, 90, { verwerking: 'geen', garen: null }), cat).regels;
+  assert.ok(regels.some(r => r.key === 'garen'));
+});

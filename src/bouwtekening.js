@@ -20,7 +20,7 @@
     'eSails is niet aansprakelijk voor het eindresultaat.';
 
   // panelen die bovenop liggen; bevestigers komen op de onderrand van de overige panelen
-  var BOVEN = { 'Dak': 1, 'Bovenkant': 1, 'Bovenblad (rond)': 1 };
+  var BOVEN = { 'Dak': 1, 'Bovenkant': 1, 'Bovenblad (rond)': 1, 'Bovenblad': 1 };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function cm(n) { return String(Math.round(n)); }
@@ -28,10 +28,15 @@
 
   /* ---------------- stukkenlijst ---------------- */
   function stukken(b) {
-    var z = b.zoom || 0, nr = 0;
+    var z = b.zoom || 0, nr = 0, snij = b.snijPanels || [];
     return b.model.panels.map(function (p) {
       nr++;
-      return { nr: nr, naam: p.naam, qty: (p.qty || 1) * b.aantal, nettoW: p.w, nettoH: p.h, snijW: p.w + 2 * z, snijH: p.h + 2 * z, zoom: z, rond: /rond\)/.test(p.naam) };
+      var sp = snij.filter(function (x) { return (x.basis || x.naam) === p.naam; })[0] || {};
+      var ex = sp.extraH || 0, delen = sp.delen || 1;
+      var deelW = delen > 1 ? sp.w : p.w;
+      return { nr: nr, naam: p.naam, qty: (p.qty || 1) * b.aantal, nettoW: p.w, nettoH: p.h,
+               snijW: deelW + 2 * z, snijH: p.h + 2 * z + ex, tekenW: p.w + 2 * z, zoom: z, extraH: ex,
+               delen: delen, deelNetto: deelW, rond: /rond\)/.test(p.naam) };
     });
   }
 
@@ -64,8 +69,9 @@
   /* ---------------- tekening van één stuk ---------------- */
   function stukSVG(s, bev, item, b, kleur) {
     var maxW = 260, maxH = 150, pad = 34;
-    var sc = Math.min(maxW / s.snijW, maxH / s.snijH);
-    var W = s.snijW * sc, H = s.snijH * sc, z = s.zoom * sc;
+    var tw = s.tekenW || s.snijW; // bij een rok uit delen tekenen we de hele strook
+    var sc = Math.min(maxW / tw, maxH / s.snijH);
+    var W = tw * sc, H = s.snijH * sc, z = s.zoom * sc, ex = (s.extraH || 0) * sc;
     var vw = Math.max(W + pad * 2, 270), vh = H + pad * 2 + 6;
     var x0 = (vw - W) / 2, y0 = pad;
     var o = '<svg class="eskh-bt-svg" width="' + cm(vw) + '" height="' + cm(vh) + '" viewBox="0 0 ' + cm(vw) + ' ' + cm(vh) + '" role="img" aria-label="' + esc(s.naam + ': ' + cm(s.nettoW) + ' bij ' + cm(s.nettoH) + ' cm') + '">';
@@ -74,13 +80,26 @@
     if (s.rond) {
       o += '<ellipse cx="' + (x0 + W / 2) + '" cy="' + (y0 + H / 2) + '" rx="' + (W / 2 - z) + '" ry="' + (H / 2 - z) + '" fill="' + kleur + '" fill-opacity=".35" stroke="#1f2937"/>';
     } else {
-      o += '<rect x="' + (x0 + z) + '" y="' + (y0 + z) + '" width="' + (W - 2 * z) + '" height="' + (H - 2 * z) + '" fill="' + kleur + '" fill-opacity=".35" stroke="#1f2937"/>';
+      o += '<rect x="' + (x0 + z) + '" y="' + (y0 + z) + '" width="' + (W - 2 * z) + '" height="' + (H - 2 * z - ex) + '" fill="' + kleur + '" fill-opacity=".35" stroke="#1f2937"/>';
+    }
+    // stiklijn van de zoom (enkel zeil rondom, gestikt): ±1 cm binnen de omgeslagen zoom
+    var gestikt = item.module === 'zonwering' || item.verwerking !== 'lijmen';
+    if (gestikt && bev && bev.rondom && !s.rond) {
+      var si = Math.max(3, (s.zoom - 1) * sc);
+      o += '<rect x="' + (x0 + z + si).toFixed(1) + '" y="' + (y0 + z + si).toFixed(1) + '" width="' + Math.max(1, W - 2 * z - 2 * si).toFixed(1) + '" height="' + Math.max(1, H - 2 * z - ex - 2 * si).toFixed(1) + '" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>';
+    }
+    // deelnaden (rok uit delen)
+    if (s.delen > 1) {
+      for (var d = 1; d < s.delen; d++) {
+        var nx = x0 + z + (W - 2 * z) * d / s.delen;
+        o += '<line x1="' + nx.toFixed(1) + '" y1="' + (y0 + 2) + '" x2="' + nx.toFixed(1) + '" y2="' + (y0 + H - 2) + '" stroke="#1f2937" stroke-width="1.2" stroke-dasharray="3 2"/>';
+      }
     }
     // bevestiging
     var accent = '#c2410c';
     if (bev) {
       var lijnRand = item.bevestiging === 'tunnel' || item.bevestiging === 'klit';
-      var ix = x0 + z, iy = y0 + z, iw = W - 2 * z, ih = H - 2 * z;
+      var ix = x0 + z, iy = y0 + z, iw = W - 2 * z, ih = H - 2 * z - ex;
       var inset = Math.min(6, iw / 8, ih / 8);
       if (lijnRand) {
         var sw = 'stroke="' + accent + '" stroke-width="3" fill="none" stroke-linecap="round"';
@@ -96,10 +115,10 @@
     var ty = y0 - 14;
     o += maatlijn(x0 + z, ty, x0 + W - z, ty, cm(s.nettoW) + ' cm');
     var lx = x0 - 14;
-    o += maatlijnV(lx, y0 + z, lx, y0 + H - z, cm(s.nettoH) + ' cm');
+    o += maatlijnV(lx, y0 + z, lx, y0 + H - z - ex, cm(s.nettoH) + ' cm');
     // label
     o += '<text x="' + (x0 + W / 2) + '" y="' + (y0 + H / 2 + 4) + '" font-size="12" font-weight="600" text-anchor="middle" fill="#111827">' + esc(s.nr + '. ' + s.naam) + (s.qty > 1 ? ' ×' + s.qty : '') + '</text>';
-    o += '<text x="' + (x0 + W / 2) + '" y="' + (y0 + H + 16) + '" font-size="10" text-anchor="middle" fill="#555">Snijmaat ' + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm (incl. ' + cm(s.zoom) + ' cm zoom per rand)</text>';
+    o += '<text x="' + (x0 + W / 2) + '" y="' + (y0 + H + 16) + '" font-size="10" text-anchor="middle" fill="#555">' + (s.delen > 1 ? s.delen + ' delen, snijmaat per deel ' : 'Snijmaat ') + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm (incl. ' + cm(s.zoom) + ' cm zoom per rand' + (s.extraH ? ' + ' + cm(s.extraH) + ' cm tunnel onder' : '') + ')</text>';
     return o + '</svg>';
   }
 
@@ -175,7 +194,7 @@
     var lx = x0 + w + 14, my = y0 + h / 2;
     o += '<g stroke="#374151" stroke-width="1"><line x1="' + lx + '" y1="' + y0 + '" x2="' + lx + '" y2="' + (y0 + h) + '"/><line x1="' + (lx - 4) + '" y1="' + y0 + '" x2="' + (lx + 4) + '" y2="' + y0 + '"/><line x1="' + (lx - 4) + '" y1="' + (y0 + h) + '" x2="' + (lx + 4) + '" y2="' + (y0 + h) + '"/></g>' +
       '<text x="' + (lx + 14) + '" y="' + my + '" font-size="11" text-anchor="middle" fill="#111827" transform="rotate(90 ' + (lx + 14) + ' ' + my + ')">' + nl(L / 100, 2) + ' m</text>';
-    o += '<text x="' + x0 + '" y="' + (y0 + h + 18) + '" font-size="11" fill="#555">' + nl(L / 100, 2) + ' m nodig (incl. snijmarge) → ' + plan.meters + ' m besteld</text>';
+    o += '<text x="' + x0 + '" y="' + (y0 + h + 18) + '" font-size="11" fill="#555">' + nl(L / 100, 2) + ' m nodig → ' + plan.meters + ' m besteld' + (plan.meters * 100 - L >= 1 ? ' (' + cm(plan.meters * 100 - L) + ' cm over)' : '') + '</text>';
     return o + '</svg>';
   }
 
@@ -209,15 +228,20 @@
     st.push('Teken de stukken af op de achterkant van het doek (bijvoorbeeld met een glaspotlood). Houd de snijmaat aan: dat is de netto maat plus ' + cm(b.zoom) + ' cm zoom per rand.');
     st.push('Snijd de stukken recht af volgens het snijplan.' + (baan ? ' Stukken die breder zijn dan de rol bestaan uit banen: laat die bij de naad ±4 cm overlappen.' : ''));
     if (b.model.panels.length > 1) st.push('Leg de stukken op het object, zet ze met spelden of tape vast en controleer de pasvorm voor je de naden maakt.');
+    var rokModel = { dekzeil: 1, blok: 1, jacuzzi: 1 }[b.def && b.def.model];
+    var gedeeld = stukken(b).some(function (x) { return x.delen > 1; });
+    if (rokModel && gedeeld) st.push('Zet de delen van de lange rokstroken eerst aan elkaar (zie de deelnaden in de tekening), zodat elke rokstrook weer zijn volle lengte heeft.');
+    if (rokModel) st.push('Maak eerst de rok: zet de rokstroken in de hoeken aan elkaar tot één rondlopende rand. Zet daarna de rok rondom aan het bovenblad, met de naad aan de binnenkant.');
     var naden = b.model.panels.length > 1 || baan;
-    var vast = item.verwerking === 'lijmen' ? 'lijm' : 'stik';
+    var vast = item.verwerking === 'lijmen' && item.module !== 'zonwering' ? 'lijm' : 'stik';
     if (naden) {
       if (item.verwerking === 'lijmen') st.push('Ontvet de lijmranden en verlijm de naden met Saba 70T PVC-lijm. Volg de verwerkingsinstructies op de verpakking.');
       else st.push('Stik de naden met UV-bestendig garen' + (item.garen ? ' (Coats Terko M36)' : '') + ', bij voorkeur met een dubbele stiknaad.');
-    } else if (item.verwerking === 'lijmen') {
+    } else if (item.verwerking === 'lijmen' && item.module !== 'zonwering') {
       st.push('Ontvet de randen waar de zoom komt; lijm de zoom met Saba 70T PVC-lijm. Volg de verwerkingsinstructies op de verpakking.');
     }
-    if (item.bevestiging === 'tunnel') st.push('Vouw de onderrand om tot een tunnelzoom (' + cm(b.zoom) + ' cm) en ' + vast + ' hem dicht. Laat een opening om het koord in te rijgen.');
+    if (item.module === 'zonwering') st.push('Sla rondom een zoom van ' + cm(b.zoom) + ' cm om en stik hem vast met UV-bestendig garen' + (item.garen ? ' (Coats Terko M36)' : '') + ', zodat de zeilringen in twee lagen doek komen. Niet lijmen: lijm laat in de zon los.');
+    else if (item.bevestiging === 'tunnel') st.push('Vouw de onderrand om tot een tunnelzoom (' + cm(b.zoom) + ' cm) en ' + vast + ' hem dicht. Laat een opening om het koord in te rijgen.');
     else st.push('Vouw de zoom rondom om (' + cm(b.zoom) + ' cm) en ' + vast + ' hem vast' + (vast === 'stik' && !naden ? ' met UV-bestendig garen' : '') + '.');
     if (x.raamfolie && x.raamfolie.breedte > 0) st.push('Snijd de ramen uit het doek, zet de raamfolie vast met dubbelzijdig tape en stik of lijm hem rondom.');
     if (x.ritsen && x.ritsen.length) st.push('Zet de ritsen in op de plek van de deur of het oprolbare deel.');
@@ -237,19 +261,24 @@
     h += '<p class="eskh-bt-disclaimer"><strong>Let op:</strong> ' + esc(DISCLAIMER) + '</p>';
     h += '<h5>Stukken</h5><table class="eskh-bt-tabel"><thead><tr><th>#</th><th>Stuk</th><th>Aantal</th><th>Netto maat</th><th>Snijmaat</th></tr></thead><tbody>';
     lijst.forEach(function (s) {
-      h += '<tr><td>' + s.nr + '</td><td>' + esc(s.naam) + '</td><td>' + s.qty + '</td><td>' + cm(s.nettoW) + ' × ' + cm(s.nettoH) + ' cm</td><td>' + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm</td></tr>';
+      h += '<tr><td>' + s.nr + '</td><td>' + esc(s.naam) + '</td><td>' + s.qty + '</td><td>' + cm(s.nettoW) + ' × ' + cm(s.nettoH) + ' cm</td><td>' + (s.delen > 1 ? s.delen + ' delen van ' : '') + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm</td></tr>';
     });
     h += '</tbody></table>';
     var bevTxt = '';
     var gedeeld = lijst.length > 1 && b.model.rand && b.model.rand.type !== 'cirkel';
     if (b.punten) bevTxt = b.punten + ' bevestigingspunten (rode stippen): één in elke hoek, daartussen gelijk verdeeld met maximaal ±' + b.afstand + ' cm.' +
-      (gedeeld ? ' Een hoekpunt wordt gedeeld door de twee stukken die daar samenkomen.' : '') + ' Posities gemeten langs de afgewerkte rand, vanaf de hoek.';
+      (gedeeld ? ' Een hoekpunt wordt gedeeld door de twee stukken die daar samenkomen.' : '') + ' Posities gemeten langs de afgewerkte rand, vanaf de hoek.' +
+      ((item.module === 'zonwering' || item.verwerking !== 'lijmen') && b.model.rand && b.model.rand.rondom ? ' Blauwe stippellijn = stiklijn van de zoom.' : '');
     else if (item.bevestiging === 'tunnel') bevTxt = 'Tunnelzoom met koord langs de rode lijn.';
     else if (item.bevestiging === 'klit') bevTxt = 'Zelfklevend klittenband langs de rode lijn.';
     h += '<h5>Tekening per stuk</h5>' + (bevTxt ? '<p class="eskh-bt-note">' + esc(bevTxt) + ' Maten in cm; gestippeld = snijmaat, doorgetrokken = netto maat.</p>' : '');
     h += '<div class="eskh-bt-stukken">';
     lijst.forEach(function (s) {
       var cap = b.punten ? bevestigingTekst(bev[s.nr]) : '';
+      if (s.delen > 1) {
+        var naden = []; for (var d = 1; d < s.delen; d++) naden.push(cm(s.nettoW * d / s.delen));
+        cap = 'Uit ' + s.delen + ' gelijke delen van ' + cm(s.deelNetto) + ' cm, deelnaden op ' + naden.join(' · ') + ' cm (stippellijn).' + (cap ? '<br>' + cap : '');
+      }
       h += '<figure>' + stukSVG(s, bev[s.nr], item, b, kleur) + (cap ? '<figcaption>' + cap + '</figcaption>' : '') + '</figure>';
     });
     h += '</div>';

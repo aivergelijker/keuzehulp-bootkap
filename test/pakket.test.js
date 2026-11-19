@@ -115,7 +115,7 @@ test('mallendoek: altijd per meter, ook bij grote oppervlakken', () => {
   const klein = P.regelsVoorItem({ ...base, maten: { lengte: 300, breedte: 200 }, extras: { mallendoek: true } }, cat).regels.find(r => r.key === 'mallendoek');
   assert.strictEqual(klein.unit, 'm');
   assert.strictEqual(klein.vid, String(cat.p.mallendoek.vid));
-  const groot = P.regelsVoorItem({ ...base, maten: { lengte: 1200, breedte: 500, overhang: 50 }, extras: { mallendoek: true } }, cat).regels.find(r => r.key === 'mallendoek');
+  const groot = P.regelsVoorItem({ ...base, maten: { lengte: 1200, breedte: 500, hoogte: 50 }, extras: { mallendoek: true } }, cat).regels.find(r => r.key === 'mallendoek');
   assert.strictEqual(groot.vid, String(cat.p.mallendoek.vid));
   assert.strictEqual(groot.unit, 'm');
   assert.ok(groot.qty > 31, 'grote mal: veel meters, geen rol');

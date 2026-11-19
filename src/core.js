@@ -15,7 +15,7 @@
   var R = {
     zoomCm: 5,          // naad/zoomtoeslag per rand
     naadOverlapCm: 4,   // overlap als een paneel uit meerdere banen bestaat
-    snijMargeCm: 10     // marge op de totale rollengte (rechtsnijden)
+    snijMargeCm: 0      // geen extra marge: de zoom rondom elk stuk is al de speling
   };
 
   function ceil(n) { return Math.ceil(n - 1e-9); }
@@ -48,7 +48,7 @@
       var q = p.qty || 1;
       var z = p.zoomCm != null ? p.zoomCm : zoom; // zoom per paneel (bijv. tunnelzoom per item)
       for (var k = 0; k < q; k++) {
-        var w = p.w + 2 * z, h = p.h + 2 * z;
+        var w = p.w + 2 * z, h = p.h + 2 * z + (p.extraH || 0); // extraH: bijv. koordtunnel alleen aan de onderrand
         var meta = { item: p.item, nettoW: p.w, nettoH: p.h, zoomCm: z };
         if (Math.min(w, h) <= rolCm) {
           pieces.push(Object.assign({ naam: p.naam, w: w, h: h }, meta));
@@ -227,6 +227,20 @@
       var rand = 2 * (w + h);
       return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: oppervlak(panels), rand: rechthoek(w, h, 'Zeil') };
     },
+    /* Dekzeil / winterkleed: bovenblad over de boot met een rok die over de
+       rand naar beneden valt. Vier losse rokstroken, in de hoeken aan elkaar
+       genaaid en daarna aan het bovenblad. Bevestigers in de onderrand van de rok. */
+    dekzeil: function (i) {
+      var L = num(i.lengte, 100, 2000), B = num(i.breedte, 50, 800), H = num(i.hoogte, 5, 150);
+      var panels = [
+        { naam: 'Bovenblad', w: L, h: B },
+        { naam: 'Rok lang', w: L, h: H, qty: 2 },
+        { naam: 'Rok kort', w: B, h: H, qty: 2 }
+      ];
+      var onder = 2 * (L + B);
+      return { panels: panels, randCm: onder, gesloten: true, zoomCm: onder, naadCm: onder + 4 * H, oppervlakM2: oppervlak(panels),
+               rand: { type: 'lus', zijden: [z(L, 'Rok lang'), z(B, 'Rok kort'), z(L, 'Rok lang'), z(B, 'Rok kort')] } };
+    },
     /* Blokvormige hoes (bank, loungeset, tafel, kist) met rok tot hoogte H */
     blok: function (i) {
       var L = num(i.lengte, 20, 600), B = num(i.breedte, 20, 400), H = num(i.hoogte, 5, 250);
@@ -245,7 +259,7 @@
       var omtrek = Math.PI * D;
       var panels = [
         { naam: 'Bovenblad (rond)', w: D, h: D },
-        { naam: 'Rondom-strook', w: omtrek + 4, h: H }
+        { naam: 'Rondom-strook', w: omtrek, h: H } // de zoom aan beide uiteinden is de naad
       ];
       return { panels: panels, randCm: omtrek, gesloten: true, zoomCm: omtrek, naadCm: omtrek + H, oppervlakM2: (Math.PI * D * D / 4 + omtrek * H) / 10000,
                rand: { type: 'cirkel', zijden: [z(omtrek, 'Rondom-strook')] } };
@@ -257,7 +271,7 @@
       var omtrek = 2 * (L + B) - 8 * Rr + 2 * Math.PI * Rr;
       var panels = [
         { naam: 'Bovenkant', w: L, h: B },
-        { naam: 'Rok (per zijde)', w: omtrek / 4 + 4, h: H, qty: 4 }
+        { naam: 'Rok (per zijde)', w: omtrek / 4, h: H, qty: 4 } // de zoom aan de uiteinden is de naad
       ];
       var zijde = omtrek / 4;
       return { panels: panels, randCm: omtrek, gesloten: true, zoomCm: omtrek, naadCm: omtrek + 4 * H, oppervlakM2: ((L * B - 4 * Rr * Rr + Math.PI * Rr * Rr) + omtrek * H) / 10000,

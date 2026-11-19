@@ -1480,6 +1480,7 @@
      "naam": "Olijfgroen",
      "prijs": 14.95,
      "hex": "#2f4a36",
+     "garen": "olijfgroen",
      "img": 450700479
     },
     {
@@ -1487,7 +1488,8 @@
      "url": "mehler-polymar-pvc-gaasweefsel-7916-285-gr-m2-zwar.html",
      "naam": "Zwart",
      "prijs": 14.95,
-     "hex": "#1c1c1e"
+     "hex": "#1c1c1e",
+     "garen": "zwart"
     }
    ]
   },
@@ -1506,6 +1508,7 @@
      "naam": "Wit",
      "prijs": 46.95,
      "hex": "#f4f3ee",
+     "garen": "wit",
      "img": 475939690
     }
    ]

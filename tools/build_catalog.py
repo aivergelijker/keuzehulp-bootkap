@@ -118,10 +118,10 @@ DOEKEN = {
      kleuren=kleuren(find(r'Ferrari \| 602N'), r'Kleur ([^#|]+)')),
   'mehler_gaas': dict(naam='Mehler Polymar PVC-gaasweefsel', merk='Mehler', soort='gaas', rolCm=250, gewicht='285 g/m²',
      badge='Zon- en windwerend', oms='Open PVC-gaasweefsel: houdt zon en warmte tegen, je kijkt er doorheen en het laat wind door. Rafelt niet.',
-     kleuren=kleuren(find(r'Polymar \| PVC Gaasweefsel'), r'gr/m2 \| ([^#|]+)', garen=False)),
+     kleuren=kleuren(find(r'Polymar \| PVC Gaasweefsel'), r'gr/m2 \| ([^#|]+)')),
   'ferrari_362': dict(naam='Serge Ferrari 362 PVC-gaasdoek', merk='Serge Ferrari', soort='gaas', rolCm=267, gewicht='430 g/m²',
      badge='Brandvertragend', oms='Brandvertragend PVC-gaasdoek van Serge Ferrari. Schaduw en privacy, laat wind door.',
-     kleuren=kleuren(find(r'Ferrari \| 362 \| PVC Gaasdoek'), r'gr/m2 \| ([^#|]+)', garen=False)),
+     kleuren=kleuren(find(r'Ferrari \| 362 \| PVC Gaasdoek'), r'gr/m2 \| ([^#|]+)')),
 }
 
 P = {}

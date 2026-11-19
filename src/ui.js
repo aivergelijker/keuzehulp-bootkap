@@ -43,6 +43,7 @@
     buiskap: [['lengte', 'Lengte van de kap', 50, 800, 5], ['breedte', 'Breedte van de kap', 50, 500, 5], ['hoogte', 'Hoogte (dek tot dak)', 30, 250, 5]],
     bimini:  [['lengte', 'Lengte van het dak', 50, 600, 5], ['breedte', 'Breedte van het dak', 50, 400, 5]],
     plat:    [['lengte', 'Lengte', 30, 2000, 5], ['breedte', 'Breedte', 30, 1000, 5], ['overhang', 'Overhang rondom', 0, 100, 5]],
+    dekzeil: [['lengte', 'Lengte van de boot (dek)', 100, 2000, 5], ['breedte', 'Breedte van de boot', 50, 800, 5], ['hoogte', 'Rokhoogte (valt over de rand)', 5, 150, 5]],
     blok:    [['lengte', 'Lengte', 20, 600, 1], ['breedte', 'Diepte / breedte', 20, 400, 1], ['hoogte', 'Hoogte (rok)', 5, 250, 1]],
     rond:    [['diameter', 'Diameter', 20, 400, 1], ['hoogte', 'Hoogte (rok)', 5, 200, 1]],
     jacuzzi: [['lengte', 'Lengte', 100, 400, 1], ['breedte', 'Breedte', 100, 400, 1], ['radius', 'Hoekradius', 0, 80, 1], ['hoogte', 'Hoogte van de rok', 5, 60, 1]],
@@ -52,6 +53,7 @@
     buiskap: '<strong>Zo meet je:</strong> lengte = van voorkant tot achterkant van de kap (over de beugels gemeten wij zelf de welving mee). Breedte = buitenmaat over de kuip. Hoogte = van dek tot het hoogste punt van het dak.',
     bimini: '<strong>Zo meet je:</strong> meet het frame van buitenbeugel tot buitenbeugel. De welving rekenen wij mee.',
     plat: '<strong>Zo meet je:</strong> lengte × breedte van wat je afdekt. De overhang komt er rondom bij, zodat het zeil netjes over de rand valt.',
+    dekzeil: '<strong>Zo meet je:</strong> lengte en breedte op het breedste punt van het dek, over relingen of opbouw heen. Rokhoogte = hoe ver het zeil langs de zijkant over de rand naar beneden valt. De rok maken we van vier stroken, in de hoeken aan elkaar genaaid.',
     blok: '<strong>Zo meet je:</strong> meet de buitenmaten op het breedste punt (ook kussens en armleuningen). Rokhoogte = hoe ver de hoes naar beneden valt; tot net boven de grond voorkomt opwaaien.',
     rond: '<strong>Zo meet je:</strong> diameter op het breedste punt (bij een bbq inclusief handvatten). Rokhoogte = hoe ver de hoes naar beneden valt.',
     jacuzzi: '<strong>Hoekradius meten:</strong> leg twee latten haaks tegen de zijkanten. De afstand van hun kruispunt tot waar de rand begint te buigen is je radius. Rechthoekige bak = 0.',
@@ -104,7 +106,7 @@
     if (!m) return ['module'];
     if (m === 'bootkap') return ['module', 'vorm', 'maten', 'doek', 'verwerking', 'extras', 'bevestiging'];
     if (m === 'afdekzeil') return ['module', 'vorm', 'maten', 'doek', 'verwerking', 'bevestiging'];
-    return ['module', 'vorm', 'maten', 'doek', 'bevestiging'];
+    return ['module', 'vorm', 'maten', 'doek', 'verwerking', 'bevestiging']; // zonwering: zoom wordt altijd gestikt
   }
   var STAPNAAM = { module: 'Wat ga je maken?', vorm: 'Type', maten: 'Afmetingen', doek: 'Doek & kleur', verwerking: 'Verwerking', extras: "Extra's", bevestiging: 'Bevestiging', overzicht: 'Jouw pakket' };
 
@@ -334,7 +336,7 @@
   function objectSVG(d, kleur) {
     var m = d.maten || {}, mk = modelKey(), stroke = isLicht(kleur) ? '#9aa1ab' : 'none';
     var s = '<svg viewBox="0 0 220 160" class="eskh-obj" aria-hidden="true">';
-    if (mk === 'blok' || mk === 'buiskap') {
+    if (mk === 'blok' || mk === 'buiskap' || mk === 'dekzeil') {
       var L = C.num(m.lengte || 100, 20, 800), B = C.num(m.breedte || 60, 20, 500), Hh = C.num(m.hoogte || 60, 5, 250);
       var sc = 120 / Math.max(L + B * 0.5, Hh + B * 0.5);
       var l = L * sc, b = B * sc * 0.5, h = Hh * sc, x = 110 - (l + b) / 2, y = 140;
@@ -483,6 +485,7 @@
         kaart('data-set="verwerking" data-val="naaien"', '<span class="eskh-ico">🪡</span><h4>Naaien</h4><p>Stikken met UV-bestendig garen. Vraagt een stevige naaimachine.</p>', d.verwerking === 'naaien') + '</div>';
     } else {
       h += '<h3>Garen</h3><p class="eskh-sub">' + esc(dk ? dk.doek.naam : 'Dit doek') + ' wordt gestikt. Kies het bijpassende zeilmakersgaren.</p>';
+      if (d.module === 'zonwering') h += '<div class="eskh-box"><strong>Rondom een gestikte zoom</strong><p class="eskh-note">Zeilringen kun je niet in enkel gaasdoek zetten: rondom komt een zoom van 5 cm (al meegerekend in de snijmaat). Sla de zoom om en stik hem vast, dan zit elke zeilring in twee lagen doek. Niet lijmen: lijm laat in de zon los en wordt niet mooi.</p></div>';
     }
     if (d.verwerking === 'naaien') {
       var auto = dk && dk.kleur.garen;
@@ -622,6 +625,7 @@
     var obj = it.object && OBJECTEN.filter(function (o) { return o.key === it.object; })[0];
     var m = it.maten, mk = def.model;
     var maat = mk === 'rond' ? 'Ø ' + m.diameter + ' × ' + m.hoogte + ' cm' :
+      mk === 'dekzeil' ? m.lengte + ' × ' + m.breedte + ' cm, rok ' + m.hoogte + ' cm' :
       (MAATVELDEN[mk] || []).filter(function (f) { return f[0] !== 'overhang' && f[0] !== 'radius'; }).map(function (f) { return m[f[0]]; }).join(' × ') + ' cm';
     return (i + 1) + '. ' + (obj ? obj.titel : def.naam) + ' · ' + maat + (it.aantal > 1 ? ' · ' + it.aantal + '×' : '');
   }
@@ -644,7 +648,7 @@
         '<div class="eskh-item-acts"><button type="button" data-edit="' + i + '">Wijzig</button><button type="button" data-dup="' + i + '">Dupliceer</button><button type="button" data-del="' + i + '">Verwijder</button></div></div>' +
         '<details class="eskh-plan"><summary>Bouwtekening &amp; berekening <span>(voorbeeld)</span></summary>' +
         '<p class="eskh-note">Netto oppervlak ' + nl(b.model.oppervlakM2 * b.aantal) + ' m² · rand ' + nl(b.randCm / 100) + ' m' +
-        (b.punten ? ' · ' + b.punten + ' bevestigingspunten (in elke hoek, daartussen max. ±' + b.afstand + ' cm)' : '') + '. Incl. ' + nl(b.zoom, 0) + ' cm zoom per rand en snijmarge.</p>' +
+        (b.punten ? ' · ' + b.punten + ' bevestigingspunten (in elke hoek, daartussen max. ±' + b.afstand + ' cm)' : '') + '. Incl. ' + nl(b.zoom, 0) + ' cm zoom per rand' + (it.bevestiging === 'tunnel' && b.zoom === C.R.zoomCm ? ' (+8 cm tunnel aan de onderrand)' : '') + '.</p>' +
         BT.html(it, b, { snijplan: !gedeeld }) +
         (gedeeld ? '<p class="eskh-note">De stukken van dit item staan in het gezamenlijke snijplan hieronder.</p>' : '') + '</details></div>';
     });
@@ -769,11 +773,11 @@
     if (d.vorm === v) return;
     d.vorm = v; d.doek = null; d.kleur = null; d.bevestiging = null; d.opt = {}; d.afstandCm = null;
     var mk = vormDef().model, def = {
-      buiskap: { lengte: 250, breedte: 220, hoogte: 110 }, bimini: { lengte: 200, breedte: 200 }, plat: { lengte: 700, breedte: 260, overhang: 30 },
+      buiskap: { lengte: 250, breedte: 220, hoogte: 110 }, bimini: { lengte: 200, breedte: 200 }, plat: { lengte: 700, breedte: 260, overhang: 30 }, dekzeil: { lengte: 700, breedte: 260, hoogte: 30 },
       zonwering: { breedte: 120, hoogte: 100 }
     }[mk];
     if (def) d.maten = JSON.parse(JSON.stringify(def));
-    if (d.module === 'zonwering') d.verwerking = 'geen';
+    if (d.module === 'zonwering') d.verwerking = 'naaien';
     if (d.module === 'bootkap' && CAT.doeken[vormDef().doeken[0]].soort !== 'pvc') d.verwerking = 'naaien'; else if (d.module !== 'zonwering') d.verwerking = null;
   }
   function kiesDoek(key) {
@@ -783,9 +787,7 @@
     var dk = CAT.doeken[key];
     var eerst = dk.kleuren.filter(function (k) { return !uitverkocht(k.vid); })[0];
     d.kleur = dk.kleuren.length === 1 ? dk.kleuren[0].vid : null;
-    if (dk.soort !== 'pvc' && d.module !== 'zonwering') d.verwerking = 'naaien';
-    else if (d.module !== 'zonwering' && d.verwerking === 'naaien' && dk.soort === 'pvc') { /* keuze behouden */ }
-    if (dk.soort === 'gaas') d.verwerking = 'geen';
+    if (dk.soort !== 'pvc') d.verwerking = 'naaien'; // acryl, polyester en gaas worden gestikt (gaas: lijm laat in de zon los)
     if (d.kleur) d.garen = (P.doekKleur(CAT, d).kleur.garen) || null;
     void eerst;
   }
