@@ -44,36 +44,57 @@
     var naden = 0; // extra naadlengte in cm (voor lijm/garen)
 
     var nuttig = rolCm - overlap;
-    panels.forEach(function (p) {
-      var q = p.qty || 1;
-      var z = p.zoomCm != null ? p.zoomCm : zoom; // zoom per paneel (bijv. tunnelzoom per item)
-      for (var k = 0; k < q; k++) {
-        var w = p.w + 2 * z, h = p.h + 2 * z + (p.extraH || 0); // extraH: bijv. koordtunnel alleen aan de onderrand
-        var meta = { item: p.item, nettoW: p.w, nettoH: p.h, zoomCm: z };
-        if (Math.min(w, h) <= rolCm) {
-          pieces.push(Object.assign({ naam: p.naam, w: w, h: h }, meta));
-        } else {
-          // breder dan de rol in beide richtingen: splits in banen. Kies de
-          // richting die de minste rollengte kost (n banen x baanlengte).
+    /* Stukken maken. Panelen die in beide richtingen breder zijn dan de rol
+       worden in banen gesplitst, in de richting die de minste rollengte kost.
+       mode 'gelijk': alle banen even breed (naden symmetrisch);
+       mode 'vol'   : volle rolbreedtes + een reststrook (laat soms ruimte over
+                      waar andere stukken naast passen). We nemen het zuinigste;
+                      bij gelijke lengte de symmetrische variant. */
+    function maakStukken(mode) {
+      var pieces = [], naden = 0;
+      panels.forEach(function (p) {
+        var q = p.qty || 1;
+        var z = p.zoomCm != null ? p.zoomCm : zoom; // zoom per paneel (bijv. tunnelzoom per item)
+        for (var k = 0; k < q; k++) {
+          var w = p.w + 2 * z, h = p.h + 2 * z + (p.extraH || 0); // extraH: bijv. koordtunnel alleen aan de onderrand
+          var meta = { item: p.item, nettoW: p.w, nettoH: p.h, zoomCm: z };
+          if (Math.min(w, h) <= rolCm) {
+            pieces.push(Object.assign({ naam: p.naam, w: w, h: h }, meta));
+            continue;
+          }
           var nW = ceil((w - overlap) / nuttig), nH = ceil((h - overlap) / nuttig);
           var dwars = (nW * h <= nH * w) ? w : h;     // maat die over de banen verdeeld wordt
           var lang = dwars === w ? h : w;
           var n = dwars === w ? nW : nH;
-          var rest = dwars - (n - 1) * nuttig;
-          for (var i = 0; i < n; i++) {
-            pieces.push(Object.assign({ naam: p.naam + ' (baan ' + (i + 1) + '/' + n + ')', w: i < n - 1 ? rolCm : Math.max(rest, overlap * 2), h: lang, vast: true, baan: true }, meta));
+          var breedtes = [], starts = [], i;
+          if (mode === 'gelijk') {
+            var bw = (dwars + (n - 1) * overlap) / n;
+            for (i = 0; i < n; i++) { breedtes.push(bw); starts.push(i * (bw - overlap)); }
+          } else {
+            var rest = dwars - (n - 1) * nuttig;
+            for (i = 0; i < n; i++) { breedtes.push(i < n - 1 ? rolCm : Math.max(rest, overlap * 2)); starts.push(i * nuttig); }
+          }
+          var naadPos = starts.slice(1).map(function (st) { return st + overlap / 2; }); // midden van de overlap, in snijmaat
+          for (i = 0; i < n; i++) {
+            pieces.push(Object.assign({ naam: p.naam + ' (baan ' + (i + 1) + '/' + n + ')', w: breedtes[i], h: lang, vast: true, baan: true,
+              baanRichting: dwars === w ? 'w' : 'h', naadPos: naadPos }, meta));
           }
           naden += (n - 1) * lang;
         }
-      }
-    });
+      });
+      return { pieces: pieces, naden: naden };
+    }
 
-    // Probeer meerdere volgordes/oriëntaties en neem het kortste plan.
-    var best = null;
-    [0, 1, 2].forEach(function (strat) {
-      var res = pakShelves(pieces, rolCm, strat);
-      if (!best || res.y < best.y) best = res;
+    // Probeer beide splitsingen en meerdere volgordes/oriëntaties; neem het kortste plan.
+    var best = null, bestNaden = 0;
+    ['gelijk', 'vol'].forEach(function (mode) {
+      var st = maakStukken(mode);
+      [0, 1, 2].forEach(function (strat) {
+        var res = pakShelves(st.pieces, rolCm, strat);
+        if (!best || res.y < best.y - 1e-9) { best = res; bestNaden = st.naden; }
+      });
     });
+    var naden = bestNaden;
 
     var lengte = best.y > 0 ? best.y + R.snijMargeCm : 0;
     return {
@@ -134,7 +155,8 @@
       y += s.h;
     }
     function stuk(s, x, yy, w, h) {
-      return { naam: s.naam, x: x, y: yy, w: w, h: h, item: s.item, nettoW: s.nettoW, nettoH: s.nettoH, zoomCm: s.zoomCm, baan: !!s.baan, gedraaid: !s.baan && s.nettoW != null && Math.abs(w - 2 * s.zoomCm - s.nettoW) > 0.5 };
+      return { naam: s.naam, x: x, y: yy, w: w, h: h, item: s.item, nettoW: s.nettoW, nettoH: s.nettoH, zoomCm: s.zoomCm, baan: !!s.baan,
+               baanRichting: s.baanRichting, naadPos: s.naadPos, gedraaid: !s.baan && s.nettoW != null && Math.abs(w - 2 * s.zoomCm - s.nettoW) > 0.5 };
     }
     pieces.forEach(plaats);
     return { y: y, placed: placed };

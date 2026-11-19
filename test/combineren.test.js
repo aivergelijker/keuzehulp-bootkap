@@ -228,3 +228,17 @@ test('zonwering uit een ouder bewaard pakket (verwerking "geen") krijgt toch gar
   const regels = P.regelsVoorItem(raam(120, 90, { verwerking: 'geen', garen: null }), cat).regels;
   assert.ok(regels.some(r => r.key === 'garen'));
 });
+
+test('buiskap: dak breder dan de rol wordt in gelijke banen gesplitst, naad in de tekening', () => {
+  const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
+  const it = { module: 'bootkap', vorm: 'buiskap', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'druk', verwerking: 'naaien', garen: 'zwart',
+    maten: { lengte: 250, breedte: 220, hoogte: 110 }, aantal: 1, afstandCm: 25, opt: {}, extras: {} };
+  const b = P.berekenItem(it, cat);
+  const banen = b.plan.stukken.filter(s => s.baan);
+  assert.strictEqual(banen.length, 2);
+  assert.ok(Math.abs(banen[0].w - banen[1].w) < 1e-6, 'gelijke banen');
+  assert.strictEqual(b.plan.meters, 13);
+  const dak = BT.stukken(b).find(s => s.naam === 'Dak');
+  assert.strictEqual(dak.banen.n, 2);
+  assert.match(BT.html(it, b), /2 banen van 145 cm breed/);
+});

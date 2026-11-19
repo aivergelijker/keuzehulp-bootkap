@@ -34,7 +34,9 @@
       var sp = snij.filter(function (x) { return (x.basis || x.naam) === p.naam; })[0] || {};
       var ex = sp.extraH || 0, delen = sp.delen || 1;
       var deelW = delen > 1 ? sp.w : p.w;
-      return { nr: nr, naam: p.naam, qty: (p.qty || 1) * b.aantal, nettoW: p.w, nettoH: p.h,
+      var bn = (b.plan.stukken || []).filter(function (x) { return x.baan && x.naam.indexOf(p.naam + ' (baan') === 0; });
+      var banen = bn.length ? { n: bn.length / ((p.qty || 1) * b.aantal), richting: bn[0].baanRichting, naadPos: bn[0].naadPos || [], breedte: bn[0].w } : null;
+      return { nr: nr, naam: p.naam, qty: (p.qty || 1) * b.aantal, nettoW: p.w, nettoH: p.h, banen: banen,
                snijW: deelW + 2 * z, snijH: p.h + 2 * z + ex, tekenW: p.w + 2 * z, zoom: z, extraH: ex,
                delen: delen, deelNetto: deelW, rond: /rond\)/.test(p.naam) };
     });
@@ -87,6 +89,15 @@
     if (gestikt && bev && bev.rondom && !s.rond) {
       var si = Math.max(3, (s.zoom - 1) * sc);
       o += '<rect x="' + (x0 + z + si).toFixed(1) + '" y="' + (y0 + z + si).toFixed(1) + '" width="' + Math.max(1, W - 2 * z - 2 * si).toFixed(1) + '" height="' + Math.max(1, H - 2 * z - ex - 2 * si).toFixed(1) + '" fill="none" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>';
+    }
+    // baannaden (stuk breder dan de rol)
+    if (s.banen && s.banen.naadPos.length) {
+      s.banen.naadPos.forEach(function (pos) {
+        var q = pos * sc;
+        o += s.banen.richting === 'w'
+          ? '<line x1="' + (x0 + q).toFixed(1) + '" y1="' + (y0 + 2) + '" x2="' + (x0 + q).toFixed(1) + '" y2="' + (y0 + H - 2) + '" stroke="#1f2937" stroke-width="1.2" stroke-dasharray="3 2"/>'
+          : '<line x1="' + (x0 + 2) + '" y1="' + (y0 + q).toFixed(1) + '" x2="' + (x0 + W - 2) + '" y2="' + (y0 + q).toFixed(1) + '" stroke="#1f2937" stroke-width="1.2" stroke-dasharray="3 2"/>';
+      });
     }
     // deelnaden (rok uit delen)
     if (s.delen > 1) {
@@ -261,7 +272,7 @@
     h += '<p class="eskh-bt-disclaimer"><strong>Let op:</strong> ' + esc(DISCLAIMER) + '</p>';
     h += '<h5>Stukken</h5><table class="eskh-bt-tabel"><thead><tr><th>#</th><th>Stuk</th><th>Aantal</th><th>Netto maat</th><th>Snijmaat</th></tr></thead><tbody>';
     lijst.forEach(function (s) {
-      h += '<tr><td>' + s.nr + '</td><td>' + esc(s.naam) + '</td><td>' + s.qty + '</td><td>' + cm(s.nettoW) + ' × ' + cm(s.nettoH) + ' cm</td><td>' + (s.delen > 1 ? s.delen + ' delen van ' : '') + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm</td></tr>';
+      h += '<tr><td>' + s.nr + '</td><td>' + esc(s.naam) + '</td><td>' + s.qty + '</td><td>' + cm(s.nettoW) + ' × ' + cm(s.nettoH) + ' cm</td><td>' + (s.delen > 1 ? s.delen + ' delen van ' : '') + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm' + (s.banen && s.banen.n > 1 ? ' <small>(' + s.banen.n + ' banen)</small>' : '') + '</td></tr>';
     });
     h += '</tbody></table>';
     var bevTxt = '';
@@ -275,6 +286,11 @@
     h += '<div class="eskh-bt-stukken">';
     lijst.forEach(function (s) {
       var cap = b.punten ? bevestigingTekst(bev[s.nr]) : '';
+      if (s.banen && s.banen.n > 1) {
+        var richt = s.banen.richting === 'w' ? 'vanaf de linkerkant' : 'vanaf de bovenkant';
+        cap = 'Breder dan de rol: ' + s.banen.n + ' banen van ' + cm(s.banen.breedte) + ' cm breed (snijmaat), naad op ' +
+          s.banen.naadPos.map(function (x) { return cm(x - s.zoom); }).join(' · ') + ' cm ' + richt + ' van de afgewerkte maat (stippellijn), 4 cm overlap.' + (cap ? '<br>' + cap : '');
+      }
       if (s.delen > 1) {
         var naden = []; for (var d = 1; d < s.delen; d++) naden.push(cm(s.nettoW * d / s.delen));
         cap = 'Uit ' + s.delen + ' gelijke delen van ' + cm(s.deelNetto) + ' cm, deelnaden op ' + naden.join(' · ') + ' cm (stippellijn).' + (cap ? '<br>' + cap : '');
