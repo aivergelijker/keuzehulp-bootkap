@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node tools/build.js",
     "test": "node --test test/*.test.js",
-    "catalog": "python3 -I tools/build_catalog.py"
+    "catalog": "python3 -I tools/build_catalog.py",
+    "demo": "node tools/build_demo.js"
   },
   "devDependencies": {
     "terser": "^5.51.2"

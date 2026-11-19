@@ -66,6 +66,10 @@ npm test && npm run build
 - Stalen (Sunbrella Plus, Sauleda) worden per kleur automatisch gekoppeld op kleurnaam.
 - Het overzicht om te controleren staat in `docs/PRODUCTKEUZES.md`.
 
+## Testversie (zonder esails.nl)
+
+`npm run build && npm run demo` maakt `dist/demo.html`: de complete tool met prijzen uit de catalogus en een nagebootste winkelwagen. Na "Alles in winkelwagen" zie je precies welke variant-ID's en aantallen besteld zouden worden.
+
 ## Testen
 
 ```bash

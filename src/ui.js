@@ -706,7 +706,7 @@
       if (!res.fout.length) {
         LIVE.track('keuzehulp_cart_klaar', { keuzehulp_regels: res.ok.length, value: Math.round(waarde * 100) / 100 });
         try { localStorage.removeItem(STORE_KEY); } catch (e) { }
-        location.href = '/cart/';
+        naarCartPagina(res.ok);
         return;
       }
       LIVE.track('keuzehulp_cart_fout', { keuzehulp_fout: res.fout.length });
@@ -718,12 +718,17 @@
       render();
     });
   }
+  /* Demo/test-haak: window.ESKH_DEMO.klaar(regels) i.p.v. naar /cart/ te navigeren */
+  function naarCartPagina(regels) {
+    if (root.ESKH_DEMO && typeof root.ESKH_DEMO.klaar === 'function') { root.ESKH_DEMO.klaar(regels); return; }
+    location.href = '/cart/';
+  }
   function retryWinkelwagen() {
     var regels = S.retry || []; if (!regels.length) return;
     S.bezig = 'Opnieuw proberen…'; render();
     LIVE.zetInWinkelwagen(regels).then(function (res) {
       S.bezig = false;
-      if (!res.fout.length) { location.href = '/cart/'; return; }
+      if (!res.fout.length) { naarCartPagina(res.ok); return; }
       S.retry = res.fout;
       S.cartResultaat = '<div class="eskh-melding" role="alert">Nog steeds ' + res.fout.length + ' product(en) niet gelukt. Bel ' + TELEFOON + ' of voeg ze via de productpagina toe.</div>';
       render();
