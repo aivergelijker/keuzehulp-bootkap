@@ -163,3 +163,6 @@
   .eskh{border:0;max-width:none}
   .eskh-plan{display:block}
 }
+
+.eskh-reset-vraag{font-size:13.5px;display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}
+.eskh .eskh-link-danger{color:#b3261e;font-weight:600}

@@ -685,7 +685,9 @@
     if (S.cartResultaat) h += S.cartResultaat;
     h += '<div class="eskh-share"><button type="button" class="eskh-link" data-act="deel">🔗 Kopieer link naar dit pakket</button>' +
       '<button type="button" class="eskh-link" data-act="print">🖨️ Print / bewaar als PDF</button>' +
-      '<button type="button" class="eskh-link" data-act="reset">↺ Opnieuw beginnen</button></div>';
+      (S.resetVraag
+        ? '<span class="eskh-reset-vraag" role="alert">Je pakket wordt gewist. Zeker weten? <button type="button" class="eskh-link eskh-link-danger" data-act="reset-ja">Ja, opnieuw beginnen</button> <button type="button" class="eskh-link" data-act="reset-nee">Annuleren</button></span>'
+        : '<button type="button" class="eskh-link" data-act="reset">↺ Opnieuw beginnen</button>') + '</div>';
     return h;
   }
 
@@ -858,7 +860,15 @@
     }
     if (act === 'cart-retry') { retryWinkelwagen(); return; }
     if (act === 'print') { window.print(); return; }
-    if (act === 'reset') { if (window.confirm('Weet je zeker dat je opnieuw wilt beginnen? Je pakket wordt gewist.')) { resetState(); try { localStorage.removeItem(STORE_KEY); } catch (e2) { } render(true); } return; }
+    // Bevestiging in de pagina zelf: window.confirm wordt door sommige (in-app) browsers stil geblokkeerd.
+    if (act === 'reset') { S.resetVraag = true; render(); return; }
+    if (act === 'reset-nee') { S.resetVraag = false; render(); return; }
+    if (act === 'reset-ja') {
+      resetState();
+      try { localStorage.removeItem(STORE_KEY); } catch (e2) { }
+      if (/[#&]kh=/.test(location.hash || '')) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e3) { } }
+      render(true); return;
+    }
     if (act === 'deel') {
       var link = deelLink();
       var klaar = function () { t.textContent = '✓ Link gekopieerd'; };
