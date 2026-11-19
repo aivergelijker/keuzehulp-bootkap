@@ -616,7 +616,7 @@
           '<div><a href="/' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.naam) + '</a>' + statusBadge(r.vid) +
           '<p>' + esc(r.notitie || '') + (gewijzigd ? ' <em>(berekend: ' + r.berekend + ')</em>' : '') + '</p>' +
           (uit ? '<p class="eskh-err">Dit product is nu niet leverbaar. Kies een andere variant of zet het aantal op 0. Vragen? Bel ' + TELEFOON + '.</p>' : '') + '</div></div>' +
-          '<div class="eskh-line-qty">' + stepper('qty:' + r.vid, r.qty, 0, 999, 'Aantal ' + r.naam) + '<small>' + (r.unit === 'm' ? 'meter' : r.unit === 'rol' ? 'rol' : 'stuks') + '</small></div>' +
+          '<div class="eskh-line-qty">' + stepper('qty:' + r.vid, r.qty, 0, 999, 'Aantal ' + r.naam) + '<small>' + (r.unit === 'm' ? 'meter' : r.unit === 'rol' ? 'rol' : (r.verpakking > 1 ? 'stuks (per ' + r.verpakking + ')' : 'stuks')) + '</small></div>' +
           '<div class="eskh-line-price">' + euro(lt) + '<small>' + euro(r.prijsLive) + ' / ' + (r.unit === 'm' ? 'm' : 'st') + '</small></div></div>';
       });
     });
@@ -765,7 +765,7 @@
       var sk = t.getAttribute('data-step'), delta = parseInt(t.getAttribute('data-d'), 10);
       if (sk.indexOf('qty:') === 0) {
         var vid = sk.slice(4), r = pakket().regels.filter(function (x) { return x.vid === vid; })[0];
-        S.overrides[vid] = Math.max(0, (r ? r.qty : 0) + delta);
+        S.overrides[vid] = Math.max(0, (r ? r.qty : 0) + delta * ((r && r.verpakking) || 1));
       } else {
         var cur = parseInt(getPath(sk), 10) || 1;
         setPath(sk, Math.max(1, cur + delta));
@@ -826,7 +826,7 @@
     if (t.hasAttribute('data-num')) {
       var key = t.getAttribute('data-num'), n = parseInt(t.value, 10);
       if (e.type !== 'change') return;
-      if (key.indexOf('qty:') === 0) S.overrides[key.slice(4)] = isNaN(n) ? 0 : Math.max(0, n);
+      if (key.indexOf('qty:') === 0) { var rv = pakket().regels.filter(function (x) { return x.vid === key.slice(4); })[0], vp = (rv && rv.verpakking) || 1; S.overrides[key.slice(4)] = isNaN(n) ? 0 : Math.ceil(Math.max(0, n) / vp) * vp; }
       else setPath(key, isNaN(n) ? 1 : Math.max(1, n));
       render(); return;
     }

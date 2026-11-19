@@ -147,10 +147,10 @@ add('draai_mh_stempel', 260002692, 'MH stempel tourniquet 17 × 11 mm', perOrder
 # --- Drukknopen A/B (in het doek) + C (op de boot)
 for merk, ids in {'ykk': (319599669, 319599676, 319599686), 'dot': (257994841, 257994829, 257994859),
                   'fasnap': (286980532, 286980536, 286980544), 'prym': (257994790, 257994796, 257994803)}.items():
-    for deel, vid in zip('abc', ids): add('druk_%s_%s' % (merk, deel), vid)
-add('druk_dot_c_bout', 258002241, 'DOT drukknoop deel C — bout RVS M5 × 9 mm')
-add('druk_dot_c_popnagel', 257994867, 'DOT drukknoop deel C — popnagel RVS 8 mm')
-add('druk_dot_c_raamclip', 257997395, 'DOT drukknoop deel C — raamclip RVS 24 mm')
+    for deel, vid in zip('abc', ids): add('druk_%s_%s' % (merk, deel), vid, **({'verpakking': 10} if merk == 'dot' else {}))
+add('druk_dot_c_bout', 258002241, 'DOT drukknoop deel C — bout RVS M5 × 9 mm', verpakking=10)
+add('druk_dot_c_popnagel', 257994867, 'DOT drukknoop deel C — popnagel RVS 8 mm', verpakking=10)
+add('druk_dot_c_raamclip', 257997395, 'DOT drukknoop deel C — raamclip RVS 24 mm', verpakking=10)
 add('druk_holpijp', 313343275, 'Paffrath holpijp rond 3 mm', perOrder=True, tool=True)
 add('druk_stempel', 256701648, 'Osborne stempel voor drukknopen (229-24)', perOrder=True, tool=True)
 # --- Zeilringen + gereedschap (ringmaat = setmaat)
@@ -174,7 +174,6 @@ add('tape_6', 302835931, 'Seam Stick dubbelzijdig tape 6 mm (rol 50 m)', perOrde
 add('tape_9', 297791084, 'Seam Stick dubbelzijdig tape 9 mm (rol 50 m)', perOrder=True)
 add('tape_12', 297791091, 'Seam Stick dubbelzijdig tape 12 mm (rol 50 m)', perOrder=True)
 add('mallendoek', 325737735, 'Mallendoek LDPE gerecycled 0,18 mm, 300 cm breed', 'm', rolCm=300)
-add('mallendoek_rol', 325737733, 'Mallendoek LDPE gerecycled 0,18 mm, 300 cm breed — rol 50 m', 'st', rolLengteM=50)
 add('band_25_zwart', 325093988, 'Polyesterband 1366 zwart 25 mm', 'm'); add('klemgesp', 313387985, 'Klemgesp RVS 25 mm')
 add('beugel_zwart', 269081614, 'Bandbeugel nylon zwart 25 mm'); add('beugel_wit', 269081652, 'Bandbeugel nylon wit 25 mm'); add('beugel_rvs', 256947996, 'Bandbeugel RVS luxe 25 mm')
 add('glaspotlood', 267142123, 'Staedtler glaspotlood wit', perOrder=True)

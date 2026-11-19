@@ -102,7 +102,8 @@
     if (!prod) throw new Error('Product ontbreekt in catalogus: ' + key);
     qty = Math.ceil(qty - 1e-9);
     if (qty <= 0) return;
-    var r = { key: key, vid: String(prod.vid), url: prod.url, naam: prod.naam, unit: prod.unit || 'st', prijs: prod.prijs,
+    if (prod.verpakking > 1) qty = Math.ceil(qty / prod.verpakking) * prod.verpakking; // bijv. DOT: per 10 verpakt
+    var r = { key: key, vid: String(prod.vid), url: prod.url, naam: prod.naam, unit: prod.unit || 'st', prijs: prod.prijs, verpakking: prod.verpakking || 1,
               qty: qty, notitie: notitie || '', perOrder: !!prod.perOrder, tool: !!prod.tool, img: prod.img || null };
     if (extra) for (var k in extra) r[k] = extra[k];
     this.list.push(r);
@@ -224,8 +225,7 @@
     var x = item.extras || {};
     if (x.mallendoek) {
       var mm = Math.ceil(b.model.oppervlakM2 * b.aantal * 1.25 / (cat.p.mallendoek.rolCm / 100));
-      if (mm >= 31) R.add('mallendoek', R.p('mallendoek_rol'), Math.ceil(mm / 50), 'Voordeliger dan ' + mm + ' losse meters.', { groep: 'extra' });
-      else R.add('mallendoek', R.p('mallendoek'), mm, 'Voor een mal van ±' + (b.model.oppervlakM2 * b.aantal).toFixed(1).replace('.', ',') + ' m², 300 cm breed.', { groep: 'extra' });
+      R.add('mallendoek', R.p('mallendoek'), mm, 'Voor een mal van ±' + (b.model.oppervlakM2 * b.aantal).toFixed(1).replace('.', ',') + ' m², 300 cm breed.', { groep: 'extra' });
     }
     if (x.raamfolie && x.raamfolie.breedte > 0 && x.raamfolie.hoogte > 0) {
       var rf = x.raamfolie;

@@ -1479,7 +1479,8 @@
    "naam": "DOT® Fasteners DOT | Durable | Drukknoop | Deel A | RVS",
    "prijs": 0.73,
    "unit": "st",
-   "img": 391528000
+   "img": 391528000,
+   "verpakking": 10
   },
   "druk_dot_b": {
    "vid": "257994829",
@@ -1487,7 +1488,8 @@
    "naam": "DOT® Fasteners DOT | Durable | Drukknoop | Deel B | RVS",
    "prijs": 0.77,
    "unit": "st",
-   "img": 391527943
+   "img": 391527943,
+   "verpakking": 10
   },
   "druk_dot_c": {
    "vid": "257994859",
@@ -1495,7 +1497,8 @@
    "naam": "DOT® Fasteners DOT | Durable | Drukknoop | Deel C | Parker | RVS | 9 mm",
    "prijs": 1.79,
    "unit": "st",
-   "img": 391528042
+   "img": 391528042,
+   "verpakking": 10
   },
   "druk_fasnap_a": {
    "vid": "286980532",
@@ -1551,7 +1554,8 @@
    "naam": "DOT drukknoop deel C — bout RVS M5 × 9 mm",
    "prijs": 1.99,
    "unit": "st",
-   "img": 391538412
+   "img": 391538412,
+   "verpakking": 10
   },
   "druk_dot_c_popnagel": {
    "vid": "257994867",
@@ -1559,7 +1563,8 @@
    "naam": "DOT drukknoop deel C — popnagel RVS 8 mm",
    "prijs": 1.29,
    "unit": "st",
-   "img": 391528075
+   "img": 391528075,
+   "verpakking": 10
   },
   "druk_dot_c_raamclip": {
    "vid": "257997395",
@@ -1567,7 +1572,8 @@
    "naam": "DOT drukknoop deel C — raamclip RVS 24 mm",
    "prijs": 1.79,
    "unit": "st",
-   "img": 391532232
+   "img": 391532232,
+   "verpakking": 10
   },
   "druk_holpijp": {
    "vid": "313343275",
@@ -1823,15 +1829,6 @@
    "prijs": 4.95,
    "unit": "m",
    "rolCm": 300
-  },
-  "mallendoek_rol": {
-   "vid": "325737733",
-   "url": "mallendoek-ldpe-gerecycled-transparant-folie-dikte.html",
-   "naam": "Mallendoek LDPE gerecycled 0,18 mm, 300 cm breed — rol 50 m",
-   "prijs": 149.75,
-   "unit": "st",
-   "img": 502322430,
-   "rolLengteM": 50
   },
   "band_25_zwart": {
    "vid": "325093988",

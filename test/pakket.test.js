@@ -75,8 +75,14 @@ test('bevestigingsonderdelen hebben gelijke aantallen per punt', () => {
   const a = druk.find(r => r.key === 'druk_a').qty;
   assert.strictEqual(druk.find(r => r.key === 'druk_b').qty, a);
   assert.strictEqual(druk.find(r => r.key === 'druk_c').qty, a);
-  // buiskap 300 x 220: rand = 2*300 + 220 = 820 cm, om de 25 cm -> ceil(820/25)+1 = 34
-  assert.strictEqual(a, 34);
+  // buiskap 300 x 220: rand = 2*300 + 220 = 820 cm, om de 25 cm -> ceil(820/25)+1 = 34 punten -> DOT per 10: 40
+  assert.strictEqual(a, 40);
+  const ykk = P.regelsVoorItem({ ...base, bevestiging: 'druk', opt: { drukMerk: 'ykk' } }, cat).regels;
+  assert.strictEqual(ykk.find(r => r.key === 'druk_a').qty, 34, 'YKK niet afgerond');
+  for (const c of ['bout', 'popnagel', 'raamclip', 'parker']) {
+    const r = P.regelsVoorItem({ ...base, bevestiging: 'druk', opt: { drukMerk: 'dot', drukC: c } }, cat).regels;
+    r.filter(x => /^druk_[abc]$/.test(x.key)).forEach(x => assert.strictEqual(x.qty % 10, 0, 'DOT ' + x.naam + ' per 10'));
+  }
   const draai = P.regelsVoorItem({ ...base, bevestiging: 'draai', opt: { draaiMerk: 'mh' } }, cat).regels;
   assert.strictEqual(draai.find(r => r.key === 'draai').qty, draai.find(r => r.key === 'draai_kous').qty);
   assert.match(draai.find(r => r.key === 'draai_kous').naam, /17 × 11/, 'MH draaier krijgt MH kous 17x11');
@@ -103,13 +109,16 @@ test('zonder gereedschap geen gereedschapsregels', () => {
   }
 });
 
-test('mallendoek: per meter, en rol van 50 m als dat voordeliger is', () => {
+test('mallendoek: altijd per meter, ook bij grote oppervlakken', () => {
   const base = { module: 'bootkap', vorm: 'dekzeil', doek: 'ferrari_705', kleur: cat.doeken.ferrari_705.kleuren[0].vid, bevestiging: 'ring', verwerking: 'naaien' };
   const klein = P.regelsVoorItem({ ...base, maten: { lengte: 300, breedte: 200 }, extras: { mallendoek: true } }, cat).regels.find(r => r.key === 'mallendoek');
   assert.strictEqual(klein.unit, 'm');
   assert.strictEqual(klein.vid, String(cat.p.mallendoek.vid));
   const groot = P.regelsVoorItem({ ...base, maten: { lengte: 1200, breedte: 500, overhang: 50 }, extras: { mallendoek: true } }, cat).regels.find(r => r.key === 'mallendoek');
-  assert.strictEqual(groot.vid, String(cat.p.mallendoek_rol.vid));
+  assert.strictEqual(groot.vid, String(cat.p.mallendoek.vid));
+  assert.strictEqual(groot.unit, 'm');
+  assert.ok(groot.qty > 31, 'grote mal: veel meters, geen rol');
+  assert.ok(!Object.keys(cat.p).some(k => /mallendoek_rol/.test(k)), 'rol niet in catalogus');
 });
 
 test('raamfolie, ritsen en trekbandjes', () => {
