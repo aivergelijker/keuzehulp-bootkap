@@ -79,7 +79,13 @@
 .eskh input[type=number]::-webkit-inner-spin-button,.eskh input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .eskh-preview{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center;background:var(--eskh-soft);border-radius:var(--eskh-radius);padding:14px 16px;margin-bottom:18px}
 .eskh-obj{width:100%;height:auto;max-height:150px}
-.eskh-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.eskh-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.eskh .eskh-stat-ind{background:var(--eskh-primary);border-color:var(--eskh-primary)}
+.eskh .eskh-stat-ind small{color:rgba(255,255,255,.75)}
+.eskh .eskh-stat-ind strong{color:#fff}
+.eskh-soon{margin-top:8px!important;font-size:12.5px;color:var(--eskh-warn)!important}
+.eskh-staal{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px;padding:12px 14px;border:1.5px dashed var(--eskh-line);border-radius:var(--eskh-radius)}
+.eskh-staal span{display:block;color:var(--eskh-muted);font-size:13.5px}
 .eskh-stat{background:#fff;border:1px solid var(--eskh-line);border-radius:8px;padding:10px;text-align:center}
 .eskh-stat small{display:block;color:var(--eskh-muted);font-size:12px}
 .eskh-stat strong{font-size:18px}
@@ -138,8 +144,10 @@
 @media (max-width:720px){
   .eskh{padding:16px;margin:12px auto;border-radius:0;border-left:0;border-right:0}
   .eskh-grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .eskh-preview{grid-template-columns:1fr;gap:10px}
-  .eskh-obj{max-height:110px}
+  .eskh-preview{grid-template-columns:1fr;gap:8px;position:sticky;top:0;z-index:4;padding:8px 10px;box-shadow:0 4px 12px rgba(15,28,63,.08)}
+  .eskh-preview-vis,.eskh-preview .eskh-plan{display:none}
+  .eskh-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .eskh-stat{padding:6px 4px}.eskh-stat small{font-size:10.5px}.eskh-stat strong{font-size:14px}
   .eskh-subgrid{grid-template-columns:1fr}
   .eskh-board-head{display:none}
   .eskh-line{grid-template-columns:1fr auto;grid-template-areas:"info info" "qty price"}

@@ -201,6 +201,24 @@ def ritsen(rx):
     return dict(sorted(out.items(), key=lambda x: float(x[0])))
 RITSEN = {'bloktand': ritsen(r'Rits Bloktand \| 10V \| Deelbaar \| 10mm \| Zwart'), 'spiraal': ritsen(r'Rits Spiraal \| 10C \| Deelbaar \| 10mm \| Zwart$|Rits Spiraal \| 10C \| Deelbaar \| 10mm \| Zwart')}
 
+# --- Stalen per kleur (Sunbrella Plus / Sauleda): match op kleurnaam
+def norm(x): return re.sub(r'[^a-z0-9]+', ' ', x.lower()).strip()
+STAAL_BRON = {'sunbrella_plus': r'Sunbrella \| Plus .*SAMPLES', 'sauleda_seastar': r'Sauleda \| Sea Star Special \| Bootdoek \| Sample'}
+for dkey, rx in STAAL_BRON.items():
+    for prd in D.values():
+        if 'variants' not in prd or not re.search(rx, prd.get('title', ''), re.I): continue
+        for vid, v in prd['variants'].items():
+            naam = norm(re.sub(r'^(Color|Kleur)\s*:\s*', '', v['title']))
+            base = re.sub(r' [a-z]?\d+$', '', re.sub(r'^\d+ ', '', naam))   # '2401 azul' / 'captain navy 5057' -> kleurnaam
+            for k in DOEKEN[dkey]['kleuren']:
+                kn = norm(k['naam'])
+                if base and (kn == base or re.sub(r' zwart$', '', kn) == base or norm(k['naam'].split('/')[0]) == base):
+                    if 'staal' not in k:
+                        k['staal'] = dict(vid=vid, url=prd['url'], prijs=v['price'], op=bool(v['avail']))
+for d in DOEKEN.values():
+    n = sum(1 for k in d['kleuren'] if 'staal' in k)
+    if n: print('stalen', d['naam'], n, 'van', len(d['kleuren']))
+
 STATUS = {k: V[v['vid']]['op'] for k, v in P.items()}
 for d in DOEKEN.values():
     for k in d['kleuren']: STATUS['doek:' + k['vid']] = V[k['vid']]['op']

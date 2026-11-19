@@ -25,7 +25,13 @@
      "prijs": 36.95,
      "hex": "#24508f",
      "img": 445495744,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "312343985",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578883",
@@ -52,7 +58,13 @@
      "prijs": 34.95,
      "hex": "#8e1f2a",
      "img": 445495865,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "312343982",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578892",
@@ -70,7 +82,13 @@
      "prijs": 34.95,
      "hex": "#1d2740",
      "img": 445495728,
-     "garen": "captain_navy"
+     "garen": "captain_navy",
+     "staal": {
+      "vid": "312343979",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578897",
@@ -114,7 +132,13 @@
      "prijs": 34.95,
      "hex": "#1d2740",
      "img": 445495859,
-     "garen": "captain_navy"
+     "garen": "captain_navy",
+     "staal": {
+      "vid": "312343993",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578908",
@@ -132,7 +156,13 @@
      "prijs": 36.95,
      "hex": "#c8b48f",
      "img": 439151002,
-     "garen": "beige"
+     "garen": "beige",
+     "staal": {
+      "vid": "312343999",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578912",
@@ -231,7 +261,13 @@
      "prijs": 36.95,
      "hex": "#c8b48f",
      "img": 445495715,
-     "garen": "beige"
+     "garen": "beige",
+     "staal": {
+      "vid": "312344003",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578964",
@@ -249,7 +285,13 @@
      "prijs": 34.95,
      "hex": "#1c1c1e",
      "img": 445495843,
-     "garen": "zwart"
+     "garen": "zwart",
+     "staal": {
+      "vid": "312344009",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578949",
@@ -267,7 +309,13 @@
      "prijs": 36.95,
      "hex": "#1d2740",
      "img": 445495780,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "312344011",
+      "url": "sunbrella-plus-320-gr-m2-samples.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "322578967",
@@ -439,7 +487,13 @@
      "prijs": 24.95,
      "hex": "#24508f",
      "img": 393274709,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997527",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003480",
@@ -448,7 +502,13 @@
      "prijs": 24.95,
      "hex": "#c8b48f",
      "img": 393274514,
-     "garen": "beige"
+     "garen": "beige",
+     "staal": {
+      "vid": "297997549",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": false
+     }
     },
     {
      "vid": "258003320",
@@ -457,7 +517,13 @@
      "prijs": 24.95,
      "hex": "#f4f3ee",
      "img": 393275068,
-     "garen": "wit"
+     "garen": "wit",
+     "staal": {
+      "vid": "297997556",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003642",
@@ -466,7 +532,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274070,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997564",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003640",
@@ -475,7 +547,13 @@
      "prijs": 24.95,
      "hex": "#8e1f2a",
      "img": 393274093,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997571",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003464",
@@ -484,7 +562,13 @@
      "prijs": 24.95,
      "hex": "#b8babb",
      "img": 393274645,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997576",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003644",
@@ -493,7 +577,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274046,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997638",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003479",
@@ -502,7 +592,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274525,
-     "garen": "naturel"
+     "garen": "naturel",
+     "staal": {
+      "vid": "297997640",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": false
+     }
     },
     {
      "vid": "258003525",
@@ -511,7 +607,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274299,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997643",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003333",
@@ -520,7 +622,13 @@
      "prijs": 24.95,
      "hex": "#5a4031",
      "img": 393274975,
-     "garen": "donkerbruin"
+     "garen": "donkerbruin",
+     "staal": {
+      "vid": "297997645",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003490",
@@ -529,7 +637,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274442,
-     "garen": "olijfgroen"
+     "garen": "olijfgroen",
+     "staal": {
+      "vid": "297997647",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003469",
@@ -538,7 +652,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274620,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997648",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003407",
@@ -547,7 +667,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274801,
-     "garen": "naturel"
+     "garen": "naturel",
+     "staal": {
+      "vid": "297997651",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003487",
@@ -556,7 +682,13 @@
      "prijs": 24.95,
      "hex": "#8e1f2a",
      "img": 393274481,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997654",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003473",
@@ -565,7 +697,13 @@
      "prijs": 24.95,
      "hex": "#8c8f92",
      "img": 393274603,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997659",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003459",
@@ -574,7 +712,13 @@
      "prijs": 24.95,
      "hex": "#24508f",
      "img": 393274739,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997660",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003335",
@@ -583,7 +727,13 @@
      "prijs": 24.95,
      "hex": "#c8b48f",
      "img": 393274958,
-     "garen": "taupe"
+     "garen": "taupe",
+     "staal": {
+      "vid": "297997663",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003687",
@@ -592,7 +742,13 @@
      "prijs": 21.75,
      "hex": "#9a9a9a",
      "img": 393273569,
-     "garen": "naturel"
+     "garen": "naturel",
+     "staal": {
+      "vid": "297997665",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003653",
@@ -601,7 +757,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274005,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997669",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003309",
@@ -610,7 +772,13 @@
      "prijs": 21.75,
      "hex": "#1d2740",
      "img": 393275080,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997673",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003478",
@@ -619,7 +787,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274557,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997677",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003557",
@@ -628,7 +802,13 @@
      "prijs": 21.75,
      "hex": "#c8b48f",
      "img": 393274143,
-     "garen": "taupe"
+     "garen": "taupe",
+     "staal": {
+      "vid": "297997681",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": false
+     }
     },
     {
      "vid": "258003325",
@@ -637,7 +817,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393275002,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997683",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003406",
@@ -646,7 +832,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274828,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997685",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003554",
@@ -655,7 +847,13 @@
      "prijs": 21.75,
      "hex": "#3d4043",
      "img": 393274175,
-     "garen": "antraciet"
+     "garen": "antraciet",
+     "staal": {
+      "vid": "297997687",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": false
+     }
     },
     {
      "vid": "258003676",
@@ -664,7 +862,13 @@
      "prijs": 24.95,
      "hex": "#1c1c1e",
      "img": 393273967,
-     "garen": "zwart"
+     "garen": "zwart",
+     "staal": {
+      "vid": "297997690",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003549",
@@ -673,7 +877,13 @@
      "prijs": 24.95,
      "hex": "#3d4043",
      "img": 393274191,
-     "garen": "antraciet"
+     "garen": "antraciet",
+     "staal": {
+      "vid": "297997696",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003396",
@@ -682,7 +892,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274925,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997698",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003297",
@@ -691,7 +907,13 @@
      "prijs": 24.95,
      "hex": "#d89aa8",
      "img": 393275094,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997703",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003647",
@@ -700,7 +922,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274032,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997708",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003542",
@@ -709,7 +937,13 @@
      "prijs": 24.95,
      "hex": "#8c8f92",
      "img": 393274210,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997711",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003508",
@@ -718,7 +952,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274367,
-     "garen": "olijfgroen"
+     "garen": "olijfgroen",
+     "staal": {
+      "vid": "297997732",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003521",
@@ -727,7 +967,13 @@
      "prijs": 24.95,
      "hex": "#24508f",
      "img": 393274346,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997735",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003502",
@@ -736,7 +982,13 @@
      "prijs": 24.95,
      "hex": "#2f4a36",
      "img": 393274388,
-     "garen": "olijfgroen"
+     "garen": "olijfgroen",
+     "staal": {
+      "vid": "297997728",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003658",
@@ -745,7 +997,13 @@
      "prijs": 24.95,
      "hex": "#8e1f2a",
      "img": 393273979,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997726",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003329",
@@ -754,7 +1012,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274992,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997721",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003488",
@@ -763,7 +1027,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274462,
-     "garen": "bordeaux"
+     "garen": "bordeaux",
+     "staal": {
+      "vid": "297997718",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003500",
@@ -772,7 +1042,13 @@
      "prijs": 24.95,
      "hex": "#2f4a36",
      "img": 393274415,
-     "garen": "olijfgroen"
+     "garen": "olijfgroen",
+     "staal": {
+      "vid": "297997717",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003536",
@@ -781,7 +1057,13 @@
      "prijs": 24.95,
      "hex": "#24508f",
      "img": 393274262,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997713",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003409",
@@ -790,7 +1072,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274770,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997737",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003545",
@@ -799,7 +1087,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274200,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997739",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003680",
@@ -808,7 +1102,13 @@
      "prijs": 21.75,
      "hex": "#1c1c1e",
      "img": 393273931,
-     "garen": "zwart"
+     "garen": "zwart",
+     "staal": {
+      "vid": "297997741",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003529",
@@ -817,7 +1117,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274286,
-     "garen": "marine_blauw"
+     "garen": "marine_blauw",
+     "staal": {
+      "vid": "297997742",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003292",
@@ -826,7 +1132,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393275122,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997743",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003477",
@@ -835,7 +1147,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274578,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997744",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003484",
@@ -844,7 +1162,13 @@
      "prijs": 24.95,
      "hex": "#e06a1b",
      "img": 393274501,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997746",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003392",
@@ -853,7 +1177,13 @@
      "prijs": 24.95,
      "hex": "#e8c547",
      "img": 393274949,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997751",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     },
     {
      "vid": "258003323",
@@ -871,7 +1201,13 @@
      "prijs": 24.95,
      "hex": "#9a9a9a",
      "img": 393274134,
-     "garen": "lichtgrijs"
+     "garen": "lichtgrijs",
+     "staal": {
+      "vid": "297997755",
+      "url": "sauleda-sea-star-special-bootdoek-sample.html",
+      "prijs": 1.95,
+      "op": true
+     }
     }
    ]
   },

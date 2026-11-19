@@ -10,7 +10,7 @@ Een klant kan meerdere items in één pakket zetten, bijvoorbeeld 3 ramen en een
 
 ## Installatie op Lightspeed
 
-1. Bouw het script met `npm run build`. Daarna staat alles in één bestand: `dist/esails-keuzehulp.js`.
+1. Bouw het script met `npm install && npm run build` (geminified, ±35 kB gzip). Daarna staat alles in één bestand: `dist/esails-keuzehulp.js`.
 2. Upload dat bestand naar de host waar je het nu ook hebt staan (Supabase storage).
 3. Zet op de pagina:
 
@@ -38,14 +38,17 @@ Een klant kan meerdere items in één pakket zetten, bijvoorbeeld 3 ramen en een
 | `src/ui.js` + `src/style.css` | De wizard zelf. |
 
 - **Live prijzen:** de prijzen in de catalogus zijn alleen een vangnet. In de shop toont de tool altijd de actuele prijs incl. btw en de voorraadstatus (op voorraad / op bestelling / niet leverbaar).
-- **Niet-leverbare producten** kun je niet selecteren en ze worden nooit in de winkelwagen gezet.
+- **Niet-leverbare producten** kun je niet selecteren en ze worden nooit in de winkelwagen gezet. Een product dat uit de shop verdwenen is (404 of variant weg) telt ook als niet leverbaar.
+- **Prijsindicatie** staat vanaf de doekkeuze live in beeld, op mobiel als vaste balk bovenaan.
+- **Staal bestellen:** bij Sunbrella en Sauleda kan de klant een staal van de gekozen kleur direct in de winkelwagen zetten.
+- **Zonwering zonder voorraad:** zijn alle gaasdoeken uitverkocht, dan toont de modulekaart "Binnenkort weer leverbaar".
 - **Toevoegen mislukt?** De klant ziet dan welke regels niet lukten, met een knop om het opnieuw te proberen.
 
 ### Tracking (GTM `dataLayer`)
 
 - `keuzehulp_start`, `keuzehulp_module`, `keuzehulp_stap`, `keuzehulp_item_klaar` en `keuzehulp_overzicht`
 - `add_to_cart` in GA4-ecommerceformaat, met `keuzehulp: true`
-- `keuzehulp_cart_klaar`, `keuzehulp_cart_fout` en `keuzehulp_deel`
+- `keuzehulp_cart_klaar`, `keuzehulp_cart_fout`, `keuzehulp_deel` en `keuzehulp_staal`
 
 ### Overig
 
@@ -53,7 +56,14 @@ Een klant kan meerdere items in één pakket zetten, bijvoorbeeld 3 ramen en een
 
 ## Catalogus bijwerken
 
-- Productkeuzes staan in `SPEC` in `tools/build_catalog.py`. Pas die aan en draai de generator opnieuw met een verse crawl (`listing.json` + `detail3.json`).
+```bash
+python3 -I tools/crawl.py crawl            # leest esails.nl (alleen lezen, ±5 min, rustig tempo)
+python3 -I tools/build_catalog.py crawl    # schrijft src/catalog.js
+npm test && npm run build
+```
+
+- Productkeuzes staan in `SPEC` in `tools/build_catalog.py`. Pas die aan en draai de generator opnieuw.
+- Stalen (Sunbrella Plus, Sauleda) worden per kleur automatisch gekoppeld op kleurnaam.
 - Het overzicht om te controleren staat in `docs/PRODUCTKEUZES.md`.
 
 ## Testen

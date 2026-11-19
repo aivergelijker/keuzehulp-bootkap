@@ -39,15 +39,28 @@
     return out;
   }
 
+  var WEG = { prijs: null, status: { code: 'uitverkocht', levertijd: 'Dit product staat niet meer in de shop.' }, weg: true };
   var inflight = {};
-  function haalProduct(url) {
+  /* vids: de variant-ID's die we op deze url verwachten. Bestaat de pagina niet
+     (404) of ontbreekt een variant, dan markeren we die als niet leverbaar, zodat
+     een opgeheven product nooit in de winkelwagen belandt. Netwerkfouten laten we
+     ongemoeid (dan geldt de catalogusprijs). */
+  function haalProduct(url, vids) {
+    vids = vids || [];
     if (inflight[url]) return inflight[url];
     var base = '/' + String(url).replace(/^\/+/, '');
     inflight[url] = fetch(base + (base.indexOf('?') < 0 ? '?' : '&') + 'format=json', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (r) {
+        if (r.status === 404 || r.status === 410) return { weg: true };
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
       .then(function (j) {
-        var vs = parseProduct(j) || {};
+        if (j && j.weg) { vids.forEach(function (v) { mem[String(v)] = WEG; }); persist(); return {}; }
+        var vs = parseProduct(j);
+        if (!vs) throw new Error('geen product-JSON');
         Object.keys(vs).forEach(function (vid) { mem[vid] = vs[vid]; });
+        vids.forEach(function (v) { if (!vs[String(v)]) mem[String(v)] = WEG; });
         persist();
         return vs;
       })
@@ -58,16 +71,17 @@
 
   /* Haal live info op voor een lijst {vid,url}. Max 3 tegelijk. */
   function verrijk(items) {
-    var todo = [], seen = {};
+    var perUrl = {}, todo = [];
     items.forEach(function (it) {
-      if (!it || !it.url || mem[it.vid] || seen[it.url]) return;
-      seen[it.url] = 1; todo.push(it.url);
+      if (!it || !it.url || mem[it.vid]) return;
+      if (!perUrl[it.url]) { perUrl[it.url] = []; todo.push(it.url); }
+      if (perUrl[it.url].indexOf(String(it.vid)) < 0) perUrl[it.url].push(String(it.vid));
     });
     var i = 0;
     function worker() {
       if (i >= todo.length) return Promise.resolve();
       var u = todo[i++];
-      return haalProduct(u).then(worker);
+      return haalProduct(u, perUrl[u]).then(worker);
     }
     return Promise.all([worker(), worker(), worker()]).then(function () { return mem; });
   }
@@ -152,5 +166,5 @@
     });
   }
 
-  root.EsailsLive = { verrijk: verrijk, info: info, zetInWinkelwagen: zetInWinkelwagen, track: track, ga4Items: ga4Items, _parseProduct: parseProduct };
+  root.EsailsLive = { verrijk: verrijk, info: info, _reset: function () { mem = {}; }, zetInWinkelwagen: zetInWinkelwagen, track: track, ga4Items: ga4Items, _parseProduct: parseProduct };
 })(typeof window !== 'undefined' ? window : this);

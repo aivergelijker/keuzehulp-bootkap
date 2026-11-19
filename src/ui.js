@@ -241,10 +241,15 @@
       vormDef().doeken.forEach(function (key) {
         var dk = CAT.doeken[key]; if (!dk) return;
         want.push(dk.kleuren[0]);
-        if (key === d.doek) dk.kleuren.forEach(function (k) { want.push(k); });
+        if (key === d.doek) dk.kleuren.forEach(function (k) { want.push(k); if (k.staal && k.vid === d.kleur) want.push(k.staal); });
       });
     }
     if (S.stap === 'overzicht') pakket().regels.forEach(function (r) { want.push(r); });
+    if (S.stap === 'module') zonweringDoeken().forEach(function (dk) { dk.kleuren.forEach(function (k) { want.push(k); }); });
+    if (S.stap !== 'overzicht' && d.vorm && d.doek && d.kleur) {
+      try { P.regelsVoorItem(previewItem(), CAT).regels.forEach(function (r) { want.push(r); }); } catch (e) { }
+      if (S.items.length) pakket().regels.forEach(function (r) { want.push(r); });
+    }
     var missend = want.filter(function (w) { return !live(w.vid); });
     if (!missend.length) return;
     clearTimeout(liveTimer);
@@ -276,11 +281,29 @@
       '<div class="eskh-stat"><small>Doek nodig</small><strong>' + b.plan.meters + ' m</strong></div>' +
       (b.punten ? '<div class="eskh-stat"><small>Bevestigers</small><strong>' + b.punten + '</strong></div>' :
                   '<div class="eskh-stat"><small>Rand</small><strong>' + nl(b.randCm / 100) + ' m</strong></div>');
+    if (d.doek && d.kleur && P.doekKleur(CAT, d)) {
+      var ind = indicatie();
+      if (ind != null) stats += '<div class="eskh-stat eskh-stat-ind"><small>Indicatie' + (S.items.length ? ' (totaal)' : '') + '</small><strong>' + euro(ind) + '</strong></div>';
+    }
     var plan = snijplanSVG(b.plan, kleur);
     var rolTxt = dk ? dk.doek.naam + ', ' + dk.doek.rolCm + ' cm breed' : 'indicatie bij ' + b.plan.rolCm + ' cm rolbreedte';
     return '<div class="eskh-preview"><div class="eskh-preview-vis">' + objectSVG(d, kleur) + '</div>' +
       '<div class="eskh-preview-info"><div class="eskh-stats">' + stats + '</div>' +
       '<details class="eskh-plan"><summary>Bekijk snijplan <span>(' + esc(rolTxt) + ')</span></summary>' + plan + '</details></div></div>';
+  }
+  /* prijsindicatie: dit item (met huidige keuzes) + wat al in het pakket staat */
+  function indicatie() {
+    try {
+      var regels = P.regelsVoorItem(previewItem(), CAT).regels;
+      var telt = function (r) { return !uitverkocht(r.vid); };
+      var som = regels.filter(telt).reduce(function (t, r) { return t + r.qty * prijsVan(r.vid, r.prijs); }, 0);
+      if (S.items.length && S.editIdx < 0) som += pakket().regels.filter(telt).reduce(function (t, r) { return t + r.qty * r.prijsLive; }, 0);
+      else if (S.items.length) {
+        var rest = S.items.filter(function (x, i) { return i !== S.editIdx; });
+        som += P.bouwPakket({ items: rest }, CAT).regels.filter(telt).reduce(function (t, r) { return t + r.qty * prijsVan(r.vid, r.prijs); }, 0);
+      }
+      return som;
+    } catch (e) { return null; }
   }
   function previewItem() {
     var d = JSON.parse(JSON.stringify(S.draft));
@@ -356,11 +379,25 @@
     return '';
   }
 
+  function zonweringDoeken() {
+    var keys = [];
+    Object.keys(P.MODULES.zonwering.vormen).forEach(function (v) { P.MODULES.zonwering.vormen[v].doeken.forEach(function (d) { if (keys.indexOf(d) < 0) keys.push(d); }); });
+    return keys.map(function (k) { return CAT.doeken[k]; }).filter(Boolean);
+  }
+  /* true als van alle zonwering-kleuren live bekend is dat ze niet leverbaar zijn */
+  function zonweringUitverkocht() {
+    var kl = [];
+    zonweringDoeken().forEach(function (dk) { kl = kl.concat(dk.kleuren); });
+    return kl.length > 0 && kl.every(function (k) { return uitverkocht(k.vid); });
+  }
   function stapModule() {
     var h = '<h3>Wat wil je maken?</h3><div class="eskh-grid eskh-grid-3">';
     Object.keys(MODULE_KAART).forEach(function (k) {
       var m = MODULE_KAART[k];
-      h += kaart('data-set="module" data-val="' + k + '"', '<span class="eskh-ico">' + m.icon + '</span><h4>' + m.titel + '</h4><p>' + m.tekst + '</p>', S.draft.module === k);
+      var binnenkort = k === 'zonwering' && zonweringUitverkocht();
+      h += kaart('data-set="module" data-val="' + k + '"', (binnenkort ? '<span class="eskh-badge eskh-badge-alt">Binnenkort weer leverbaar</span>' : '') +
+        '<span class="eskh-ico">' + m.icon + '</span><h4>' + m.titel + '</h4><p>' + m.tekst + '</p>' +
+        (binnenkort ? '<p class="eskh-soon">Het gaasdoek is tijdelijk uitverkocht. Je kunt alvast je pakket samenstellen en delen, of bel ' + TELEFOON + ' voor de levertijd.</p>' : ''), S.draft.module === k);
     });
     return h + '</div>';
   }
@@ -424,7 +461,15 @@
         h += '<button type="button" class="eskh-color' + (d.kleur === k.vid ? ' is-active' : '') + (uit ? ' is-out' : '') + '" data-kleur="' + k.vid + '" aria-pressed="' + (d.kleur === k.vid) + '"' + (uit ? ' aria-disabled="true"' : '') + '>' +
           '<span class="eskh-swatch" style="background:' + k.hex + '">' + sw + '</span><span class="eskh-color-name">' + esc(k.naam) + '</span>' + statusBadge(k.vid) + '</button>';
       });
-      h += '</div><p class="eskh-note">Kleuren op een scherm wijken af. Twijfel? Bestel eerst een staal of bel ons: ' + TELEFOON + '.</p>';
+      h += '</div>';
+      var gek = d.kleur && dk.kleuren.filter(function (k) { return k.vid === d.kleur; })[0];
+      var heeftStalen = dk.kleuren.some(function (k) { return k.staal; });
+      if (gek && gek.staal && !uitverkocht(gek.staal.vid)) {
+        h += '<div class="eskh-staal"><div><strong>Twijfel je over de kleur?</strong><span>Bestel eerst een staal van ' + esc(gek.naam) + ' en voel het doek zelf.</span></div>' +
+          (S.staalOk === gek.staal.vid ? '<span class="eskh-stock eskh-stock-ok">✓ Staal in je winkelwagen</span>' :
+            '<button type="button" class="eskh-btn eskh-btn-ghost eskh-btn-sm" data-act="staal"' + (S.bezig ? ' disabled' : '') + '>Staal bestellen (' + euro(prijsVan(gek.staal.vid, gek.staal.prijs)) + ')</button>') + '</div>';
+      }
+      h += '<p class="eskh-note">Kleuren op een scherm wijken af. ' + (heeftStalen ? 'Van dit doek kun je een staal bestellen. ' : '') + 'Twijfel? Bel ons: ' + TELEFOON + '.</p>';
     }
     return h;
   }
@@ -607,8 +652,9 @@
       if (!rs.length) return;
       h += '<div class="eskh-group">' + g[1] + '</div>';
       rs.forEach(function (r) {
-        var lt = r.qty * r.prijsLive; totaal += lt;
+        var lt = r.qty * r.prijsLive;
         var uit = uitverkocht(r.vid) && r.qty > 0;
+        if (!uit) totaal += lt;
         if (uit) problemen++;
         var gewijzigd = r.qty !== r.berekend;
         h += '<div class="eskh-line' + (r.qty === 0 ? ' is-zero' : '') + (uit ? ' is-out' : '') + '">' +
@@ -792,6 +838,19 @@
     if (act === 'nieuw') { S.draft = nieuwItem(); S.editIdx = -1; ga('module'); return; }
     if (act === 'rits-plus') { d.extras.ritsen.push({ type: 'spiraal', lengte: null, aantal: 1 }); render(); return; }
     if (act === 'cart') { naarWinkelwagen(); return; }
+    if (act === 'staal') {
+      var sk = P.doekKleur(CAT, d);
+      if (!sk || !sk.kleur.staal) return;
+      var st = sk.kleur.staal;
+      S.bezig = 'Staal toevoegen…'; render();
+      LIVE.zetInWinkelwagen([{ vid: st.vid, qty: 1, naam: 'Staal ' + sk.doek.naam + ' ' + sk.kleur.naam, prijs: st.prijs }]).then(function (res) {
+        S.bezig = false;
+        if (res.fout.length) S.melding = 'Het staal kon niet worden toegevoegd. Probeer het opnieuw of bel ' + TELEFOON + '.';
+        else { S.staalOk = st.vid; LIVE.track('keuzehulp_staal', { keuzehulp_doek: sk.doek.naam, keuzehulp_kleur: sk.kleur.naam }); }
+        render();
+      });
+      return;
+    }
     if (act === 'cart-retry') { retryWinkelwagen(); return; }
     if (act === 'print') { window.print(); return; }
     if (act === 'reset') { if (window.confirm('Weet je zeker dat je opnieuw wilt beginnen? Je pakket wordt gewist.')) { resetState(); try { localStorage.removeItem(STORE_KEY); } catch (e2) { } render(true); } return; }

@@ -18,7 +18,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
 const byUrl = {};
 function reg(p) { if (!p || !p.url) return; (byUrl[p.url] = byUrl[p.url] || {})[p.vid] = p; }
 Object.values(cat.p).forEach(reg); Object.values(cat.garen).forEach(reg);
-Object.values(cat.doeken).forEach(d => d.kleuren.forEach(reg));
+Object.values(cat.doeken).forEach(d => d.kleuren.forEach(k => { reg(k); if (k.staal) reg(k.staal); }));
 Object.values(cat.ritsen).forEach(r => Object.values(r).forEach(reg));
 const UITVERKOCHT = new Set([String(cat.doeken.sunbrella_plus.kleuren[1].vid)]);
 
@@ -28,7 +28,9 @@ async function run() {
   for (const scenario of SCENARIOS) {
     for (const vp of [{ w: 1280, h: 900, naam: 'desktop' }, { w: 390, h: 844, naam: 'mobiel' }]) {
       const page = await browser.newPage({ viewport: { width: vp.w, height: vp.h } });
-      const cart = {}; const posts = []; const errors = [];
+      const cart = {}; const posts = []; const errors = []; const ctx = {};
+      const weg = new Set(scenario.weg || []);
+      const uitv = new Set([...UITVERKOCHT, ...(scenario.uitverkocht || [])]);
       page.on('pageerror', e => errors.push(e.message));
       page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
       await page.route('**/*', async route => {
@@ -44,9 +46,10 @@ async function run() {
           return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ page: { cart: { products: Object.entries(cart).map(([vid, quantity]) => ({ id: 1, vid: Number(vid), quantity })) } } }) });
         if (u.pathname === '/cart/') return route.fulfill({ contentType: 'text/html', body: '<h1>cart</h1>' });
         const url = u.pathname.replace(/^\//, '');
+        if (u.searchParams.get('format') === 'json' && weg.has(url)) return route.fulfill({ status: 404, body: '' });
         if (u.searchParams.get('format') === 'json' && byUrl[url]) {
           const vs = byUrl[url]; const variants = {};
-          Object.values(vs).forEach(p => { const out = UITVERKOCHT.has(String(p.vid)); variants[p.vid] = { id: Number(p.vid), title: 'x', price: { price_incl: Math.round(p.prijs * 1.1 * 100) / 100 }, stock: { available: !out, on_stock: !out, level: out ? 0 : 50, delivery: { title: '' } } }; });
+          Object.values(vs).forEach(p => { const out = uitv.has(String(p.vid)); variants[p.vid] = { id: Number(p.vid), title: 'x', price: { price_incl: Math.round(p.prijs * 1.1 * 100) / 100 }, stock: { available: !out, on_stock: !out, level: out ? 0 : 50, delivery: { title: '' } } }; });
           return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ product: { variants } }) });
         }
         if (/webshopapp/.test(u.host)) return route.fulfill({ status: 404, body: '' });
@@ -55,22 +58,28 @@ async function run() {
       await page.goto('http://shop.test/keuzehulp/');
       const t0 = Date.now();
       try {
-        await scenario.stappen(page, SHOTS ? n => page.screenshot({ path: path.join(SHOTS, `${scenario.naam}-${vp.naam}-${n}.png`), fullPage: true }) : async () => {});
+        await scenario.stappen(page, SHOTS ? n => page.screenshot({ path: path.join(SHOTS, `${scenario.naam}-${vp.naam}-${n}.png`), fullPage: true }) : async () => {}, ctx);
+        if (scenario.alleenStappen) {
+          assert.strictEqual(errors.length, 0, 'geen JS-fouten: ' + errors.join(' | '));
+          resultaten.push(`ok   ${scenario.naam} (${vp.naam})`); await page.close(); continue;
+        }
         // overzicht
         await page.waitForSelector('.eskh-board');
         await page.waitForTimeout(300);
         const pk = await page.evaluate(() => window.EsailsKeuzehulp._pakket());
         const totaalUI = await page.textContent('.eskh-total strong');
         if (SHOTS) await page.screenshot({ path: path.join(SHOTS, `${scenario.naam}-${vp.naam}-overzicht.png`), fullPage: true });
-        scenario.check && scenario.check(pk);
+        scenario.check && scenario.check(pk, ctx, totaalUI);
         // live prijs (x1.1) moet in het totaal zitten
-        const verwacht = pk.regels.filter(r => r.qty > 0).reduce((s, r) => s + r.qty * r.prijsLive, 0);
+        const nietLeverbaar = new Set(await page.evaluate(() => window.EsailsKeuzehulp._pakket().regels.filter(r => { const l = window.EsailsLive.info(r.vid); return l && l.status && l.status.code === 'uitverkocht'; }).map(r => r.vid)));
+        const verwacht = pk.regels.filter(r => r.qty > 0 && !nietLeverbaar.has(r.vid)).reduce((s, r) => s + r.qty * r.prijsLive, 0);
         assert.strictEqual(totaalUI.replace(/\s/g, ''), ('€' + verwacht.toFixed(2).replace('.', ',')), 'totaal in UI');
-        assert.ok(pk.regels.every(r => Math.abs(r.prijsLive - Math.round(r.prijs * 1.1 * 100) / 100) < 0.001), 'live prijzen toegepast');
+        assert.ok(pk.regels.filter(r => !nietLeverbaar.has(r.vid)).every(r => Math.abs(r.prijsLive - Math.round(r.prijs * 1.1 * 100) / 100) < 0.001), 'live prijzen toegepast');
         await page.click('[data-act="cart"]');
         await page.waitForURL('**/cart/', { timeout: 15000 });
-        const verwachtCart = {};
-        pk.regels.filter(r => r.qty > 0 && !UITVERKOCHT.has(r.vid)).forEach(r => { verwachtCart[r.vid] = r.qty; });
+        const verwachtCart = Object.assign({}, ctx.extraCart || {});
+        pk.regels.filter(r => r.qty > 0 && !nietLeverbaar.has(r.vid)).forEach(r => { verwachtCart[r.vid] = (verwachtCart[r.vid] || 0) + r.qty; });
+        (scenario.weg || []).forEach(u => Object.keys(byUrl[u] || {}).forEach(v => assert.ok(!cart[v], 'opgeheven product niet in cart')));
         assert.deepStrictEqual(cart, verwachtCart, 'winkelwagen = pakket');
         assert.strictEqual(errors.length, 0, 'geen JS-fouten: ' + errors.join(' | '));
         resultaten.push(`ok   ${scenario.naam} (${vp.naam}) — ${posts.length} regels in cart, ${totaalUI}, ${Date.now() - t0} ms`);
@@ -92,8 +101,19 @@ async function zetMaat(page, key, v) { const el = page.locator(`input[type=numbe
 
 const SCENARIOS = [
   {
+    naam: 'zonwering-binnenkort',
+    alleenStappen: true,
+    uitverkocht: ['mehler_gaas', 'ferrari_362'].flatMap(d => cat.doeken[d].kleuren.map(k => String(k.vid))),
+    stappen: async page => {
+      await page.waitForSelector('.eskh-soon', { timeout: 5000 });
+      assert.ok(/Binnenkort/.test(await page.textContent('[data-val="zonwering"]')), 'badge binnenkort');
+      assert.ok(!(await page.textContent('[data-val="bootkap"]')).includes('Binnenkort'), 'bootkap niet');
+    }
+  },
+  {
     naam: 'bootkap-buiskap',
-    stappen: async (page, shot) => {
+    weg: [cat.p.loxx_sleutel.url],
+    stappen: async (page, shot, ctx) => {
       await shot('1-module');
       await klik(page, '[data-set="module"][data-val="bootkap"]');
       await klik(page, '[data-set="vorm"][data-val="buiskap"]');
@@ -106,7 +126,12 @@ const SCENARIOS = [
       // uitverkochte kleur mag niet selecteerbaar zijn
       await page.click(`[data-kleur="${cat.doeken.sunbrella_plus.kleuren[1].vid}"]`, { force: true });
       assert.ok(await page.isVisible('.eskh-melding'), 'melding bij uitverkochte kleur');
-      await klik(page, `[data-kleur="${cat.doeken.sunbrella_plus.kleuren.find(k => /Captain Navy/.test(k.naam)).vid}"]`);
+      const navy = cat.doeken.sunbrella_plus.kleuren.find(k => /Captain Navy/.test(k.naam));
+      await klik(page, `[data-kleur="${navy.vid}"]`);
+      await page.waitForSelector('[data-act="staal"]');
+      await klik(page, '[data-act="staal"]');
+      await page.waitForSelector('text=Staal in je winkelwagen');
+      ctx.extraCart = { [navy.staal.vid]: 1 };
       await shot('4-doek');
       await volgende(page);
       await shot('5-verwerking');
@@ -123,12 +148,15 @@ const SCENARIOS = [
       await volgende(page);
       await klik(page, '[data-set="bevestiging"][data-val="loxx"]');
       await klik(page, '[data-path-set="opt.loxxBasis"][data-val="bout"]');
+      await page.waitForTimeout(400);
+      ctx.indicatie = (await page.textContent('.eskh-stat-ind strong')).replace(/\s/g, '');
       await shot('7-bevestiging');
       await volgende(page);
     },
-    check: pk => {
+    check: (pk, ctx, totaalUI) => {
       const keys = pk.regels.map(r => r.key);
       ['doek', 'garen', 'raamfolie', 'tape', 'loxx_kop', 'loxx_basis', 'loxx_moer', 'loxx_sleutel', 'loxx_holpijp'].forEach(k => assert.ok(keys.includes(k), 'regel ' + k));
+      assert.strictEqual(ctx.indicatie, totaalUI.replace(/\s/g, ''), 'indicatie tijdens stappen = totaal in overzicht');
       assert.ok(keys.some(k => k.startsWith('rits_')), 'rits');
     }
   },
