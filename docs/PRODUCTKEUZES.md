@@ -233,18 +233,18 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 | druk_ykk_a | YKK YKK | Drukknoop | RVS | Deel A | 319599669 | € 0.59 | st |  | ✅ |
 | druk_ykk_b | YKK YKK | Drukknoop | RVS | Deel B | 319599676 | € 0.73 | st |  | ✅ |
 | druk_ykk_c | YKK YKK | Drukknoop | RVS | Deel C | 319599686 | € 0.59 | st |  | ✅ |
-| druk_dot_a | DOT® Fasteners DOT | Durable | Drukknoop | Deel A | RVS | 257994841 | € 0.73 | st |  | ✅ |
-| druk_dot_b | DOT® Fasteners DOT | Durable | Drukknoop | Deel B | RVS | 257994829 | € 0.77 | st |  | ✅ |
-| druk_dot_c | DOT® Fasteners DOT | Durable | Drukknoop | Deel C | Parker | RVS | 9 mm | 257994859 | € 1.79 | st |  | ✅ |
+| druk_dot_a | DOT® Fasteners DOT | Durable | Drukknoop | Deel A | RVS | 257994841 | € 0.73 | st |  | ✅ (per 10) |
+| druk_dot_b | DOT® Fasteners DOT | Durable | Drukknoop | Deel B | RVS | 257994829 | € 0.77 | st |  | ✅ (per 10) |
+| druk_dot_c | DOT® Fasteners DOT | Durable | Drukknoop | Deel C | Parker | RVS | 9 mm | 257994859 | € 1.79 | st |  | ✅ (per 10) |
 | druk_fasnap_a | Fasnap Fasnap | Drukknoop | Deel A | Koper-Vernikkeld | 286980532 | € 0.49 | st |  | ✅ |
 | druk_fasnap_b | Fasnap Fasnap | Drukknoop | Deel B | Koper-Vernikkeld | 286980536 | € 0.59 | st |  | ✅ |
 | druk_fasnap_c | Fasnap Fasnap | Drukknoop | Deel C | Koper-Vernikkeld | 286980544 | € 0.49 | st |  | ✅ |
 | druk_prym_a | Prym Prym | Drukknoop | Koper-Vernikkeld | Deel A | Stift 5 mm | 257994790 | € 0.49 | st |  | ✅ |
 | druk_prym_b | Prym Prym | Drukknoop | Koper-Vernikkeld | Deel B | Type 3000 | 257994796 | € 0.49 | st |  | ✅ |
 | druk_prym_c | Prym Prym | Drukknoop | Messing-Vernikkeld | Deel C | Type 3001 / 23 | 257994803 | € 0.49 | st |  | ✅ |
-| druk_dot_c_bout | DOT drukknoop deel C — bout RVS M5 × 9 mm | 258002241 | € 1.99 | st |  | ✅ |
-| druk_dot_c_popnagel | DOT drukknoop deel C — popnagel RVS 8 mm | 257994867 | € 1.29 | st |  | ✅ |
-| druk_dot_c_raamclip | DOT drukknoop deel C — raamclip RVS 24 mm | 257997395 | € 1.79 | st |  | ✅ |
+| druk_dot_c_bout | DOT drukknoop deel C — bout RVS M5 × 9 mm | 258002241 | € 1.99 | st |  | ✅ (per 10) |
+| druk_dot_c_popnagel | DOT drukknoop deel C — popnagel RVS 8 mm | 257994867 | € 1.29 | st |  | ✅ (per 10) |
+| druk_dot_c_raamclip | DOT drukknoop deel C — raamclip RVS 24 mm | 257997395 | € 1.79 | st |  | ✅ (per 10) |
 | druk_holpijp | Paffrath holpijp rond 3 mm | 313343275 | € 4.30 | st | ja | ✅ |
 | druk_stempel | Osborne stempel voor drukknopen (229-24) | 256701648 | € 37.95 | st | ja | ✅ |
 | ring_10_rvs | MH zeilring DIN 10 — RVS | 260094625 | € 0.45 | st |  | ✅ |
@@ -275,7 +275,6 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 | tape_9 | Seam Stick dubbelzijdig tape 9 mm (rol 50 m) | 297791084 | € 8.45 | st | ja | ✅ |
 | tape_12 | Seam Stick dubbelzijdig tape 12 mm (rol 50 m) | 297791091 | € 9.99 | st | ja | ✅ |
 | mallendoek | Mallendoek LDPE gerecycled 0,18 mm, 300 cm breed | 325737735 | € 4.95 | m |  | ✅ |
-| mallendoek_rol | Mallendoek LDPE gerecycled 0,18 mm, 300 cm breed — rol 50 m | 325737733 | € 149.75 | st |  | ✅ |
 | band_25_zwart | Polyesterband 1366 zwart 25 mm | 325093988 | € 1.22 | m |  | ✅ |
 | klemgesp | Klemgesp RVS 25 mm | 313387985 | € 2.95 | st |  | ✅ |
 | beugel_zwart | Bandbeugel nylon zwart 25 mm | 269081614 | € 1.29 | st |  | ✅ |
