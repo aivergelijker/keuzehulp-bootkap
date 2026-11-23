@@ -20,11 +20,12 @@ test('snijplan: lange zijde dwars als die past (bespaart doek)', () => {
 
 test('snijplan: paneel breder dan rol in beide richtingen wordt in banen gesplitst', () => {
   const r = C.snijplan([{ naam: 'Dekzeil', w: 600, h: 300 }], 152);
-  // 610 x 310 op 152: 3 banen x 610 = 1830 of 5 banen x 310 = 1550 -> kies 5 x 310
-  assert.strictEqual(r.stukken.length, 5);
-  assert.ok(r.extraNaadCm > 0);
-  assert.strictEqual(r.lengteCm, 5 * 310 + C.R.snijMargeCm);
-  assert.strictEqual(r.meters, 16);
+  // 610 x 310 op 152: banen altijd in de lengte (minste naden): 3 banen x 610, ook al zou dwars (5 x 310) minder doek kosten
+  assert.strictEqual(r.stukken.length, 3);
+  assert.ok(r.stukken.every(s => s.baan && s.h === 610));
+  assert.strictEqual(r.extraNaadCm, 2 * 610);
+  assert.strictEqual(r.lengteCm, 3 * 610 + C.R.snijMargeCm);
+  assert.strictEqual(r.meters, 19);
 });
 
 test('snijplan: nooit minder doek dan het oppervlak', () => {

@@ -221,7 +221,7 @@
 
   /* ---------------- werkvolgorde ---------------- */
   var BEV_STAP = {
-    loxx: function (b) { return 'Sla met de holpijp (9 mm) op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gat in de zoom en monteer de Loxx-koppen met de montagesleutel. Zet de onderdelen op de boot op dezelfde posities.'; },
+    loxx: function (b) { return 'Sla met de holpijp (9 mm) op het stansblok op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gat in de zoom en monteer de Loxx-koppen met de montagesleutel. Zet de onderdelen op de boot op dezelfde posities.'; },
     druk: function (b) { return 'Sla met de holpijp op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gaatje in de zoom en zet deel A en B met de stempel vast op het stansblok. Zet deel C op de boot op dezelfde posities.'; },
     draai: function (b) { return 'Sla met de ovale holpijp op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gat in de zoom en zet de kous en ring met de stempel vast. Monteer de draaiers op de boot op dezelfde posities.'; },
     ring: function (b) { return 'Sla met de holpijp op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gat in de zoom en zet de zeilringen met de stempel vast op het stansblok. Rijg het elastisch koord door de ringen en om de haken of knoppen.'; },

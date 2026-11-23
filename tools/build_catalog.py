@@ -134,7 +134,7 @@ add('loxx_zelftapper_rvs', 253532032, 'Loxx zelftapper RVS 12 mm (op de boot)');
 add('loxx_bout_rvs', 255769033, 'Loxx bout RVS M5 × 10 mm (op de boot)'); add('loxx_moer_rvs', 255769886, 'Loxx moer RVS M5 (voor de bout)')
 add('loxx_doekdeel_kv', 253531985, 'Loxx ontvanger/doekdeel koper-vernikkeld (doek-op-doek)')
 add('loxx_sleutel', 253911895, 'Loxx montagesleutel', perOrder=True)
-add('loxx_holpijp', 316670607, 'Holpijp 9 mm voor Loxx', perOrder=True, tool=True)
+add('loxx_holpijp', 313343441, 'Paffrath holpijp rond 9 mm — brede greep (voor Loxx)', perOrder=True, tool=True)  # handholpijp, niet het kopje voor de holpijptang
 # --- Tourniquets (draaier + kous&ring per merk, matchend formaat)
 add('draai_prym', 257993275, 'Prym tourniquet draaier #9065 messing-vernikkeld (15 × 9 mm)')
 add('draai_prym_kous', 258015200, 'Prym tourniquet kous & ring F370 (15 × 9 mm)')

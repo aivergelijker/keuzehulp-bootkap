@@ -238,10 +238,11 @@ test('buiskap: dak breder dan de rol wordt in gelijke banen gesplitst, naad in d
   const banen = b.plan.stukken.filter(s => s.baan);
   assert.strictEqual(banen.length, 2);
   assert.ok(Math.abs(banen[0].w - banen[1].w) < 1e-6, 'gelijke banen');
-  assert.strictEqual(b.plan.meters, 13);
+  assert.ok(banen.every(s => s.h === 285), 'banen in de lengte van het dak (275 + zoom)');
+  assert.strictEqual(b.plan.meters, 14);
   const dak = BT.stukken(b).find(s => s.naam === 'Dak');
   assert.strictEqual(dak.banen.n, 2);
-  assert.match(BT.html(it, b), /2 banen van 145 cm breed/);
+  assert.match(BT.html(it, b), /2 banen van 117 cm breed/);
 });
 
 test('buiskap: schuine voorkant (optioneel) en uitleg welving in de stukkenlijst', () => {
@@ -278,4 +279,55 @@ test('balkonscherm: oogjes met elastisch koord of tie-wraps, geen klittenband', 
   assert.ok(!tw.some(r => r.key === 'koord'));
   const b = P.berekenItem(it({ balkonVast: 'tiewrap' }), cat);
   assert.ok(BT.werkvolgorde(it({ balkonVast: 'tiewrap' }), b).some(s => /tie-wrap per oogje/.test(s)));
+});
+
+test('Loxx-gereedschap: holpijp rond 9 mm (brede greep) + stansblok', () => {
+  const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
+  const it = { module: 'bootkap', vorm: 'bimini', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'loxx', verwerking: 'naaien',
+    maten: { lengte: 200, breedte: 180 }, aantal: 1, opt: {}, extras: {}, gereedschap: true };
+  const regels = P.regelsVoorItem(it, cat).regels;
+  assert.strictEqual(regels.find(r => r.key === 'loxx_holpijp').vid, '313343441');
+  assert.ok(regels.some(r => r.key === 'stansblok'));
+});
+
+test('banen altijd in de lengte: dekzeil 8 × 3 m op rol 250 = 2 banen van 8,1 m', () => {
+  const k = cat.doeken.mehler_8205.kleuren[0].vid;
+  const it = { module: 'bootkap', vorm: 'dekzeil', doek: 'mehler_8205', kleur: k, bevestiging: 'ring', verwerking: 'naaien',
+    maten: { lengte: 800, breedte: 300, hoogte: 30 }, aantal: 1, opt: {}, extras: {} };
+  const banen = P.berekenItem(it, cat).plan.stukken.filter(s => s.baan);
+  assert.strictEqual(banen.length, 2);
+  assert.ok(banen.every(s => s.h === 810));
+});
+
+test('mallendoek: mal van alle stukken op 300 cm, zonder marge', () => {
+  const k = cat.doeken.ferrari_705.kleuren[0].vid;
+  const dz = maten => ({ module: 'bootkap', vorm: 'dekzeil', doek: 'ferrari_705', kleur: k, bevestiging: 'ring', verwerking: 'naaien',
+    maten, aantal: 1, opt: {}, extras: { mallendoek: true } });
+  const mal = it => P.regelsVoorItem(it, cat).regels.find(r => r.key === 'mallendoek');
+  // boot van 3 m breed: het bovenblad past in één lengte van 8 m; de rokstroken komen erbij
+  const m = mal(dz({ lengte: 800, breedte: 300, hoogte: 30 }));
+  assert.ok(m.qty >= 8 && m.qty <= 16, 'mal ' + m.qty);
+  assert.match(m.notitie, /alle stukken/);
+  // twee items delen één malplan
+  const pk = P.bouwPakket({ items: [dz({ lengte: 300, breedte: 120, hoogte: 20 }), dz({ lengte: 300, breedte: 120, hoogte: 20 })] }, cat);
+  const los = mal(dz({ lengte: 300, breedte: 120, hoogte: 20 })).qty;
+  assert.ok(pk.regels.find(r => r.key === 'mallendoek').qty <= 2 * los);
+  assert.ok(pk.snijplannen.some(g => g.soort === 'mallendoek'));
+});
+
+test('snijplannen: geen overlap, binnen de rol, banen in de lengte (raster van maten)', () => {
+  const M = [[150, 150, 70], [250, 220, 110], [400, 300, 150], [800, 300, 30], [1200, 400, 50], [2000, 800, 100]];
+  for (const [mod, m] of Object.entries(P.MODULES)) for (const [vorm, v] of Object.entries(m.vormen)) for (const doek of v.doeken) for (const [l, b, h] of M) {
+    const d = cat.doeken[doek];
+    const it = { module: mod, vorm, doek, kleur: d.kleuren[0].vid, bevestiging: v.bevestiging[0], verwerking: 'naaien',
+      maten: { lengte: l, breedte: b, hoogte: h, diameter: Math.min(l, 400), overhang: 20, radius: 30 }, aantal: 1, opt: {}, extras: {} };
+    const plan = P.berekenItem(it, cat).plan, st = plan.stukken, lbl = `${vorm}/${doek} ${l}x${b}x${h}`;
+    st.forEach((a, i) => {
+      assert.ok(a.x >= -1e-6 && a.x + a.w <= plan.rolCm + 1e-6, lbl + ' binnen de rol');
+      if (a.baan) assert.ok(a.h >= a.w - 1e-6, lbl + ' baan in de lengte');
+      for (let j = i + 1; j < st.length; j++) { const c = st[j];
+        assert.ok(!(a.x < c.x + c.w - 1e-6 && c.x < a.x + a.w - 1e-6 && a.y < c.y + c.h - 1e-6 && c.y < a.y + a.h - 1e-6), lbl + ' overlap'); }
+    });
+    assert.strictEqual(plan.meters, Math.ceil(plan.lengteCm / 100 - 1e-9), lbl + ' meters');
+  }
 });

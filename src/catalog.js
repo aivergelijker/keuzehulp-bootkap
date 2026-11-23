@@ -1707,12 +1707,12 @@
    "perOrder": true
   },
   "loxx_holpijp": {
-   "vid": "316670607",
-   "url": "holpijp-9-mm-voor-holpijp-tang.html",
-   "naam": "Holpijp 9 mm voor Loxx",
-   "prijs": 32.95,
+   "vid": "313343441",
+   "url": "holpijp-rond-9-mm.html",
+   "naam": "Paffrath holpijp rond 9 mm — brede greep (voor Loxx)",
+   "prijs": 6.42,
    "unit": "st",
-   "img": 498050071,
+   "img": 476835983,
    "perOrder": true,
    "tool": true
   },

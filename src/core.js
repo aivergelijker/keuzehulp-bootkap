@@ -45,7 +45,7 @@
 
     var nuttig = rolCm - overlap;
     /* Stukken maken. Panelen die in beide richtingen breder zijn dan de rol
-       worden in banen gesplitst, in de richting die de minste rollengte kost.
+       worden in banen gesplitst die langs de lange zijde lopen (minste naden).
        mode 'gelijk': alle banen even breed (naden symmetrisch);
        mode 'vol'   : volle rolbreedtes + een reststrook (laat soms ruimte over
                       waar andere stukken naast passen). We nemen het zuinigste;
@@ -62,10 +62,11 @@
             pieces.push(Object.assign({ naam: p.naam, w: w, h: h }, meta));
             continue;
           }
-          var nW = ceil((w - overlap) / nuttig), nH = ceil((h - overlap) / nuttig);
-          var dwars = (nW * h <= nH * w) ? w : h;     // maat die over de banen verdeeld wordt
+          // Banen altijd in de lengte: ze lopen langs de lange zijde van het stuk,
+          // zodat er zo min mogelijk banen en naden zijn (ook als dwars minder doek zou kosten).
+          var dwars = Math.min(w, h);               // maat die over de banen verdeeld wordt
           var lang = dwars === w ? h : w;
-          var n = dwars === w ? nW : nH;
+          var n = ceil((dwars - overlap) / nuttig);
           var breedtes = [], starts = [], i;
           if (mode === 'gelijk') {
             var bw = (dwars + (n - 1) * overlap) / n;

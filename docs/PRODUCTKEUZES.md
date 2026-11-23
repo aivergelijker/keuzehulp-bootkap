@@ -221,7 +221,7 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 | loxx_moer_rvs | Loxx moer RVS M5 (voor de bout) | 255769886 | € 0.19 | st |  | ✅ |
 | loxx_doekdeel_kv | Loxx ontvanger/doekdeel koper-vernikkeld (doek-op-doek) | 253531985 | € 1.59 | st |  | ✅ |
 | loxx_sleutel | Loxx montagesleutel | 253911895 | € 0.49 | st | ja | ✅ |
-| loxx_holpijp | Holpijp 9 mm voor Loxx | 316670607 | € 32.95 | st | ja | ✅ |
+| loxx_holpijp | Paffrath holpijp rond 9 mm — brede greep (voor Loxx) | 313343441 | € 6.42 | st | ja | ✅ |
 | draai_prym | Prym tourniquet draaier #9065 messing-vernikkeld (15 × 9 mm) | 257993275 | € 0.99 | st |  | ✅ |
 | draai_prym_kous | Prym tourniquet kous & ring F370 (15 × 9 mm) | 258015200 | € 0.59 | st |  | ✅ |
 | draai_mh | MH tourniquet draaier messing-vernikkeld (17 × 11 mm) | 260022585 | € 1.45 | st |  | ✅ |

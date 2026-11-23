@@ -190,7 +190,10 @@
         if (basis === 'doekdeel') R.add('loxx_basis', R.p('loxx_doekdeel_kv'), n, 'Voor doek-op-doek: de kop klikt in het doekdeel.', { groep: 'bevestiging' });
         // De montagesleutel krijgt de klant bij elke Loxx-bestelling erbij, ook zonder gereedschap.
         R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Hoort bij elke Loxx-bestelling: om de koppen in het doek te monteren.', { groep: 'bevestiging' });
-        if (gereedschap) R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat voor de kop in het doek.', { groep: 'gereedschap' });
+        if (gereedschap) {
+          R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat (9 mm) voor de kop in het doek.', { groep: 'gereedschap' });
+          R.add('stansblok', R.p('stansblok'), 1, 'Ondergrond voor de holpijp.', { groep: 'gereedschap' });
+        }
         break;
       }
       case 'druk': {
@@ -270,8 +273,10 @@
     /* extra's */
     var x = item.extras || {};
     if (x.mallendoek) {
-      var mm = b.model.oppervlakM2 * b.aantal * 1.25 / (cat.p.mallendoek.rolCm / 100);
-      R.add('mallendoek', R.p('mallendoek'), mm, 'Voor een mal van ±' + (b.model.oppervlakM2 * b.aantal).toFixed(1).replace('.', ',') + ' m², 300 cm breed.', { groep: 'extra' });
+      // Mal van alle stukken (dezelfde als het doek, incl. rokdelen), netto maat zonder zoom,
+      // op de rol mallendoek van 300 cm: een boot van 3 m breed past zo in één lengte.
+      var malPlan = C.snijplan(malPanelen(b), cat.p.mallendoek.rolCm, { zoomCm: 0 });
+      R.add('mallendoek', R.p('mallendoek'), malPlan.meters, 'Mal van alle stukken (' + malPlan.stukken.length + ' stuk' + (malPlan.stukken.length === 1 ? '' : 'ken') + ') op een rol van ' + cat.p.mallendoek.rolCm + ' cm breed.', { groep: 'extra' });
     }
     if (x.raamfolie && x.raamfolie.breedte > 0 && x.raamfolie.hoogte > 0) {
       var rf = x.raamfolie;
@@ -290,6 +295,11 @@
       if (x.trekband.beugel) R.add('beugel', R.p('beugel_' + x.trekband.beugel), s, 'Op de boot, voor het andere uiteinde.', { groep: 'extra' });
     }
     return { regels: R.list, berekening: b };
+  }
+
+  /* Mal-stukken: dezelfde stukken als het doek, netto (zonder zoom of tunnel). */
+  function malPanelen(b) {
+    return b.snijPanels.map(function (p) { return { naam: p.naam, w: p.w, h: p.h, qty: p.qty, zoomCm: 0, extraH: 0 }; });
   }
 
   /* ---------------- volledig project ---------------- */
@@ -341,6 +351,12 @@
         var g = groep(String(b.dk.kleur.vid), { soort: 'doek', dk: b.dk, rolCm: b.dk.doek.rolCm, naam: b.dk.doek.naam + ' — ' + b.dk.kleur.naam });
         g.items.push(idx); g.los += b.plan.meters;
         b.snijPanels.forEach(function (p) { g.panels.push(Object.assign({}, p, { item: idx })); });
+      }
+      var ml = r.regels.filter(function (ln) { return ln.key === 'mallendoek'; })[0];
+      if (ml) {
+        var gm = groep(String(ml.vid), { soort: 'mallendoek', rolCm: cat.p.mallendoek.rolCm, naam: ml.naam });
+        gm.items.push(idx); gm.los += ml.qty;
+        malPanelen(b).forEach(function (p) { gm.panels.push(Object.assign(p, { item: idx })); });
       }
       var fr = r.regels.filter(function (ln) { return ln.key === 'raamfolie'; })[0];
       var rf = r.item.extras && r.item.extras.raamfolie;

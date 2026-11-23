@@ -118,7 +118,8 @@ test('mallendoek: altijd per meter, ook bij grote oppervlakken', () => {
   const groot = P.regelsVoorItem({ ...base, maten: { lengte: 1200, breedte: 500, hoogte: 50 }, extras: { mallendoek: true } }, cat).regels.find(r => r.key === 'mallendoek');
   assert.strictEqual(groot.vid, String(cat.p.mallendoek.vid));
   assert.strictEqual(groot.unit, 'm');
-  assert.ok(groot.qty > 31, 'grote mal: veel meters, geen rol');
+  // bovenblad 1200 x 500 op 300 cm: 2 banen van 12 m, plus de rokstroken
+  assert.ok(groot.qty >= 24, 'grote mal: veel meters, geen rol');
   assert.ok(!Object.keys(cat.p).some(k => /mallendoek_rol/.test(k)), 'rol niet in catalogus');
 });
 
