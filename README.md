@@ -4,20 +4,27 @@ Eén keuzehulp voor esails.nl met drie modules:
 
 - **Bootkap & dekzeil**: buiskap/achtertent, bimini, dekzeil/winterkleed
 - **Afdekzeil op maat**: loungeset, tuintafel, (kogel)bbq, buitenkeuken, jacuzzi, plat zeil
-- **Zonwering**: raam (zuignappen) en balkon (elastiek)
+- **Zonwering**: raam (zuignappen) en balkon (oogjes met elastisch koord of tie-wraps)
 
 Een klant kan meerdere items in één pakket zetten, bijvoorbeeld 3 ramen en een balkon, of een bank en een bbq. Gereedschap en "1× per order"-producten worden dan maar één keer besteld.
 
 ## Installatie op Lightspeed
 
-1. Bouw het script met `npm install && npm run build` (geminified, ±35 kB gzip). Daarna staat alles in één bestand: `dist/esails-keuzehulp.js`.
-2. Upload dat bestand naar de host waar je het nu ook hebt staan (Supabase storage).
-3. Zet op de pagina:
+Het script wordt rechtstreeks vanaf GitHub geladen via jsDelivr (gratis CDN; werkt omdat deze repo openbaar is). Er hoeft niets geüpload te worden.
+
+1. Bouw het script met `npm install && npm run build` (geminified, ±35 kB gzip). Daarna staat alles in één bestand: `dist/esails-keuzehulp.js`. De CSS, de productcatalogus en alle rekenlogica zitten daarin; er is geen ander script of bestand nodig.
+2. Commit en push `dist/` naar GitHub en noteer het commitnummer (`git rev-parse --short HEAD`).
+3. Zet op de pagina in Lightspeed, met dat commitnummer:
 
 ```html
 <div id="esails-keuzehulp"></div>
-<script src="https://<jouw-host>/esails-keuzehulp.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/aivergelijker/keuzehulp-bootkap@<commit>/dist/esails-keuzehulp.js" defer></script>
 ```
+
+4. Nieuwe versie live zetten = alleen het commitnummer in die scripttag vervangen. Gebruik altijd een commitnummer (of tag), geen branchnaam: met een branchnaam kan jsDelivr tot een week een oude versie uit de cache serveren.
+
+- Het script moet op esails.nl zelf draaien: live prijzen, voorraad en de winkelwagen lopen via `/<product>.html?format=json` en `/cart/add/` op hetzelfde domein.
+- Het script wacht tot ±6 seconden op de `<div>`, dus de volgorde van div en script maakt niet uit.
 
 - Een module direct openen kan met `<div id="esails-keuzehulp" data-module="afdekzeil"></div>` of met `?keuzehulp=zonwering` in de URL.
 - De oude mount-ID's (`esails-wizard-mount`, `esails-jacuzzi-mount`, `esails-zonwering-mount`) werken ook nog.
