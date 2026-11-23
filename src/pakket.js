@@ -189,7 +189,7 @@
         }
         if (basis === 'doekdeel') R.add('loxx_basis', R.p('loxx_doekdeel_kv'), n, 'Voor doek-op-doek: de kop klikt in het doekdeel.', { groep: 'bevestiging' });
         // De montagesleutel krijgt de klant bij elke Loxx-bestelling erbij, ook zonder gereedschap.
-        R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Hoort bij elke Loxx-bestelling: om de koppen in het doek te monteren.', { groep: 'bevestiging' });
+        R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Gratis bij elke Loxx-bestelling: om de koppen in het doek te monteren.', { groep: 'bevestiging', gratis: true });
         if (gereedschap) R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat voor de kop in het doek.', { groep: 'gereedschap' });
         break;
       }
@@ -365,6 +365,7 @@
 
   function totaal(regels, prijzen) {
     return regels.reduce(function (s, r) {
+      if (r.gratis) return s; // bijv. Loxx-sleutel: gratis bij de bestelling
       var p = prijzen && prijzen[r.vid] && prijzen[r.vid].prijs != null ? prijzen[r.vid].prijs : r.prijs;
       return s + p * r.qty;
     }, 0);

@@ -162,7 +162,8 @@
   function ga4Items(regels) {
     return regels.map(function (r) {
       var l = info(r.vid);
-      return { item_id: String(r.vid), item_name: r.naam, price: Math.round(((l && l.prijs != null) ? l.prijs : r.prijs) * 100) / 100, quantity: r.qty, item_category: r.groep || '' };
+      var prijs = r.gratis ? 0 : ((l && l.prijs != null) ? l.prijs : r.prijs);
+      return { item_id: String(r.vid), item_name: r.naam, price: Math.round(prijs * 100) / 100, quantity: r.qty, item_category: r.groep || '' };
     });
   }
 
