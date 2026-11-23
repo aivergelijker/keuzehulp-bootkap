@@ -209,6 +209,7 @@ const SCENARIOS = [
       await klik(page, '[data-set="doek"][data-val="mehler_gaas"]');
       await klik(page, `[data-kleur="${cat.doeken.mehler_gaas.kleuren[0].vid}"]`);
       await volgende(page);
+      await volgende(page); // verwerking: altijd naaien
       await klik(page, '[data-set="bevestiging"][data-val="zuignap"]');
       await volgende(page);
       await page.waitForSelector('.eskh-board');
@@ -220,6 +221,7 @@ const SCENARIOS = [
       await klik(page, '[data-set="doek"][data-val="mehler_gaas"]');
       await klik(page, `[data-kleur="${cat.doeken.mehler_gaas.kleuren[1].vid}"]`);
       await volgende(page);
+      await volgende(page); // verwerking: altijd naaien
       await klik(page, '[data-set="bevestiging"][data-val="balkon"]');
       await volgende(page);
       await page.waitForSelector('.eskh-board');
