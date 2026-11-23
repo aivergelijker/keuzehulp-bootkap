@@ -1,6 +1,6 @@
 /* eSails Keuzehulp — alles gescoped onder .eskh. Pas de tokens aan op de huisstijl. */
 .eskh{--eskh-primary:#0f1c3f;--eskh-primary-2:#1d2f5e;--eskh-cta:#0f1c3f;--eskh-cta-text:#fff;--eskh-accent:#e8a33d;--eskh-text:#16181d;--eskh-muted:#5d6470;--eskh-line:#e3e5e9;--eskh-soft:#f5f6f8;--eskh-ok:#1f7a3f;--eskh-warn:#a86400;--eskh-bad:#b42318;--eskh-radius:10px;
-  font-family:inherit;color:var(--eskh-text);background:#fff;max-width:960px;margin:24px auto;padding:24px;border:1px solid var(--eskh-line);border-radius:var(--eskh-radius);box-sizing:border-box;line-height:1.5;font-size:15px}
+  font-family:inherit;color:var(--eskh-text);background:#fff;max-width:100%;margin:24px 0;padding:24px;border:1px solid var(--eskh-line);border-radius:var(--eskh-radius);box-sizing:border-box;line-height:1.5;font-size:15px}
 .eskh *,.eskh *::before,.eskh *::after{box-sizing:border-box}
 .eskh button{font:inherit}
 .eskh .eskh-card,.eskh .eskh-color,.eskh .eskh-pill,.eskh .eskh-chip,.eskh .eskh-btn-ghost,.eskh .eskh-stepper button,.eskh .eskh-item-acts button{color:var(--eskh-text)}

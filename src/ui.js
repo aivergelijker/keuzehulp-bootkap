@@ -215,7 +215,9 @@
     var idx = st.indexOf(S.stap);
     var totaalStappen = S.draft.module ? st.length : 7;
     var pct = isOverzicht ? 100 : Math.round(((idx + 1) / (totaalStappen + 1)) * 100);
-    var html = '<div class="eskh-head"><h2>' + (isOverzicht ? 'Jouw materiaalpakket' : 'eSails Keuzehulp') + '</h2>' +
+    // Heeft de pagina zelf al een titel met "keuzehulp" (bijv. de h1 van Lightspeed), dan geen tweede titel.
+    var titel = isOverzicht ? 'Jouw materiaalpakket' : (paginaHeeftTitel() ? '' : 'eSails Keuzehulp');
+    var html = '<div class="eskh-head">' + (titel ? '<h2>' + titel + '</h2>' : '') +
       '<p>' + (isOverzicht ? 'Precies berekend op jouw maten. Pas aantallen aan of voeg nog iets toe.' : 'Stel in een paar stappen je complete materiaalpakket samen. Wij rekenen alles uit.') + '</p>' +
       '<div class="eskh-progress" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"><div style="width:' + pct + '%"></div></div>' +
       '<div class="eskh-stepname">' + (isOverzicht ? 'Overzicht' : ('Stap ' + (idx + 1) + (S.draft.module ? ' van ' + st.length : '') + ' · ' + STAPNAAM[S.stap])) + '</div></div>';
@@ -1020,6 +1022,7 @@
     el.classList.add('eskh');
     root$ = el;
     injectCSS();
+    pasPaginaAan(el);
     resetState();
     var hersteld = herstel();
     var pre = el.getAttribute('data-module') || (/[?&]keuzehulp=(bootkap|afdekzeil|zonwering)/.exec(location.search) || [])[1];
@@ -1033,6 +1036,45 @@
     LIVE.track('keuzehulp_start', { keuzehulp_hersteld: hersteld });
     render();
     return true;
+  }
+
+  /* Lightspeed-pagina netjes maken vanuit het script (de CMS laat weinig aanpassen):
+     1. Staat de keuzehulp in een smalle grid-kolom (bijv. col-lg-7 in de korte omschrijving van
+        een categorie), dan krijgt die kolom de volle containerbreedte.
+     2. Staat de mount-div nog een keer op de pagina (bijv. ook in de lange omschrijving, met een
+        eigen kop), dan verbergen we die tweede div, de kop ervoor en het lege blok eromheen. */
+  function pasPaginaAan(el) {
+    try {
+      for (var c = el.parentElement; c && c !== document.body; c = c.parentElement) {
+        if (/(^|\s)col-(sm|md|lg|xl)-([1-9]|1[01])(\s|$)/.test(c.className || '')) {
+          c.style.flex = '0 0 100%'; c.style.maxWidth = '100%'; c.style.width = '100%';
+          break;
+        }
+      }
+      var sel = MOUNT_IDS.map(function (id) { return '[id="' + id + '"]'; }).join(',');
+      [].slice.call(document.querySelectorAll(sel)).forEach(function (dup) {
+        if (dup === el) return;
+        dup.style.display = 'none';
+        var kop = dup.previousElementSibling;
+        if (kop && /^H[1-6]$/.test(kop.tagName)) kop.style.display = 'none';
+        var ouder = dup.parentElement;
+        var rest = ouder ? [].slice.call(ouder.children).filter(function (k) { return k !== dup && k !== kop && (k.textContent || '').trim(); }) : [];
+        if (ouder && !rest.length) {
+          var blok = ouder.closest ? ouder.closest('.content') : null;
+          var hoeveel = blok ? (blok.textContent || '').replace(kop ? kop.textContent : '', '').trim() : 'x';
+          (blok && !hoeveel ? blok : ouder).style.display = 'none';
+        }
+      });
+    } catch (e) { /* nooit de keuzehulp zelf laten breken op de paginaopmaak */ }
+  }
+
+  var _paginaTitel = null;
+  function paginaHeeftTitel() {
+    if (_paginaTitel === null) {
+      var h1 = document.querySelector('h1');
+      _paginaTitel = !!(h1 && !root$.contains(h1) && /keuzehulp/i.test(h1.textContent || ''));
+    }
+    return _paginaTitel;
   }
 
   function injectCSS() {
