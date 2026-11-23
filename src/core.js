@@ -50,9 +50,14 @@
        mode 'vol'   : volle rolbreedtes + een reststrook (laat soms ruimte over
                       waar andere stukken naast passen). We nemen het zuinigste;
                       bij gelijke lengte de symmetrische variant. */
-    function maakStukken(mode) {
+    function moetSplitsen(p) {
+      var z = p.zoomCm != null ? p.zoomCm : zoom;
+      return Math.min(p.w + 2 * z, p.h + 2 * z + (p.extraH || 0)) > rolCm;
+    }
+    function maakStukken(modes) {
       var pieces = [], naden = 0;
-      panels.forEach(function (p) {
+      panels.forEach(function (p, pi) {
+        var mode = (modes && modes[pi]) || 'gelijk';
         var q = p.qty || 1;
         var z = p.zoomCm != null ? p.zoomCm : zoom; // zoom per paneel (bijv. tunnelzoom per item)
         for (var k = 0; k < q; k++) {
@@ -86,12 +91,32 @@
       return { pieces: pieces, naden: naden };
     }
 
-    // Probeer beide splitsingen en meerdere volgordes/oriëntaties; neem het kortste plan.
+    // Per gesplitst paneel apart kiezen tussen gelijke banen en volle banen + reststrook
+    // (alle combinaties bij maximaal 4 van zulke panelen), en per combinatie twee
+    // inpasmethodes proberen: planken (shelf) en vrije ruimtes (MaxRects, vult gaten
+    // naast grote stukken). Het kortste plan wint; bij gelijke lengte de eerste
+    // (symmetrische banen, planken).
+    var splitIdx = [];
+    panels.forEach(function (p, pi) { if (moetSplitsen(p)) splitIdx.push(pi); });
+    var combos = [];
+    if (splitIdx.length <= 4) {
+      for (var mask = 0; mask < (1 << splitIdx.length); mask++) {
+        var modes = {};
+        splitIdx.forEach(function (pi, k) { modes[pi] = (mask >> k) & 1 ? 'vol' : 'gelijk'; });
+        combos.push(modes);
+      }
+    } else {
+      combos.push({}, splitIdx.reduce(function (m, pi) { m[pi] = 'vol'; return m; }, {}));
+    }
     var best = null, bestNaden = 0;
-    ['gelijk', 'vol'].forEach(function (mode) {
-      var st = maakStukken(mode);
+    combos.forEach(function (modes) {
+      var st = maakStukken(modes);
       [0, 1, 2].forEach(function (strat) {
         var res = pakShelves(st.pieces, rolCm, strat);
+        if (!best || res.y < best.y - 1e-9) { best = res; bestNaden = st.naden; }
+      });
+      [0, 1, 2, 3].forEach(function (orde) {
+        var res = pakVrij(st.pieces, rolCm, orde);
         if (!best || res.y < best.y - 1e-9) { best = res; bestNaden = st.naden; }
       });
     });
@@ -105,6 +130,63 @@
       stukken: best.placed,
       extraNaadCm: naden
     };
+  }
+
+  /* Inpassen in vrije ruimtes (MaxRects, "laagste bovenrand eerst"):
+     de rol is een strook van rolCm breed; elk stuk gaat op de plek waar zijn
+     bovenkant zo laag mogelijk uitkomt (dus ook in een gat naast een groot paneel).
+     orde 0: langste zijde, 1: oppervlak, 2: breedte, 3: hoogte (allemaal aflopend). */
+  function pakVrij(src, rolCm, orde) {
+    var pieces = src.slice();
+    var sleutel = [
+      function (p) { return Math.max(p.w, p.h); },
+      function (p) { return p.w * p.h; },
+      function (p) { return Math.min(p.w, p.h); },
+      function (p) { return p.h; }
+    ][orde];
+    pieces.sort(function (a, b) { return sleutel(b) - sleutel(a) || b.w * b.h - a.w * a.h; });
+    var BIG = 1e7, vrij = [{ x: 0, y: 0, w: rolCm, h: BIG }], placed = [], top = 0;
+    pieces.forEach(function (s) {
+      var opties = [[s.w, s.h]];
+      if (!s.vast && s.w !== s.h) opties.push([s.h, s.w]);
+      var keus = null;
+      opties.forEach(function (o) {
+        var w = o[0], h = o[1];
+        if (w > rolCm + 1e-9) return;
+        vrij.forEach(function (f) {
+          if (w <= f.w + 1e-9 && h <= f.h + 1e-9) {
+            var boven = f.y + h;
+            if (!keus || boven < keus.boven - 1e-9 || (Math.abs(boven - keus.boven) < 1e-9 && (f.y < keus.y - 1e-9 || (Math.abs(f.y - keus.y) < 1e-9 && f.x < keus.x)))) {
+              keus = { x: f.x, y: f.y, w: w, h: h, boven: boven };
+            }
+          }
+        });
+      });
+      var r = keus;
+      placed.push(stukVrij(s, r.x, r.y, r.w, r.h));
+      top = Math.max(top, r.y + r.h);
+      // vrije ruimtes opsplitsen rond het geplaatste stuk
+      var nieuw = [];
+      vrij.forEach(function (f) {
+        if (r.x >= f.x + f.w - 1e-9 || r.x + r.w <= f.x + 1e-9 || r.y >= f.y + f.h - 1e-9 || r.y + r.h <= f.y + 1e-9) { nieuw.push(f); return; }
+        if (r.x > f.x + 1e-9) nieuw.push({ x: f.x, y: f.y, w: r.x - f.x, h: f.h });
+        if (r.x + r.w < f.x + f.w - 1e-9) nieuw.push({ x: r.x + r.w, y: f.y, w: f.x + f.w - r.x - r.w, h: f.h });
+        if (r.y > f.y + 1e-9) nieuw.push({ x: f.x, y: f.y, w: f.w, h: r.y - f.y });
+        if (r.y + r.h < f.y + f.h - 1e-9) nieuw.push({ x: f.x, y: r.y + r.h, w: f.w, h: f.y + f.h - r.y - r.h });
+      });
+      // ruimtes die helemaal in een andere liggen weghalen
+      vrij = nieuw.filter(function (a, i) {
+        return !nieuw.some(function (b, j) {
+          return i !== j && a.x >= b.x - 1e-9 && a.y >= b.y - 1e-9 && a.x + a.w <= b.x + b.w + 1e-9 && a.y + a.h <= b.y + b.h + 1e-9 && (j < i || a.w * a.h < b.w * b.h);
+        });
+      });
+    });
+    return { y: top, placed: placed };
+  }
+  function stukVrij(s, x, y, w, h) {
+    return { naam: s.naam, x: x, y: y, w: w, h: h, item: s.item, nettoW: s.nettoW, nettoH: s.nettoH, zoomCm: s.zoomCm, baan: !!s.baan,
+             baanRichting: s.baanRichting, naadPos: s.naadPos,
+             gedraaid: !s.baan && s.nettoW != null && Math.abs(w - 2 * s.zoomCm - s.nettoW) > 0.5 };
   }
 
   /* Shelf-packing met kolommen: elke plank (shelf) heeft de hoogte van

@@ -48,8 +48,15 @@
 .eskh-fields{display:grid;gap:14px}
 .eskh-field label{display:block;font-weight:600;margin-bottom:6px;font-size:14px}
 .eskh-field-row{display:flex;align-items:center;gap:14px}
-.eskh-field-row input[type=range]{flex:1;accent-color:var(--eskh-primary);min-width:0}
-.eskh input[type=range]{width:100%;accent-color:var(--eskh-primary)}
+/* Schuifjes: eigen opmaak, sterk genoeg tegen thema-stijlen (Lightspeed) */
+.eskh .eskh-field-row input[type=range]{flex:1 1 auto;width:auto;min-width:0}
+.eskh input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;margin:14px 0;padding:0;border:0;border-radius:3px;box-shadow:none;outline:none;cursor:pointer;
+  background:linear-gradient(to right,var(--eskh-primary) 0,var(--eskh-primary) var(--pct,50%),#c9cfd8 var(--pct,50%),#c9cfd8 100%)}
+.eskh input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--eskh-primary);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+.eskh input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--eskh-primary);box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer}
+.eskh input[type=range]::-moz-range-track{background:transparent;border:0}
+.eskh input[type=range]:focus-visible{outline:2px solid var(--eskh-primary);outline-offset:6px}
+.eskh .eskh-num{flex:0 0 auto}
 .eskh-num{display:inline-flex;align-items:center;border:1.5px solid var(--eskh-line);border-radius:8px;background:#fff;overflow:hidden}
 .eskh-num input{width:84px;border:0;padding:9px 6px 9px 10px;font:inherit;font-size:16px;text-align:right;background:transparent;-moz-appearance:textfield}
 .eskh-num em{font-style:normal;color:var(--eskh-muted);padding-right:10px;font-size:13px}
@@ -189,3 +196,5 @@
 .eskh-bt-stappen li{margin-bottom:4px}
 .eskh-gezamenlijk em{font-style:normal;color:#15803d;font-weight:600}
 .eskh-bt-stukken figcaption{font-size:11.5px;line-height:1.45;color:var(--eskh-text);padding:4px 4px 2px;border-top:1px dashed #e5e7eb;margin-top:4px}
+.eskh .eskh-preview-vis{align-self:start}
+.eskh .eskh-preview .eskh-bt-plan{max-width:100%;height:auto;margin-top:10px}

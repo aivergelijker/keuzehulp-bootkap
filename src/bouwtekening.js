@@ -205,7 +205,7 @@
     var lx = x0 + w + 14, my = y0 + h / 2;
     o += '<g stroke="#374151" stroke-width="1"><line x1="' + lx + '" y1="' + y0 + '" x2="' + lx + '" y2="' + (y0 + h) + '"/><line x1="' + (lx - 4) + '" y1="' + y0 + '" x2="' + (lx + 4) + '" y2="' + y0 + '"/><line x1="' + (lx - 4) + '" y1="' + (y0 + h) + '" x2="' + (lx + 4) + '" y2="' + (y0 + h) + '"/></g>' +
       '<text x="' + (lx + 14) + '" y="' + my + '" font-size="11" text-anchor="middle" fill="#111827" transform="rotate(90 ' + (lx + 14) + ' ' + my + ')">' + nl(L / 100, 2) + ' m</text>';
-    o += '<text x="' + x0 + '" y="' + (y0 + h + 18) + '" font-size="11" fill="#555">' + nl(L / 100, 2) + ' m nodig → ' + plan.meters + ' m besteld' + (plan.meters * 100 - L >= 1 ? ' (' + cm(plan.meters * 100 - L) + ' cm over)' : '') + '</text>';
+    o += '<text x="' + x0 + '" y="' + (y0 + h + 18) + '" font-size="11" fill="#555">' + nl(L / 100, 2) + ' m nodig → ' + plan.meters + ' m besteld</text>';
     return o + '</svg>';
   }
 

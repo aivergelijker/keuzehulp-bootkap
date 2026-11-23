@@ -184,6 +184,7 @@ for w, haak, lus in ((25, 260555711, 260556996), (50, 260556506, 260557218)):
     add('klit_%d_haak' % w, haak, 'Klittenband zelfklevend zwart %d mm — haak (hard)' % w, 'm'); add('klit_%d_lus' % w, lus, 'Klittenband zelfklevend zwart %d mm — lus (zacht)' % w, 'm')
 # --- Bootkap extra's
 add('raamfolie', 293617490, 'Achilles Vinistar Super raamfolie 0,4 mm (137 cm breed)', 'm', rolCm=137)
+add('raamfolie_helder05', 253834832, 'Achilles Vinistar Super raamfolie 0,5 mm (137 cm breed)', 'm', rolCm=137)  # standaard
 add('raamfolie_05', 323098115, 'Achilles Vinistar Smoke Tint raamfolie 0,5 mm (137 cm breed)', 'm', rolCm=137)
 add('tape_6', 302835931, 'Seam Stick dubbelzijdig tape 6 mm (rol 50 m)', perOrder=True)
 add('tape_9', 297791084, 'Seam Stick dubbelzijdig tape 9 mm (rol 50 m)', perOrder=True)

@@ -270,6 +270,7 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 | klit_50_haak | Klittenband zelfklevend zwart 50 mm — haak (hard) | 260556506 | € 1.99 | m |  | ✅ |
 | klit_50_lus | Klittenband zelfklevend zwart 50 mm — lus (zacht) | 260557218 | € 1.99 | m |  | ✅ |
 | raamfolie | Achilles Vinistar Super raamfolie 0,4 mm (137 cm breed) | 293617490 | € 9.32 | m |  | ✅ |
+| raamfolie_helder05 | Achilles Vinistar Super raamfolie 0,5 mm (137 cm breed) | 253834832 | € 12.95 | m |  | ✅ |
 | raamfolie_05 | Achilles Vinistar Smoke Tint raamfolie 0,5 mm (137 cm breed) | 323098115 | € 16.95 | m |  | ✅ |
 | tape_6 | Seam Stick dubbelzijdig tape 6 mm (rol 50 m) | 302835931 | € 5.20 | st | ja | ✅ |
 | tape_9 | Seam Stick dubbelzijdig tape 9 mm (rol 50 m) | 297791084 | € 8.45 | st | ja | ✅ |

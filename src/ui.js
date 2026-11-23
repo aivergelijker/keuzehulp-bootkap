@@ -234,6 +234,7 @@
         (toonVolgende ? '<button type="button" class="eskh-btn eskh-btn-primary' + (stapGeldig(S.stap) ? '' : ' is-disabled') + '" data-act="volgende" aria-disabled="' + (!stapGeldig(S.stap)) + '">' + (laatste ? 'Bekijk mijn pakket →' : 'Volgende') + '</button>' : '<span></span>') + '</div>';
     }
     root$.innerHTML = html;
+    vulSchuifjes();
     bewaar();
     if (scroll) {
       var r = root$.getBoundingClientRect();
@@ -295,7 +296,7 @@
       var ind = indicatie();
       if (ind != null) stats += '<div class="eskh-stat eskh-stat-ind"><small>Indicatie' + (S.items.length ? ' (totaal)' : '') + '</small><strong>' + euro(ind) + '</strong></div>';
     }
-    var plan = snijplanSVG(b.plan, kleur);
+    var plan = BT.snijplanSVG(b.plan, { kleur: kleur }); // vaste natuurlijke grootte: rekt niet uit bij lange rollen
     var rolTxt = dk ? dk.doek.naam + ', ' + dk.doek.rolCm + ' cm breed' : 'indicatie bij ' + b.plan.rolCm + ' cm rolbreedte';
     return '<div class="eskh-preview"><div class="eskh-preview-vis">' + objectSVG(d, kleur) + '</div>' +
       '<div class="eskh-preview-info"><div class="eskh-stats">' + stats + '</div>' +
@@ -322,19 +323,6 @@
     if (!d.doek || !CAT.doeken[d.doek]) d.doek = def.doeken[0];
     if (!P.doekKleur(CAT, d)) d.kleur = CAT.doeken[d.doek].kleuren[0].vid;
     return d;
-  }
-  function snijplanSVG(plan, kleur) {
-    var W = 300, sc = W / plan.rolCm, H = Math.max(40, plan.lengteCm * sc);
-    var maxH = 420; if (H > maxH) { sc = sc * maxH / H; H = maxH; }
-    var w = plan.rolCm * sc;
-    var s = '<svg class="eskh-plan-svg" viewBox="0 0 ' + (w + 2) + ' ' + (H + 22) + '" role="img" aria-label="Snijplan">' +
-      '<rect x="1" y="1" width="' + w + '" height="' + (plan.lengteCm * sc) + '" fill="#f3f4f6" stroke="#9aa1ab" stroke-dasharray="4 3"/>';
-    plan.stukken.forEach(function (p) {
-      s += '<rect x="' + (1 + p.x * sc) + '" y="' + (1 + p.y * sc) + '" width="' + Math.max(1, p.w * sc - 1) + '" height="' + Math.max(1, p.h * sc - 1) + '" fill="' + kleur + '" fill-opacity=".85" stroke="#fff"/>';
-      if (p.w * sc > 46 && p.h * sc > 16) s += '<text x="' + (1 + p.x * sc + 4) + '" y="' + (1 + p.y * sc + 13) + '" font-size="10" fill="' + (isLicht(kleur) ? '#111' : '#fff') + '">' + esc(p.naam.replace(/ \(baan.*\)/, '')) + '</text>';
-    });
-    s += '<text x="1" y="' + (H + 16) + '" font-size="11" fill="#555">Rol ' + plan.rolCm + ' cm breed · ' + nl(plan.lengteCm / 100, 2) + ' m lang → ' + plan.meters + ' m besteld</text></svg>';
-    return s;
   }
   function isLicht(hex) {
     var h = String(hex).replace('#', ''); if (h.length !== 6) return false;
@@ -535,7 +523,7 @@
         '<label>Breedte per raam <span class="eskh-num"><input type="number" inputmode="numeric" data-path="extras.raamfolie.breedte" value="' + (rf.breedte || '') + '" min="10" max="500"><em>cm</em></span></label>' +
         '<label>Hoogte per raam <span class="eskh-num"><input type="number" inputmode="numeric" data-path="extras.raamfolie.hoogte" value="' + (rf.hoogte || '') + '" min="10" max="200"><em>cm</em></span></label>' +
         '<label>Aantal ramen ' + stepper('extras.raamfolie.aantal', rf.aantal || 1, 1, 20, 'Aantal ramen') + '</label></div>' +
-        '<div class="eskh-pills"><span class="eskh-pills-label">Folie:</span>' + pill('data-path-set="extras.raamfolie.soort" data-val="helder"', 'Helder 0,4 mm', rf.soort !== 'smoke') + pill('data-path-set="extras.raamfolie.soort" data-val="smoke"', 'Smoke tint 0,5 mm', rf.soort === 'smoke') + '</div>' +
+        '<div class="eskh-pills"><span class="eskh-pills-label">Folie:</span>' + pill('data-path-set="extras.raamfolie.soort" data-val="helder05"', 'Helder 0,5 mm (standaard)', rf.soort !== 'helder' && rf.soort !== 'smoke') + pill('data-path-set="extras.raamfolie.soort" data-val="helder"', 'Helder 0,4 mm', rf.soort === 'helder') + pill('data-path-set="extras.raamfolie.soort" data-val="smoke"', 'Smoke tint 0,5 mm', rf.soort === 'smoke') + '</div>' +
         '<div class="eskh-pills"><span class="eskh-pills-label">Dubbelzijdig tape:</span>' + pill('data-path-set="extras.raamfolie.tape" data-val=""', 'Geen', !rf.tape) +
           ['6', '9', '12'].map(function (t) { return pill('data-path-set="extras.raamfolie.tape" data-val="' + t + '"', t + ' mm', rf.tape === t); }).join('') + '</div>' +
         (!(rf.breedte > 0 && rf.hoogte > 0) ? '<small class="eskh-err">Vul de maten van de ramen in, anders rekenen we geen folie.</small>' : '');
@@ -883,7 +871,7 @@
       var k = t.getAttribute('data-toggle');
       if (k === 'gereedschap') d.gereedschap = d.gereedschap === false;
       else if (k === 'ontvetter') d.ontvetter = d.ontvetter === false;
-      else if (k === 'extras.raamfolie') setPath(k, getPath(k) ? null : { breedte: null, hoogte: null, aantal: 1, soort: 'helder', tape: '9' });
+      else if (k === 'extras.raamfolie') setPath(k, getPath(k) ? null : { breedte: null, hoogte: null, aantal: 1, soort: 'helder05', tape: '9' });
       else if (k === 'extras.ritsen') setPath(k, (getPath(k) || []).length ? [] : [{ type: 'spiraal', lengte: ritsLengte('spiraal'), aantal: ritsDoel() ? 2 : 1 }]);
       else if (k === 'extras.trekband') setPath(k, getPath(k) ? null : { sets: trekbandSets(), beugel: 'rvs' });
       else if (k === 'maten.voorkantSchuin') { d.maten.voorkantSchuin = !d.maten.voorkantSchuin; if (d.maten.voorkantSchuin && !(d.maten.voorkantLengte > 0)) d.maten.voorkantLengte = Math.round((d.maten.hoogte || 100) * 1.2 / 5) * 5; }
@@ -975,12 +963,13 @@
       d.maten[k] = v;
       // zusterveld (slider <-> getal) direct bijwerken zonder volledige render (focus behouden)
       root$.querySelectorAll('[data-maat="' + k + '"]').forEach(function (el) { if (el !== t && v != null && !isNaN(v)) el.value = v; });
+      vulSchuifjes();
       clearTimeout(inputTimer);
       inputTimer = setTimeout(function () { renderPreviewAlleen(); }, t.type === 'range' ? 0 : 250);
       if (e.type === 'change') render();
       return;
     }
-    if (t.hasAttribute('data-afstand')) { d.afstandCm = parseInt(t.value, 10); if (e.type === 'change' || t.type === 'range') { clearTimeout(inputTimer); inputTimer = setTimeout(render, 60); } return; }
+    if (t.hasAttribute('data-afstand')) { d.afstandCm = parseInt(t.value, 10); vulSchuifjes(); if (e.type === 'change' || t.type === 'range') { clearTimeout(inputTimer); inputTimer = setTimeout(render, 60); } return; }
     if (t.hasAttribute('data-num')) {
       var key = t.getAttribute('data-num'), n = parseInt(t.value, 10);
       if (e.type !== 'change') return;
@@ -1066,6 +1055,15 @@
         }
       });
     } catch (e) { /* nooit de keuzehulp zelf laten breken op de paginaopmaak */ }
+  }
+
+  /* Schuifjes: het deel links van de knop krijgt de hoofdkleur (via --pct). */
+  function vulSchuifjes() {
+    [].forEach.call(root$.querySelectorAll('input[type=range]'), function (el) {
+      var min = parseFloat(el.min) || 0, max = parseFloat(el.max) || 100, v = parseFloat(el.value);
+      var pct = max > min ? Math.max(0, Math.min(100, (v - min) / (max - min) * 100)) : 0;
+      el.style.setProperty('--pct', pct + '%');
+    });
   }
 
   var _paginaTitel = null;

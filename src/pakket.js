@@ -281,7 +281,9 @@
     if (x.raamfolie && x.raamfolie.breedte > 0 && x.raamfolie.hoogte > 0) {
       var rf = x.raamfolie;
       var fplan = C.snijplan([{ naam: 'Raam', w: C.num(rf.breedte, 10, 500), h: C.num(rf.hoogte, 10, 200), qty: Math.max(1, rf.aantal || 1) * b.aantal }], cat.p.raamfolie.rolCm, { zoomCm: 3 });
-      R.add('raamfolie', R.p(rf.soort === 'smoke' ? 'raamfolie_05' : 'raamfolie'), fplan.meters, (rf.aantal || 1) + '× raam ' + rf.breedte + ' × ' + rf.hoogte + ' cm, rol 137 cm.', { groep: 'extra' });
+      // soort: 'helder05' = standaard (helder 0,5 mm), 'helder' = helder 0,4 mm, 'smoke' = smoke tint 0,5 mm
+      var folieKey = { helder: 'raamfolie', smoke: 'raamfolie_05' }[rf.soort] || 'raamfolie_helder05';
+      R.add('raamfolie', R.p(folieKey), fplan.meters, (rf.aantal || 1) + '× raam ' + rf.breedte + ' × ' + rf.hoogte + ' cm, rol 137 cm.', { groep: 'extra' });
       if (rf.tape) R.add('tape', R.p('tape_' + rf.tape), 1, 'Om de raamfolie vóór het stikken op zijn plaats te houden.', { groep: 'extra' });
     }
     (x.ritsen || []).forEach(function (rz, i) {

@@ -331,3 +331,25 @@ test('snijplannen: geen overlap, binnen de rol, banen in de lengte (raster van m
     assert.strictEqual(plan.meters, Math.ceil(plan.lengteCm / 100 - 1e-9), lbl + ' meters');
   }
 });
+
+test('raamfolie: helder 0,5 mm is de standaard; 0,4 mm en smoke blijven te kiezen', () => {
+  const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
+  const kap = soort => ({ module: 'bootkap', vorm: 'bimini', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'ring', verwerking: 'naaien',
+    maten: { lengte: 200, breedte: 180 }, aantal: 1, opt: {}, extras: { raamfolie: { breedte: 60, hoogte: 40, aantal: 1, soort } } });
+  const vid = soort => P.regelsVoorItem(kap(soort), cat).regels.find(r => r.key === 'raamfolie').vid;
+  assert.strictEqual(vid(undefined), '253834832');
+  assert.strictEqual(vid('helder05'), '253834832');
+  assert.strictEqual(vid('helder'), String(cat.p.raamfolie.vid));
+  assert.strictEqual(vid('smoke'), String(cat.p.raamfolie_05.vid));
+});
+
+test('snijplan vult gaten: voorkant-banen naast de smalle dakbaan (buiskap 450 × 200, schuine voorkant 150)', () => {
+  const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
+  const it = { module: 'bootkap', vorm: 'buiskap', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'druk', verwerking: 'naaien',
+    maten: { lengte: 450, breedte: 200, hoogte: 110, voorkantSchuin: true, voorkantLengte: 150 }, aantal: 1, opt: {}, extras: {} };
+  const plan = P.berekenItem(it, cat).plan;
+  assert.strictEqual(plan.meters, 20); // was 22 met alleen planken en één splitsmodus voor alles
+  const dak2 = plan.stukken.find(s => s.naam === 'Dak (baan 2/2)');
+  const voor = plan.stukken.filter(s => /^Voorkant/.test(s.naam));
+  voor.forEach(v => assert.ok(v.x >= dak2.x + dak2.w - 1e-6 && v.y >= dak2.y - 1e-6 && v.y + v.h <= dak2.y + dak2.h + 1e-6, 'voorkant ligt naast de dakbaan'));
+});

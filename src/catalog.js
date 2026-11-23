@@ -2125,6 +2125,15 @@
    "img": 447888450,
    "rolCm": 137
   },
+  "raamfolie_helder05": {
+   "vid": "253834832",
+   "url": "raamfolie-glasfolie-achilles-dikte-05-mm-breedte-1.html",
+   "naam": "Achilles Vinistar Super raamfolie 0,5 mm (137 cm breed)",
+   "prijs": 12.95,
+   "unit": "m",
+   "img": 385709668,
+   "rolCm": 137
+  },
   "raamfolie_05": {
    "vid": "323098115",
    "url": "achilles-raamfolie-glasfolie-vinistar-smoke-tint-d.html",
