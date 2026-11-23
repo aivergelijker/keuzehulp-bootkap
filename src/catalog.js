@@ -2290,6 +2290,14 @@
    "img": 387325003,
    "perOrder": true
   },
+  "tiewrap": {
+   "vid": "278827793",
+   "url": "tie-rap-zwart-vorstbestendig-76-x-370-mm-10-stuks.html",
+   "naam": "Tiewraps zwart vorstbestendig 7,6 × 370 mm (10 stuks)",
+   "prijs": 0.39,
+   "unit": "st",
+   "img": 422584818
+  },
   "zuignap": {
    "vid": "314190231",
    "url": "zuignap-met-lip-50-mm-transparant-m4-x-10-mm-met-t.html",

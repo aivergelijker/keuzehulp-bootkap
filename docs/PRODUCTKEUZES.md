@@ -22,7 +22,7 @@ Status: ✅ leverbaar · ❌ niet leverbaar op moment van crawl.
 ### Zonwering
 
 - **Voor een raam**: Mehler Polymar PVC-gaasweefsel, Serge Ferrari 362 PVC-gaasdoek — bevestiging: Zuignappen + zeilringen
-- **Voor een balkon**: Mehler Polymar PVC-gaasweefsel, Serge Ferrari 362 PVC-gaasdoek — bevestiging: Zeilringen + elastiek langs de railing, Klittenband
+- **Voor een balkon**: Mehler Polymar PVC-gaasweefsel, Serge Ferrari 362 PVC-gaasdoek — bevestiging: Oogjes + koord of tie-wraps aan de reling (geen klittenband buiten)
 
 ## Doeken en kleuren
 

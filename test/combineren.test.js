@@ -71,13 +71,14 @@ test('klittenband is zelfklevend', () => {
   }
 });
 
-test('Loxx-montagesleutel valt weg als gereedschap uit staat', () => {
+test('Loxx-montagesleutel komt bij elke Loxx-bestelling, ook zonder gereedschap', () => {
   const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
   const it = g => ({ module: 'bootkap', vorm: 'bimini', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'loxx', verwerking: 'naaien',
     maten: { lengte: 200, breedte: 180 }, aantal: 1, opt: {}, extras: {}, gereedschap: g });
   const keys = g => P.regelsVoorItem(it(g), cat).regels.map(r => r.key);
   assert.ok(keys(true).includes('loxx_sleutel'));
-  assert.ok(!keys(false).includes('loxx_sleutel'));
+  assert.ok(keys(false).includes('loxx_sleutel'));
+  assert.ok(!keys(false).includes('loxx_holpijp'));
 });
 
 test('bouwtekening: alle panelen, disclaimer en punten kloppen voor elke vorm', () => {
@@ -258,4 +259,23 @@ test('buiskap: schuine voorkant (optioneel) en uitleg welving in de stukkenlijst
   assert.strictEqual(vk(P.berekenItem(kap({ lengte: 250, breedte: 220, hoogte: 110, voorkantSchuin: false, voorkantLengte: 140 }), cat)).h, 110);
   const html = BT.html(kap({ lengte: 250, breedte: 220, hoogte: 110 }), recht);
   assert.match(html, /10% extra lengte voor de welving van het dak/);
+});
+
+test('zonwering: "Geen garen nodig" wordt gerespecteerd', () => {
+  const regels = P.regelsVoorItem(raam(120, 90, { verwerking: 'naaien', garen: null }), cat).regels;
+  assert.ok(!regels.some(r => r.key === 'garen'));
+});
+
+test('balkonscherm: oogjes met elastisch koord of tie-wraps, geen klittenband', () => {
+  assert.deepStrictEqual(P.MODULES.zonwering.vormen.balkon.bevestiging, ['balkon']);
+  const it = o => raam(290, 100, { vorm: 'balkon', bevestiging: 'balkon', afstandCm: 50, opt: o });
+  const koord = P.regelsVoorItem(it({}), cat).regels.map(r => r.key);
+  assert.ok(koord.includes('ring') && koord.includes('koord') && koord.includes('koordklem'));
+  assert.ok(!koord.includes('aanslag') && !koord.includes('tiewrap'));
+  const tw = P.regelsVoorItem(it({ balkonVast: 'tiewrap' }), cat).regels;
+  const n = tw.find(r => r.key === 'ring').qty;
+  assert.strictEqual(tw.find(r => r.key === 'tiewrap').qty, Math.ceil(n / 10));
+  assert.ok(!tw.some(r => r.key === 'koord'));
+  const b = P.berekenItem(it({ balkonVast: 'tiewrap' }), cat);
+  assert.ok(BT.werkvolgorde(it({ balkonVast: 'tiewrap' }), b).some(s => /tie-wrap per oogje/.test(s)));
 });

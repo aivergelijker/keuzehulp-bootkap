@@ -35,7 +35,7 @@
     bimini:  { icon: '☀️', tekst: 'Zonnedak op een frame. Licht en snel op te zetten.' },
     dekzeil: { icon: '⚓', tekst: 'Plat zeil over de boot: 100% waterdicht in de winter.' },
     raam:    { icon: '🪟', tekst: 'Tegen het glas met zuignappen. Geen boren, zo weer weg.', badge: 'Geen boren' },
-    balkon:  { icon: '🏙️', tekst: 'Met elastiek langs spijlen of railing. Beweegt mee met de wind.', badge: 'Voor railing' }
+    balkon:  { icon: '🏙️', tekst: 'Oogjes in de zoom, met elastisch koord of tie-wraps aan de reling of balustrade.', badge: 'Voor reling' }
   };
 
   /* Maatvelden per model */
@@ -501,7 +501,7 @@
         kaart('data-set="verwerking" data-val="naaien"', '<span class="eskh-ico">🪡</span><h4>Naaien</h4><p>Stikken met UV-bestendig garen. Vraagt een stevige naaimachine.</p>', d.verwerking === 'naaien') + '</div>';
     } else {
       h += '<h3>Garen</h3><p class="eskh-sub">' + esc(dk ? dk.doek.naam : 'Dit doek') + ' wordt gestikt. Kies het bijpassende zeilmakersgaren.</p>';
-      if (d.module === 'zonwering') h += '<div class="eskh-box"><strong>Rondom een gestikte zoom</strong><p class="eskh-note">Zeilringen kun je niet in enkel gaasdoek zetten: rondom komt een zoom van 5 cm (al meegerekend in de snijmaat). Sla de zoom om en stik hem vast, dan zit elke zeilring in twee lagen doek. Niet lijmen: lijm laat in de zon los en wordt niet mooi.</p></div>';
+      if (d.module === 'zonwering') h += '<div class="eskh-box"><strong>Rondom een gestikte zoom</strong><p class="eskh-note">Zeilringen kun je niet in enkel gaasdoek zetten: rondom komt een zoom van 5 cm (al meegerekend in de snijmaat). Sla de zoom om en stik hem vast, dan zit elke zeilring in twee lagen doek. Lijmen kan niet: gaasdoek heeft open gaatjes, daar hecht lijm niet op.</p></div>';
     }
     if (d.verwerking === 'naaien') {
       var auto = dk && dk.kleur.garen;
@@ -580,7 +580,7 @@
       tunnel: ['〰️', 'Koord door een zoom rondom: aantrekken en klaar. Simpel en strak.'],
       klit: ['🧷', 'Zelfklevend klittenband langs de rand. Geen gereedschap nodig.'],
       zuignap: ['🪟', 'Zuignappen aan de binnenzijde van het glas, met een zeilring per zuignap.'],
-      balkon: ['🏙️', 'Zeilringen in de rand, elastiek met koordhaken om de spijlen.']
+      balkon: ['🏙️', 'Oogjes (zeilringen) in de zoom, met elastisch koord of tie-wraps aan de reling of balustrade.']
     };
     def.bevestiging.forEach(function (k) {
       var bv = P.BEVESTIGING[k];
@@ -612,6 +612,10 @@
            opties('Vastzetten aan:', 'aanslag', [['koordhaak', 'Koordhaken'], ['musketon', 'Musketonhaken'], ['rondknop', 'Rondknoppen (kunststof)'], ['noorse_knop', 'Noorse knoppen (RVS)'], ['geen', 'Heb ik al']]);
     }
     if (b === 'tunnel') h += opties('Koord:', 'koordDikte', [[6, '6 mm'], [8, '8 mm']]) + opties('Kleur koord:', 'koordKleur', [['zwart', 'Zwart'], ['wit', 'Wit']]);
+    if (b === 'balkon') {
+      h += opties('Aan de reling met:', 'balkonVast', [['koord', 'Elastisch koord (shockcord)'], ['tiewrap', 'Tie-wraps']]);
+      if ((o.balkonVast || 'koord') === 'koord') h += opties('Kleur koord:', 'koordKleur', [['zwart', 'Zwart'], ['wit', 'Wit']]);
+    }
     if (b === 'klit') h += opties('Breedte:', 'klitBreedte', [[25, '25 mm'], [50, '50 mm (stevig)']]);
 
     var bv = P.BEVESTIGING[b];
@@ -851,8 +855,14 @@
       ga('maten'); return;
     }
     if (t.hasAttribute('data-kleur')) {
-      if (t.getAttribute('aria-disabled') === 'true') { S.melding = 'Deze kleur is nu niet leverbaar. Kies een andere kleur of bel ' + TELEFOON + '.'; render(); return; }
+      // Niet-leverbare kleur blokkeren, behalve als het hele doek tijdelijk uitverkocht is: dan kan de
+      // klant zijn pakket wel samenstellen en delen (zoals de modulekaart belooft); het doek gaat niet in de winkelwagen.
+      var dkAlles = CAT.doeken[d.doek], alleUit = dkAlles && dkAlles.kleuren.every(function (k) { return uitverkocht(k.vid); });
+      if (t.getAttribute('aria-disabled') === 'true' && !alleUit) { S.melding = 'Deze kleur is nu niet leverbaar. Kies een andere kleur of bel ' + TELEFOON + '.'; render(); return; }
       d.kleur = t.getAttribute('data-kleur');
+      var dkk = P.doekKleur(CAT, d);
+      if (dkk && d.verwerking === 'naaien') d.garen = dkk.kleur.garen || null;
+      if (alleUit) { S.melding = 'Dit doek is tijdelijk uitverkocht. Je kunt je pakket wel samenstellen en delen; het doek zetten we nog niet in de winkelwagen. Vragen over de levertijd? Bel ' + TELEFOON + '.'; render(); return; }
       var dk2 = P.doekKleur(CAT, d);
       if (dk2 && d.verwerking === 'naaien') d.garen = dk2.kleur.garen || null;
       S.melding = null; render(); return;

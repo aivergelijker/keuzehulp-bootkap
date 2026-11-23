@@ -225,7 +225,8 @@
     druk: function (b) { return 'Sla met de holpijp op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gaatje in de zoom en zet deel A en B met de stempel vast op het stansblok. Zet deel C op de boot op dezelfde posities.'; },
     draai: function (b) { return 'Sla met de ovale holpijp op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gat in de zoom en zet de kous en ring met de stempel vast. Monteer de draaiers op de boot op dezelfde posities.'; },
     ring: function (b) { return 'Sla met de holpijp op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een gat in de zoom en zet de zeilringen met de stempel vast op het stansblok. Rijg het elastisch koord door de ringen en om de haken of knoppen.'; },
-    balkon: function (b) { return 'Zet op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een zeilring in de zoom en bind het doek met elastiek en koordhaken aan de spijlen of railing.'; },
+    balkon: function (b, item) { return 'Zet op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een oogje (zeilring 10 mm) in de zoom. ' +
+      ((item.opt || {}).balkonVast === 'tiewrap' ? 'Zet het doek met een tie-wrap per oogje vast aan de reling of balustrade.' : 'Rijg het elastisch koord door de oogjes en om de reling of balustrade, trek het gelijkmatig aan en werk de uiteinden af met de koordklemmen.'); },
     zuignap: function (b) { return 'Zet op de afgetekende punten (in elke hoek, daartussen gelijk verdeeld) een zeilring (10 mm) in de zoom en haak er een zuignap in. Druk de zuignappen op schoon, vetvrij glas.'; },
     tunnel: function () { return 'Rijg het koord door de tunnelzoom, trek het strak en werk de uiteinden af met de koordklemmen.'; },
     klit: function () { return 'Plak het zelfklevende klittenband op een schone, droge en vetvrije ondergrond: de ene kant op het doek, de andere op het object. Druk het goed aan en laat de lijmlaag hechten voor je het belast.'; }
@@ -251,14 +252,14 @@
     } else if (item.verwerking === 'lijmen' && item.module !== 'zonwering') {
       st.push('Ontvet de randen waar de zoom komt; lijm de zoom met Saba 70T PVC-lijm. Volg de verwerkingsinstructies op de verpakking.');
     }
-    if (item.module === 'zonwering') st.push('Sla rondom een zoom van ' + cm(b.zoom) + ' cm om en stik hem vast met UV-bestendig garen' + (item.garen ? ' (Coats Terko M36)' : '') + ', zodat de zeilringen in twee lagen doek komen. Niet lijmen: lijm laat in de zon los.');
+    if (item.module === 'zonwering') st.push('Sla rondom een zoom van ' + cm(b.zoom) + ' cm om en stik hem vast met UV-bestendig garen' + (item.garen ? ' (Coats Terko M36)' : '') + ', zodat de zeilringen in twee lagen doek komen. Niet lijmen: gaasdoek heeft open gaatjes, daar hecht lijm niet op.');
     else if (item.bevestiging === 'tunnel') st.push('Vouw de onderrand om tot een tunnelzoom (' + cm(b.zoom) + ' cm) en ' + vast + ' hem dicht. Laat een opening om het koord in te rijgen.');
     else st.push('Vouw de zoom rondom om (' + cm(b.zoom) + ' cm) en ' + vast + ' hem vast' + (vast === 'stik' && !naden ? ' met UV-bestendig garen' : '') + '.');
     if (x.raamfolie && x.raamfolie.breedte > 0) st.push('Snijd de ramen uit het doek, zet de raamfolie vast met dubbelzijdig tape en stik of lijm hem rondom.');
     if (x.ritsen && x.ritsen.length) st.push(item.vorm === 'buiskap'
       ? 'Zet de ritsen over de kap: elke rits loopt van de onderkant van een zijkant over het dak tot het midden, waar de twee ritsen samenkomen.'
       : 'Zet de ritsen in op de plek van de deur of het oprolbare deel.');
-    if (BEV_STAP[item.bevestiging]) st.push(BEV_STAP[item.bevestiging](b));
+    if (BEV_STAP[item.bevestiging]) st.push(BEV_STAP[item.bevestiging](b, item));
     if (x.trekband && x.trekband.sets > 0) st.push('Zet de trekbandjes met klemgesp vast en span het doek gelijkmatig aan.');
     st.push('Pas het geheel en span het aan. Controleer na de eerste keer gebruik of alles nog strak zit.');
     return st;

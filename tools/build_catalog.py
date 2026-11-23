@@ -177,6 +177,7 @@ for k, vid in {'6_zwart': 259527665, '6_wit': 259527590, '8_zwart': 259419002, '
 add('koordhaak', 302548075, 'Koordhaak nylon wit (6–10 mm koord)')
 add('musketon', 259143564, 'Musketonhaak nylon zwart (8 mm)')
 add('koordklem', 277045622, 'Koordklem rond RVS 8 mm (koordeinden afwerken)')
+add('tiewrap', 278827793, 'Tiewraps zwart vorstbestendig 7,6 × 370 mm (10 stuks)')  # balkonscherm: één per oogje
 add('rondknop', 259998021, 'MH rondknop asymmetrisch zwart 30 × 24 mm'); add('noorse_knop', 257072753, 'Marinetech Noorse knop RVS 11 × 10 mm')
 # --- Klittenband (zelfklevend, per meter): geen naaimachine of gereedschap nodig
 for w, haak, lus in ((25, 260555711, 260556996), (50, 260556506, 260557218)):

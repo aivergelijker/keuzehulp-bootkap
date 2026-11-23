@@ -33,7 +33,7 @@
       naam: 'Zonwering',
       vormen: {
         raam:   { naam: 'Voor een raam', model: 'zonwering', doeken: ['mehler_gaas', 'ferrari_362'], bevestiging: ['zuignap'] },
-        balkon: { naam: 'Voor een balkon', model: 'zonwering', doeken: ['mehler_gaas', 'ferrari_362'], bevestiging: ['balkon', 'klit'] }
+        balkon: { naam: 'Voor een balkon', model: 'zonwering', doeken: ['mehler_gaas', 'ferrari_362'], bevestiging: ['balkon'] } // buiten: geen klittenband
       }
     }
   };
@@ -46,7 +46,7 @@
     tunnel:  { naam: 'Tunnelzoom met koord', afstand: 0 },
     klit:    { naam: 'Klittenband', afstand: 0 },
     zuignap: { naam: 'Zuignappen + zeilringen', afstand: 50 },
-    balkon:  { naam: 'Zeilringen + elastiek langs de railing', afstand: 50 }
+    balkon:  { naam: 'Oogjes + koord of tie-wraps aan de reling', afstand: 50 }
   };
 
   var TUNNEL_ZOOM_CM = 8; // extra doek per rand voor een koordtunnel
@@ -165,8 +165,9 @@
       if (gram <= 200) R.add('lijm', R.p('saba_250'), 1, 'Voor ±' + Math.round(gram) + ' g lijm (naden + zoom).', { groep: 'verwerking' });
       else R.add('lijm', R.p('saba_1l'), Math.ceil(gram / 900), 'Voor ±' + Math.round(gram) + ' g lijm (naden + zoom).', { groep: 'verwerking' });
       if (item.ontvetter !== false) R.add('ontvetter', R.p('griffon_cleaner'), 1, 'Ontvet de lijmnaden vooraf: essentieel voor een waterdichte hechting.', { groep: 'verwerking' });
-    } else if (item.garen || (item.module === 'zonwering' && b.dk && b.dk.kleur.garen)) {
-      // zonwering wordt altijd gestikt: ook bij een ouder bewaard pakket zonder garenkeuze
+    } else if (item.garen || (item.module === 'zonwering' && item.verwerking !== 'naaien' && b.dk && b.dk.kleur.garen)) {
+      // zonwering wordt altijd gestikt: een ouder bewaard pakket (nog zonder stap Verwerking) krijgt het
+      // bijpassende garen; kiest de klant zelf "Geen garen nodig", dan respecteren we dat
       var garen = cat.garen[item.garen || b.dk.kleur.garen];
       if (garen) {
         var klossen = Math.max(1, Math.ceil((b.stikCm / 100) * 5 / 800)); // dubbele stiknaad, ~2,5x draad per naadmeter, 800 m per klos
@@ -187,10 +188,9 @@
           R.add('loxx_moer', R.p('loxx_moer_rvs'), n, 'Eén moer per bout.', { groep: 'bevestiging' });
         }
         if (basis === 'doekdeel') R.add('loxx_basis', R.p('loxx_doekdeel_kv'), n, 'Voor doek-op-doek: de kop klikt in het doekdeel.', { groep: 'bevestiging' });
-        if (gereedschap) {
-          R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Om de Loxx-koppen in het doek te monteren.', { groep: 'gereedschap' });
-          R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat voor de kop in het doek.', { groep: 'gereedschap' });
-        }
+        // De montagesleutel krijgt de klant bij elke Loxx-bestelling erbij, ook zonder gereedschap.
+        R.add('loxx_sleutel', R.p('loxx_sleutel'), 1, 'Hoort bij elke Loxx-bestelling: om de koppen in het doek te monteren.', { groep: 'bevestiging' });
+        if (gereedschap) R.add('loxx_holpijp', R.p('loxx_holpijp'), 1, 'Slaat het gat voor de kop in het doek.', { groep: 'gereedschap' });
         break;
       }
       case 'druk': {
@@ -218,16 +218,27 @@
         }
         break;
       }
-      case 'ring':
       case 'balkon': {
-        var din = item.bevestiging === 'balkon' ? 10 : (o.ringDin || 12);
+        // Oogjes (zeilringen DIN 10) in de zoom; aan de reling/balustrade met elastisch koord of tie-wraps.
+        R.add('ring', R.p('ring_10_' + (o.ringMat || 'rvs')), n, 'Oogje (zeilring DIN 10) in de zoom. ' + bevNotitie, { groep: 'bevestiging' });
+        if (o.balkonVast === 'tiewrap') {
+          R.add('tiewrap', R.p('tiewrap'), Math.ceil(n / 10), n + ' tie-wraps: één per oogje, om de reling (zakjes van 10).', { groep: 'bevestiging' });
+        } else {
+          R.add('koord', R.p('shock_6_' + (o.koordKleur || 'zwart')), b.randCm * 1.5 / 100, 'Elastisch koord: door de oogjes en om de reling rijgen, incl. rijgmarge.', { groep: 'bevestiging' });
+          R.add('koordklem', R.p('koordklem'), 2 * b.aantal, 'Om de koordeinden af te werken.', { groep: 'bevestiging' });
+        }
+        if (gereedschap) R.add('ring_set', R.p('ring_10_set'), 1, 'Holpijp + stempel 10 mm voor de oogjes.', { groep: 'gereedschap' });
+        break;
+      }
+      case 'ring': {
+        var din = o.ringDin || 12;
         var mat = o.ringMat || 'rvs';
         R.add('ring', R.p('ring_' + din + '_' + mat), n, 'Zeilring DIN ' + din + ' in de rand. ' + bevNotitie, { groep: 'bevestiging' });
-        var dikte = item.bevestiging === 'balkon' ? 6 : (o.koordDikte || 6);
+        var dikte = o.koordDikte || 6;
         var kk = o.koordKleur || 'zwart';
-        var factor = item.bevestiging === 'balkon' ? 1.15 : 1.5; // rijgen in zigzag vraagt meer koord
+        var factor = 1.5; // rijgen in zigzag vraagt meer koord
         R.add('koord', R.p('shock_' + dikte + '_' + kk), b.randCm * factor / 100, 'Elastisch koord, incl. rijgmarge.', { groep: 'bevestiging' });
-        var aanslag = item.bevestiging === 'balkon' ? 'koordhaak' : (o.aanslag || 'koordhaak');
+        var aanslag = o.aanslag || 'koordhaak';
         if (aanslag !== 'geen') {
           var aanslagNaam = { koordhaak: 'Haakt het koord vast.', musketon: 'Haakt het koord vast.', rondknop: 'Op de boot/het object; koord wordt erom geslagen.', noorse_knop: 'Op de boot; koord wordt erom geslagen.' }[aanslag];
           R.add('aanslag', R.p(aanslag), n, aanslagNaam, { groep: 'bevestiging' });
