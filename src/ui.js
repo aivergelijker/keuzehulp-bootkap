@@ -271,8 +271,7 @@
     pk.regels.forEach(function (r) {
       r.berekend = r.qty;
       if (S.overrides[r.vid] != null) r.qty = S.overrides[r.vid];
-      r.prijsWas = prijsVan(r.vid, r.prijs);
-      r.prijsLive = r.gratis ? 0 : r.prijsWas;
+      r.prijsLive = prijsVan(r.vid, r.prijs);
     });
     return pk;
   }
@@ -305,11 +304,11 @@
     try {
       var regels = P.regelsVoorItem(previewItem(), CAT).regels;
       var telt = function (r) { return !uitverkocht(r.vid); };
-      var som = regels.filter(telt).reduce(function (t, r) { return t + (r.gratis ? 0 : r.qty * prijsVan(r.vid, r.prijs)); }, 0);
+      var som = regels.filter(telt).reduce(function (t, r) { return t + r.qty * prijsVan(r.vid, r.prijs); }, 0);
       if (S.items.length && S.editIdx < 0) som += pakket().regels.filter(telt).reduce(function (t, r) { return t + r.qty * r.prijsLive; }, 0);
       else if (S.items.length) {
         var rest = S.items.filter(function (x, i) { return i !== S.editIdx; });
-        som += P.bouwPakket({ items: rest }, CAT).regels.filter(telt).reduce(function (t, r) { return t + (r.gratis ? 0 : r.qty * prijsVan(r.vid, r.prijs)); }, 0);
+        som += P.bouwPakket({ items: rest }, CAT).regels.filter(telt).reduce(function (t, r) { return t + r.qty * prijsVan(r.vid, r.prijs); }, 0);
       }
       return som;
     } catch (e) { return null; }
@@ -709,9 +708,7 @@
           '<p>' + esc(r.notitie || '') + (gewijzigd ? ' <em>(berekend: ' + r.berekend + ')</em>' : '') + '</p>' +
           (uit ? '<p class="eskh-err">Dit product is nu niet leverbaar. Kies een andere variant of zet het aantal op 0. Vragen? Bel ' + TELEFOON + '.</p>' : '') + '</div></div>' +
           '<div class="eskh-line-qty">' + stepper('qty:' + r.vid, r.qty, 0, 999, 'Aantal ' + r.naam) + '<small>' + (r.unit === 'm' ? 'meter' : r.unit === 'rol' ? 'rol' : (r.verpakking > 1 ? 'stuks (per ' + r.verpakking + ')' : 'stuks')) + '</small></div>' +
-          '<div class="eskh-line-price">' + (r.gratis
-            ? '<s class="eskh-was">' + euro(r.qty * r.prijsWas) + '</s> ' + euro(0) + '<small class="eskh-gratis">Gratis</small>'
-            : euro(lt) + '<small>' + euro(r.prijsLive) + ' / ' + (r.unit === 'm' ? 'm' : 'st') + '</small>') + '</div></div>';
+          '<div class="eskh-line-price">' + euro(lt) + '<small>' + euro(r.prijsLive) + ' / ' + (r.unit === 'm' ? 'm' : 'st') + '</small></div></div>';
       });
     });
     h += '</div>';

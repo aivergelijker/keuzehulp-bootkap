@@ -279,14 +279,3 @@ test('balkonscherm: oogjes met elastisch koord of tie-wraps, geen klittenband', 
   const b = P.berekenItem(it({ balkonVast: 'tiewrap' }), cat);
   assert.ok(BT.werkvolgorde(it({ balkonVast: 'tiewrap' }), b).some(s => /tie-wrap per oogje/.test(s)));
 });
-
-test('Loxx-sleutel is gratis: telt als € 0 in het totaal', () => {
-  const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
-  const it = { module: 'bootkap', vorm: 'bimini', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'loxx', verwerking: 'naaien',
-    maten: { lengte: 200, breedte: 180 }, aantal: 1, opt: {}, extras: {}, gereedschap: true };
-  const pk = P.bouwPakket({ items: [it] }, cat);
-  const sleutel = pk.regels.find(r => r.key === 'loxx_sleutel');
-  assert.strictEqual(sleutel.gratis, true);
-  const zonder = pk.regels.filter(r => r.key !== 'loxx_sleutel').reduce((t, r) => t + r.qty * r.prijs, 0);
-  assert.ok(Math.abs(pk.totaal - zonder) < 1e-9);
-});

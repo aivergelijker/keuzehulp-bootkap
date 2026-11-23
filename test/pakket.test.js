@@ -149,8 +149,8 @@ test('doekmeters schalen met aantal en zijn altijd hele meters', () => {
 test('totaal = som van regels, live prijzen overschrijven fallback', () => {
   const item = [...alleItems()][0];
   const pk = P.bouwPakket({ items: [item] }, cat);
-  const som = pk.regels.reduce((s, r) => s + (r.gratis ? 0 : r.prijs * r.qty), 0); // gratis regels (Loxx-sleutel) tellen niet mee
+  const som = pk.regels.reduce((s, r) => s + r.prijs * r.qty, 0);
   assert.ok(Math.abs(pk.totaal - som) < 1e-9);
   const live = {}; pk.regels.forEach(r => { live[r.vid] = { prijs: 1 }; });
-  assert.strictEqual(P.totaal(pk.regels, live), pk.regels.reduce((s, r) => s + (r.gratis ? 0 : r.qty), 0));
+  assert.strictEqual(P.totaal(pk.regels, live), pk.regels.reduce((s, r) => s + r.qty, 0));
 });
