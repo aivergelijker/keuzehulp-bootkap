@@ -50,8 +50,8 @@
     zonwering: [['breedte', 'Breedte', 20, 600, 1], ['hoogte', 'Hoogte', 20, 400, 1]]
   };
   var MEETTIP = {
-    buiskap: '<strong>Zo meet je:</strong> lengte = van voorkant tot achterkant van de kap (over de beugels gemeten wij zelf de welving mee). Breedte = buitenmaat over de kuip. Hoogte = van dek tot het hoogste punt van het dak.',
-    bimini: '<strong>Zo meet je:</strong> meet het frame van buitenbeugel tot buitenbeugel. De welving rekenen wij mee.',
+    buiskap: '<strong>Zo meet je:</strong> lengte = van voorkant tot achterkant van de kap, recht gemeten. Breedte = buitenmaat over de kuip. Hoogte = van dek tot het hoogste punt van het dak. Voor de welving van het dak over de beugels rekenen wij 10% extra lengte bij het dak.',
+    bimini: '<strong>Zo meet je:</strong> meet het frame van buitenbeugel tot buitenbeugel, recht gemeten. Voor de welving van het dak rekenen wij 10% extra lengte bij.',
     plat: '<strong>Zo meet je:</strong> lengte × breedte van wat je afdekt. De overhang komt er rondom bij, zodat het zeil netjes over de rand valt.',
     dekzeil: '<strong>Zo meet je:</strong> lengte en breedte op het breedste punt van het dek, over relingen of opbouw heen. Rokhoogte = hoe ver het zeil langs de zijkant over de rand naar beneden valt. De rok maken we van vier stroken, in de hoeken aan elkaar genaaid.',
     blok: '<strong>Zo meet je:</strong> meet de buitenmaten op het breedste punt (ook kussens en armleuningen). Rokhoogte = hoe ver de hoes naar beneden valt; tot net boven de grond voorkomt opwaaien.',
@@ -118,7 +118,8 @@
     switch (stap) {
       case 'module': return !!d.module;
       case 'vorm': return !!d.vorm;
-      case 'maten': return (MAATVELDEN[modelKey()] || []).every(function (f) { var v = d.maten[f[0]]; return v != null && v !== '' && !isNaN(v) && v >= f[2] && v <= f[3]; });
+      case 'maten': return (MAATVELDEN[modelKey()] || []).every(function (f) { var v = d.maten[f[0]]; return v != null && v !== '' && !isNaN(v) && v >= f[2] && v <= f[3]; }) &&
+        (!(modelKey() === 'buiskap' && d.maten.voorkantSchuin) || (d.maten.voorkantLengte >= d.maten.hoogte && d.maten.voorkantLengte <= 400));
       case 'doek': return !!(d.doek && d.kleur && P.doekKleur(CAT, d));
       case 'verwerking': return !!d.verwerking;
       case 'extras': {
@@ -137,6 +138,11 @@
 
   function ga(stap) {
     S.stap = stap; S.melding = null;
+    // Kap: trekbandjes aan de achterkant staan standaard aan (alleen zolang de klant ze nog niet zelf aan/uit zette)
+    if (stap === 'extras' && modelKey() === 'buiskap') {
+      S.draft.extras = S.draft.extras || {};
+      if (S.draft.extras.trekband === undefined) S.draft.extras.trekband = { sets: trekbandSets(), beugel: 'rvs' };
+    }
     if (stap === 'overzicht') LIVE.track('keuzehulp_overzicht', { keuzehulp_items: S.items.length });
     else LIVE.track('keuzehulp_stap', { keuzehulp_stap: stap, keuzehulp_module: S.draft.module || '' });
     render(true);
@@ -433,7 +439,17 @@
         '<span class="eskh-num"><input id="eskh-m-' + f[0] + '" type="number" inputmode="decimal" min="' + f[2] + '" max="' + f[3] + '" step="1" value="' + (v == null ? '' : v) + '" data-maat="' + f[0] + '"><em>cm</em></span></div>' +
         (fout ? '<small class="eskh-err">Tussen ' + f[2] + ' en ' + f[3] + ' cm</small>' : '') + '</div>';
     });
-    if (mk === 'buiskap') h += '<div class="eskh-field">' + toggleRij('maten.achterkant', 'Achterkant meenemen', 'Sluit je de kap ook aan de achterzijde af (bijv. met een rits)?', !!d.maten.achterkant) + '</div>';
+    if (mk === 'buiskap') {
+      h += '<div class="eskh-field">' + toggleRij('maten.voorkantSchuin', 'Voorkant loopt schuin', 'Staat de voorkant schuin naar achteren, zoals bij de meeste buiskappen? Meet de voorkant dan langs de schuinte, van dek tot dak. Uit = we rekenen met een rechte voorkant (de hoogte).', !!d.maten.voorkantSchuin) + '</div>';
+      if (d.maten.voorkantSchuin) {
+        var vk = d.maten.voorkantLengte, hmin = C.num(d.maten.hoogte || 30, 30, 250), vfout = vk == null || isNaN(vk) || vk < hmin || vk > 400;
+        h += '<div class="eskh-field' + (vfout ? ' is-error' : '') + '"><label for="eskh-m-voorkantLengte">Lengte voorkant langs de schuinte</label>' +
+          '<div class="eskh-field-row"><input type="range" min="' + hmin + '" max="400" step="5" value="' + (vfout ? hmin : vk) + '" data-maat="voorkantLengte" aria-label="Lengte voorkant (schuif)">' +
+          '<span class="eskh-num"><input id="eskh-m-voorkantLengte" type="number" inputmode="decimal" min="' + hmin + '" max="400" step="1" value="' + (vk == null ? '' : vk) + '" data-maat="voorkantLengte"><em>cm</em></span></div>' +
+          (vfout ? '<small class="eskh-err">Tussen ' + hmin + ' (de hoogte) en 400 cm</small>' : '') + '</div>';
+      }
+      h += '<div class="eskh-field">' + toggleRij('maten.achterkant', 'Achterkant meenemen', 'Sluit je de kap ook aan de achterzijde af? Ook die zetten we langs de onderrand vast.', !!d.maten.achterkant) + '</div>';
+    }
     h += '<div class="eskh-field"><label>Aantal van dit formaat</label>' + stepper('aantal', d.aantal || 1, 1, 50, 'Aantal van dit formaat') + '</div>';
     h += '</div><p class="eskh-note">' + (MEETTIP[mk] || '') + '</p>';
     return h;
@@ -525,7 +541,8 @@
     h += '</div>';
     // ritsen
     var rz = x.ritsen || [];
-    h += '<div class="eskh-box">' + toggleRij('extras.ritsen', '🤐 Deelbare ritsen', 'YKK 10 mm, zwart. Voor een deur in de kap of een oprolbaar deel.', rz.length > 0);
+    var kap = modelKey() === 'buiskap';
+    h += '<div class="eskh-box">' + toggleRij('extras.ritsen', '🤐 Deelbare ritsen', 'YKK 10 mm, zwart. Voor een deur in de kap of een oprolbaar deel.' + (kap ? ' Bij een kap zijn het meestal twee ritsen: van de onderkant van de ene zijkant tot het midden van het dak, en vanaf het midden naar de onderkant van de andere zijkant. We zetten er alvast twee klaar van ± ' + Math.round(ritsDoel() || 0) + ' cm (hoogte + halve breedte).' : ''), rz.length > 0);
     rz.forEach(function (r, i) {
       var lengtes = r.type ? Object.keys(CAT.ritsen[r.type]) : [];
       h += '<div class="eskh-rits"><div class="eskh-pills"><span class="eskh-pills-label">Rits ' + (i + 1) + ':</span>' +
@@ -542,7 +559,7 @@
     h += '</div>';
     // trekband
     var tb = x.trekband;
-    h += '<div class="eskh-box">' + toggleRij('extras.trekband', '🎗️ Trekbandjes met klemgesp', 'Polyester band 25 mm met RVS klemgesp om de kap strak te zetten. 1 set = 1 m band + 1 gesp.', !!tb);
+    h += '<div class="eskh-box">' + toggleRij('extras.trekband', '🎗️ Trekbandjes met klemgesp', (kap ? 'Aan de achterkant van een kap zitten meestal een paar bandjes met een bandbeugel en klemgesp; die zetten we alvast aan. ' : '') + 'Polyester band 25 mm met RVS klemgesp om de kap strak te zetten. 1 set = 1 m band + 1 gesp.', !!tb);
     if (tb) {
       h += '<div class="eskh-pills"><span class="eskh-pills-label">Aantal sets:</span>' + stepper('extras.trekband.sets', tb.sets || 1, 1, 40, 'Aantal sets') + '</div>' +
         '<div class="eskh-pills"><span class="eskh-pills-label">Bandbeugel op de boot:</span>' + pill('data-path-set="extras.trekband.beugel" data-val=""', 'Geen', !tb.beugel) +
@@ -768,6 +785,26 @@
     if (S.draft.module !== m) { S.draft = nieuwItem(m); }
     LIVE.track('keuzehulp_module', { keuzehulp_module: m });
   }
+  /* Rits bij een kap: meestal één opening over de kap, van de onderkant van de
+     ene zijkant via het dak naar de onderkant van de andere zijkant, verdeeld
+     over twee ritsen die in het midden van het dak samenkomen. Eén rits is dan
+     ± hoogte + halve breedte; we kiezen de kortste leverbare lengte die dat haalt. */
+  function ritsDoel() {
+    var m = S.draft.maten || {};
+    return modelKey() === 'buiskap' && m.breedte > 0 && m.hoogte > 0 ? m.hoogte + m.breedte / 2 : null;
+  }
+  function ritsLengte(type) {
+    var lengtes = Object.keys(CAT.ritsen[type] || {}).map(Number).sort(function (a, b) { return a - b; });
+    var doel = ritsDoel();
+    if (!lengtes.length || !doel) return null;
+    for (var i = 0; i < lengtes.length; i++) if (lengtes[i] >= doel && !uitverkocht(CAT.ritsen[type][String(lengtes[i])].vid)) return lengtes[i];
+    return lengtes[lengtes.length - 1];
+  }
+  /* Trekbandjes aan de achterkant van een kap: ongeveer één per 80 cm breedte, minstens 2. */
+  function trekbandSets() {
+    var B = S.draft.maten && S.draft.maten.breedte;
+    return modelKey() === 'buiskap' && B > 0 ? Math.max(2, Math.round(B / 80)) : 4;
+  }
   function kiesVorm(v) {
     var d = S.draft;
     if (d.vorm === v) return;
@@ -824,15 +861,20 @@
     if (t.hasAttribute('data-path-set')) {
       var v = t.getAttribute('data-val'), p = t.getAttribute('data-path-set');
       if (/^opt\.(ringDin|koordDikte|klitBreedte)$/.test(p)) v = parseInt(v, 10);
-      setPath(p, v === '' ? null : v); S.melding = null; render(); return;
+      setPath(p, v === '' ? null : v);
+      // ander type rits: lengte opnieuw kiezen als die er bij dit type niet is
+      var rm = /^extras\.ritsen\.(\d+)\.type$/.exec(p);
+      if (rm) { var rz = d.extras.ritsen[+rm[1]]; if (!rz.lengte || !CAT.ritsen[v][String(rz.lengte)]) rz.lengte = ritsLengte(v); }
+      S.melding = null; render(); return;
     }
     if (t.hasAttribute('data-toggle')) {
       var k = t.getAttribute('data-toggle');
       if (k === 'gereedschap') d.gereedschap = d.gereedschap === false;
       else if (k === 'ontvetter') d.ontvetter = d.ontvetter === false;
       else if (k === 'extras.raamfolie') setPath(k, getPath(k) ? null : { breedte: null, hoogte: null, aantal: 1, soort: 'helder', tape: '9' });
-      else if (k === 'extras.ritsen') setPath(k, (getPath(k) || []).length ? [] : [{ type: 'spiraal', lengte: null, aantal: 1 }]);
-      else if (k === 'extras.trekband') setPath(k, getPath(k) ? null : { sets: 4, beugel: 'rvs' });
+      else if (k === 'extras.ritsen') setPath(k, (getPath(k) || []).length ? [] : [{ type: 'spiraal', lengte: ritsLengte('spiraal'), aantal: ritsDoel() ? 2 : 1 }]);
+      else if (k === 'extras.trekband') setPath(k, getPath(k) ? null : { sets: trekbandSets(), beugel: 'rvs' });
+      else if (k === 'maten.voorkantSchuin') { d.maten.voorkantSchuin = !d.maten.voorkantSchuin; if (d.maten.voorkantSchuin && !(d.maten.voorkantLengte > 0)) d.maten.voorkantLengte = Math.round((d.maten.hoogte || 100) * 1.2 / 5) * 5; }
       else setPath(k, !getPath(k));
       render(); return;
     }
@@ -865,7 +907,7 @@
     if (act === 'vorige') { vorige(); return; }
     if (act === 'naar-overzicht') { ga('overzicht'); return; }
     if (act === 'nieuw') { S.draft = nieuwItem(); S.editIdx = -1; ga('module'); return; }
-    if (act === 'rits-plus') { d.extras.ritsen.push({ type: 'spiraal', lengte: null, aantal: 1 }); render(); return; }
+    if (act === 'rits-plus') { d.extras.ritsen.push({ type: 'spiraal', lengte: ritsLengte('spiraal'), aantal: 1 }); render(); return; }
     if (act === 'cart') { naarWinkelwagen(); return; }
     if (act === 'staal') {
       var sk = P.doekKleur(CAT, d);

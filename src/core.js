@@ -222,10 +222,13 @@
     buiskap: function (i) {
       var L = num(i.lengte, 50, 800), B = num(i.breedte, 50, 500), H = num(i.hoogte, 30, 250);
       var dak = L * 1.1; // welving over de beugels
+      // Schuine voorkant (optioneel): de voorkant wordt gemeten langs de schuinte,
+      // van dek tot dak. Zonder die maat rekenen we met een rechte voorkant (= hoogte).
+      var V = i.voorkantSchuin ? Math.max(H, num(i.voorkantLengte || H, 30, 400)) : H;
       var panels = [
-        { naam: 'Dak', w: dak, h: B },
+        { naam: 'Dak', w: dak, h: B, noot: 'Incl. 10% extra lengte voor de welving van het dak.' },
         { naam: 'Zijkant', w: L, h: H, qty: 2 },
-        { naam: 'Voorkant', w: B, h: H }
+        { naam: 'Voorkant', w: B, h: V, noot: V > H ? 'Hoogte langs de schuinte gemeten (' + Math.round(V) + ' cm).' : null }
       ];
       if (i.achterkant) panels.push({ naam: 'Achterkant', w: B, h: H });
       var rand = 2 * L + B + (i.achterkant ? B : 0);
@@ -237,7 +240,7 @@
     /* Bimini / zonnedek: één dakpaneel */
     bimini: function (i) {
       var L = num(i.lengte, 50, 600), B = num(i.breedte, 50, 400);
-      var panels = [{ naam: 'Bimini-dak', w: L * 1.1, h: B }];
+      var panels = [{ naam: 'Bimini-dak', w: L * 1.1, h: B, noot: 'Incl. 10% extra lengte voor de welving van het dak.' }];
       var rand = 2 * (L * 1.1 + B);
       return { panels: panels, randCm: rand, gesloten: true, zoomCm: rand, oppervlakM2: oppervlak(panels), rand: rechthoek(L * 1.1, B, 'Bimini-dak') };
     },

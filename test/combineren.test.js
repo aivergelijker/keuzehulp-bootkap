@@ -242,3 +242,20 @@ test('buiskap: dak breder dan de rol wordt in gelijke banen gesplitst, naad in d
   assert.strictEqual(dak.banen.n, 2);
   assert.match(BT.html(it, b), /2 banen van 145 cm breed/);
 });
+
+test('buiskap: schuine voorkant (optioneel) en uitleg welving in de stukkenlijst', () => {
+  const sb = cat.doeken.sunbrella_plus.kleuren[0].vid;
+  const kap = maten => ({ module: 'bootkap', vorm: 'buiskap', doek: 'sunbrella_plus', kleur: sb, bevestiging: 'druk', verwerking: 'naaien', garen: 'zwart',
+    maten, aantal: 1, afstandCm: 25, opt: {}, extras: {} });
+  const recht = P.berekenItem(kap({ lengte: 250, breedte: 220, hoogte: 110 }), cat);
+  const schuin = P.berekenItem(kap({ lengte: 250, breedte: 220, hoogte: 110, voorkantSchuin: true, voorkantLengte: 140 }), cat);
+  const vk = b => b.model.panels.find(p => p.naam === 'Voorkant');
+  assert.strictEqual(vk(recht).h, 110);
+  assert.strictEqual(vk(schuin).h, 140);
+  // korter dan de hoogte kan niet: dan blijft het de hoogte
+  assert.strictEqual(vk(P.berekenItem(kap({ lengte: 250, breedte: 220, hoogte: 110, voorkantSchuin: true, voorkantLengte: 80 }), cat)).h, 110);
+  // uit = rechte voorkant, ook als er nog een lengte bewaard staat
+  assert.strictEqual(vk(P.berekenItem(kap({ lengte: 250, breedte: 220, hoogte: 110, voorkantSchuin: false, voorkantLengte: 140 }), cat)).h, 110);
+  const html = BT.html(kap({ lengte: 250, breedte: 220, hoogte: 110 }), recht);
+  assert.match(html, /10% extra lengte voor de welving van het dak/);
+});

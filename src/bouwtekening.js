@@ -36,7 +36,7 @@
       var deelW = delen > 1 ? sp.w : p.w;
       var bn = (b.plan.stukken || []).filter(function (x) { return x.baan && x.naam.indexOf(p.naam + ' (baan') === 0; });
       var banen = bn.length ? { n: bn.length / ((p.qty || 1) * b.aantal), richting: bn[0].baanRichting, naadPos: bn[0].naadPos || [], breedte: bn[0].w } : null;
-      return { nr: nr, naam: p.naam, qty: (p.qty || 1) * b.aantal, nettoW: p.w, nettoH: p.h, banen: banen,
+      return { nr: nr, naam: p.naam, noot: p.noot || null, qty: (p.qty || 1) * b.aantal, nettoW: p.w, nettoH: p.h, banen: banen,
                snijW: deelW + 2 * z, snijH: p.h + 2 * z + ex, tekenW: p.w + 2 * z, zoom: z, extraH: ex,
                delen: delen, deelNetto: deelW, rond: /rond\)/.test(p.naam) };
     });
@@ -255,7 +255,9 @@
     else if (item.bevestiging === 'tunnel') st.push('Vouw de onderrand om tot een tunnelzoom (' + cm(b.zoom) + ' cm) en ' + vast + ' hem dicht. Laat een opening om het koord in te rijgen.');
     else st.push('Vouw de zoom rondom om (' + cm(b.zoom) + ' cm) en ' + vast + ' hem vast' + (vast === 'stik' && !naden ? ' met UV-bestendig garen' : '') + '.');
     if (x.raamfolie && x.raamfolie.breedte > 0) st.push('Snijd de ramen uit het doek, zet de raamfolie vast met dubbelzijdig tape en stik of lijm hem rondom.');
-    if (x.ritsen && x.ritsen.length) st.push('Zet de ritsen in op de plek van de deur of het oprolbare deel.');
+    if (x.ritsen && x.ritsen.length) st.push(item.vorm === 'buiskap'
+      ? 'Zet de ritsen over de kap: elke rits loopt van de onderkant van een zijkant over het dak tot het midden, waar de twee ritsen samenkomen.'
+      : 'Zet de ritsen in op de plek van de deur of het oprolbare deel.');
     if (BEV_STAP[item.bevestiging]) st.push(BEV_STAP[item.bevestiging](b));
     if (x.trekband && x.trekband.sets > 0) st.push('Zet de trekbandjes met klemgesp vast en span het doek gelijkmatig aan.');
     st.push('Pas het geheel en span het aan. Controleer na de eerste keer gebruik of alles nog strak zit.');
@@ -272,7 +274,7 @@
     h += '<p class="eskh-bt-disclaimer"><strong>Let op:</strong> ' + esc(DISCLAIMER) + '</p>';
     h += '<h5>Stukken</h5><table class="eskh-bt-tabel"><thead><tr><th>#</th><th>Stuk</th><th>Aantal</th><th>Netto maat</th><th>Snijmaat</th></tr></thead><tbody>';
     lijst.forEach(function (s) {
-      h += '<tr><td>' + s.nr + '</td><td>' + esc(s.naam) + '</td><td>' + s.qty + '</td><td>' + cm(s.nettoW) + ' × ' + cm(s.nettoH) + ' cm</td><td>' + (s.delen > 1 ? s.delen + ' delen van ' : '') + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm' + (s.banen && s.banen.n > 1 ? ' <small>(' + s.banen.n + ' banen)</small>' : '') + '</td></tr>';
+      h += '<tr><td>' + s.nr + '</td><td>' + esc(s.naam) + (s.noot ? '<br><small>' + esc(s.noot) + '</small>' : '') + '</td><td>' + s.qty + '</td><td>' + cm(s.nettoW) + ' × ' + cm(s.nettoH) + ' cm</td><td>' + (s.delen > 1 ? s.delen + ' delen van ' : '') + cm(s.snijW) + ' × ' + cm(s.snijH) + ' cm' + (s.banen && s.banen.n > 1 ? ' <small>(' + s.banen.n + ' banen)</small>' : '') + '</td></tr>';
     });
     h += '</tbody></table>';
     var bevTxt = '';
